@@ -132,10 +132,11 @@ export class CourseFormComponent implements OnInit {
       return;
     }
 
+
     this.isLoading = true;
 
     const courseData: CourseDetailsResponse = this.courseForm.value;
-
+    console.log(courseData);
     let operation: Observable<any>;
     if (this.isEditMode && this.courseId) {
       operation = this.courseService.updateCourse(this.courseId, courseData);

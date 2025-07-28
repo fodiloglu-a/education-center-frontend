@@ -19,7 +19,7 @@
         <h3 class="course-title">{{ course.title }}</h3>
         <p class="course-description">{{ course.description }}</p>
         <div class="course-meta">
-          <span class="instructor-name">{{ 'INSTRUCTOR' | translate }}: {{ course.instructorName }}</span>
+          <span class="instructor-name">{{ 'ROLE_INSTRUCTOR' | translate }}: {{ course.instructorName }}</span>
           <span class="course-price">{{ course.price | currency:'USD':'symbol':'1.2-2':'uk' }}</span> <!-- Para birimi formatı -->
         </div>
         <button class="view-details-button primary-btn">{{ 'VIEW_DETAILS' | translate }}</button>

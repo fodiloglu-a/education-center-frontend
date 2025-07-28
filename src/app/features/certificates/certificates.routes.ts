@@ -31,7 +31,7 @@ export const CERTIFICATES_ROUTES: Routes = [
     path: 'generate/:userId/:courseId', // '/certificates/generate/:userId/:courseId' yolu (sertifika oluşturma - ADMIN/INSTRUCTOR için)
     component: CertificateDetailComponent, // Oluşturulduktan sonra detayını gösterebiliriz
     canActivate: [AuthGuard, RoleGuard], // Oturum açmış ve belirli bir role sahip kullanıcılar erişebilir
-    data: { roles: ['ROLE_ADMIN', 'INSTRUCTOR'] }, // Sadece ADMIN veya INSTRUCTOR oluşturabilir
+    data: { roles: ['ROLE_ADMIN', 'ROLE_INSTRUCTOR'] }, // Sadece ADMIN veya INSTRUCTOR oluşturabilir
     title: 'Sertifika Oluştur'
   }
 ];

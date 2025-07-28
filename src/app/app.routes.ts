@@ -37,7 +37,7 @@ export const routes: Routes = [
     path: 'instructor', // Yeni eğitmen rotası
     loadChildren: () => import('./features/instructor/instructor.routes').then(m => m.INSTRUCTOR_ROUTES),
     canActivate: [AuthGuard, RoleGuard], // Oturum açmış ve belirli bir role sahip kullanıcılar erişebilir
-    data: { roles: ['INSTRUCTOR', 'ROLE_ADMIN'] }, // Sadece eğitmenler veya adminler erişebilir
+    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] }, // Sadece eğitmenler veya adminler erişebilir
     title: 'Eğitmen Paneli'
   },
   {

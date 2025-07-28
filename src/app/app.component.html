@@ -17,7 +17,7 @@
           <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a></li>
           <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active">{{ 'CERTIFICATES' | translate }}</a></li>
           <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active">{{ 'REVIEWS' | translate }}</a></li>
-          <li *ngIf="hasRole('ROLE_ADMIN') | async"><a routerLink="/instructor" routerLinkActive="active">{{ 'ADMIN_PANEL' | translate }}</a></li>
+            <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active">{{ 'ADMIN_PANEL' | translate }}</a></li>
         </ul>
       </nav>
 

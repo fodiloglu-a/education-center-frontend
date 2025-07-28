@@ -28,7 +28,7 @@ export const COURSES_ROUTES: Routes = [
     path: 'new',
     component: CourseFormComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['INSTRUCTOR', 'ROLE_ADMIN'] },
+    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
     title: 'Yeni Eğitim Oluştur'
   },
 
@@ -37,7 +37,7 @@ export const COURSES_ROUTES: Routes = [
     path: ':courseId/edit',
     component: CourseFormComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['INSTRUCTOR', 'ROLE_ADMIN'] },
+    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
     title: 'Eğitimi Düzenle'
   },
 
@@ -46,7 +46,7 @@ export const COURSES_ROUTES: Routes = [
     path: ':courseId/lessons/new',
     component: LessonFormComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['INSTRUCTOR', 'ROLE_ADMIN'] },
+    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
     title: 'Yeni Ders Ekle'
   },
 
@@ -55,7 +55,7 @@ export const COURSES_ROUTES: Routes = [
     path: ':courseId/lessons/:lessonId/edit',
     component: LessonFormComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['INSTRUCTOR', 'ROLE_ADMIN'] },
+    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
     title: 'Dersi Düzenle'
   },
 

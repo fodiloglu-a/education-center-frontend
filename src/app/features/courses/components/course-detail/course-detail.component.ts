@@ -55,7 +55,7 @@ export class CourseDetailComponent implements OnInit {
     });
 
     this.tokenService.userRole$.subscribe(role => {
-      this.isInstructorOrAdmin = role === 'INSTRUCTOR' || role === 'ROLE_ADMIN';
+      this.isInstructorOrAdmin = role === 'ROLE_INSTRUCTOR' || role === 'ROLE_ADMIN';
     });
   }
 

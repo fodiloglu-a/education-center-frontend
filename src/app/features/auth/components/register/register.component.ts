@@ -29,7 +29,7 @@ export class RegisterComponent implements OnInit {
   isLoading: boolean = false;
   roles: { value: string; labelKey: string }[] = [
     { value: 'ROLE_USER', labelKey: 'ROLE_LEARNER' },
-    { value: 'INSTRUCTOR', labelKey: 'INSTRUCTOR' }
+    { value: 'ROLE_INSTRUCTOR', labelKey: 'ROLE_INSTRUCTOR' }
   ];
 
   constructor(
