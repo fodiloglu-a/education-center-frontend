@@ -1,0 +1,60 @@
+<!-- instructor-dashboard.component.html -->
+
+<div class="dashboard-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <h2 class="page-title">{{ 'INSTRUCTOR_DASHBOARD' | translate }}</h2>
+  <p class="page-subtitle">{{ 'INSTRUCTOR_DASHBOARD_SUBTITLE' | translate }}</p>
+
+  <div class="dashboard-content" *ngIf="!isLoading && stats">
+    <!-- İstatistik Kartları -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="material-icons stat-icon">school</span>
+        <h3>{{ 'TOTAL_COURSES' | translate }}</h3>
+        <p class="stat-value">{{ stats.totalCourses }}</p>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon">group</span>
+        <h3>{{ 'TOTAL_STUDENTS' | translate }}</h3>
+        <p class="stat-value">{{ stats.totalStudents }}</p>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon">star_half</span>
+        <h3>{{ 'AVERAGE_RATING' | translate }}</h3>
+        <p class="stat-value">{{ stats.averageRating | number:'1.1-1' }}</p>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons stat-icon">reviews</span>
+        <h3>{{ 'TOTAL_REVIEWS' | translate }}</h3>
+        <p class="stat-value">{{ stats.totalReviews }}</p>
+      </div>
+    </div>
+
+    <!-- Hızlı Erişim Butonları -->
+    <div class="quick-actions">
+      <h3 class="section-title">{{ 'QUICK_ACTIONS' | translate }}</h3>
+      <div class="action-buttons-grid">
+        <a [routerLink]="['/courses', 'new']" class="action-button primary-btn">
+          <span class="material-icons">add_circle</span> {{ 'CREATE_NEW_COURSE' | translate }}
+        </a>
+        <a [routerLink]="['/instructor', 'courses']" class="action-button secondary-btn">
+          <span class="material-icons">list_alt</span> {{ 'MY_COURSES' | translate }}
+        </a>
+        <a [routerLink]="['/instructor', 'reviews']" class="action-button secondary-btn">
+          <span class="material-icons">comment</span> {{ 'MY_REVIEWS' | translate }}
+        </a>
+        <!-- İleride eklenebilecek diğer hızlı eylemler -->
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !stats && !errorMessage" class="no-content-found">
+    <p>{{ 'NO_DASHBOARD_STATS' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadDashboardStats(instructorId || 0)">{{ 'RETRY_LOAD_STATS' | translate }}</button>
+  </div>
+</div>

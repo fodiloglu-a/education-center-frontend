@@ -1,0 +1,75 @@
+<!-- review-form.component.html -->
+
+<div class="review-form-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <div class="review-form-card" *ngIf="!isLoading">
+    <h2 class="card-title">
+      <ng-container *ngIf="isEditMode">{{ 'EDIT_REVIEW' | translate }}</ng-container>
+      <ng-container *ngIf="!isEditMode">{{ 'ADD_REVIEW' | translate }}</ng-container>
+    </h2>
+    <p class="card-subtitle">
+      <ng-container *ngIf="isEditMode">{{ 'EDIT_REVIEW_SUBTITLE' | translate }}</ng-container>
+      <ng-container *ngIf="!isEditMode">{{ 'ADD_REVIEW_SUBTITLE' | translate }}</ng-container>
+    </p>
+    <p class="course-context-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ courseTitle }}</strong></p>
+
+    <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" class="review-form">
+      <!-- Puan Alanı -->
+      <div class="form-group">
+        <label for="rating">{{ 'RATING' | translate }}</label>
+        <select id="rating" formControlName="rating" class="form-control"
+                [class.is-invalid]="rating?.invalid && (rating?.dirty || rating?.touched)">
+          <option value="5">5 {{ 'STARS' | translate }}</option>
+          <option value="4">4 {{ 'STARS' | translate }}</option>
+          <option value="3">3 {{ 'STARS' | translate }}</option>
+          <option value="2">2 {{ 'STARS' | translate }}</option>
+          <option value="1">1 {{ 'STAR' | translate }}</option>
+        </select>
+        <div *ngIf="rating?.invalid && (rating?.dirty || rating?.touched)" class="invalid-feedback">
+          <div *ngIf="rating?.errors?.['required']">{{ 'RATING_REQUIRED' | translate }}</div>
+          <div *ngIf="rating?.errors?.['min'] || rating?.errors?.['max']">{{ 'RATING_INVALID' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- Yorum Metni Alanı -->
+      <div class="form-group">
+        <label for="comment">{{ 'COMMENT' | translate }}</label>
+        <textarea id="comment" formControlName="comment" class="form-control" rows="5"
+                  [class.is-invalid]="comment?.invalid && (comment?.dirty || comment?.touched)"
+                  placeholder="{{ 'COMMENT_PLACEHOLDER' | translate }}"></textarea>
+        <div *ngIf="comment?.invalid && (comment?.dirty || comment?.touched)" class="invalid-feedback">
+          <div *ngIf="comment?.errors?.['maxlength']">{{ 'COMMENT_MAX_LENGTH' | translate: '{max: 500}' }}</div>
+        </div>
+      </div>
+
+      <!-- Hata Mesajı -->
+      <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+      <!-- Kaydet Butonu -->
+      <button type="submit" class="submit-button primary-btn" [disabled]="reviewForm.invalid || isLoading">
+        <span *ngIf="!isLoading">
+          <ng-container *ngIf="isEditMode">{{ 'SAVE_CHANGES' | translate }}</ng-container>
+          <ng-container *ngIf="!isEditMode">{{ 'SUBMIT_REVIEW_BUTTON' | translate }}</ng-container>
+        </span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+
+    <p class="back-link">
+      <a [routerLink]="['/courses', courseId]">{{ 'BACK_TO_COURSE_DETAIL' | translate }}</a>
+    </p>
+  </div>
+
+  <div *ngIf="!isLoading && (!courseId && !reviewId) && !errorMessage" class="no-content-found">
+    <p>{{ 'INVALID_REVIEW_CONTEXT' | translate }}</p>
+    <button class="action-button primary-btn" routerLink="/courses">{{ 'BACK_TO_COURSES' | translate }}</button>
+  </div>
+</div>

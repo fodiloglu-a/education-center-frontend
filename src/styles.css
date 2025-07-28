@@ -1,0 +1,103 @@
+/* You can add global styles to this file, and also import other style files */
+/* Ana Renkler - Light Mode */
+:root {
+  --primary-color: #4361EE;      /* Mavi */
+  --secondary-color: #C3AD90;    /* Bej/Kum */
+  --background-color: #FFF8EE;   /* Açık Krem */
+  --accent-color: #7C4213;       /* Kahverengi */
+  --dark-color: #3D2010;         /* Koyu Kahverengi */
+  --deep-blue: #001F83;          /* Derin Mavi */
+  --text-color: #4A2D0F;         /* Yumuşatılmış koyu kahverengi */
+
+  /* UI Renkleri - Light Mode */
+  --light-accent: #E9DDD0;       /* Açık bej - vurgu alanları */
+  --highlight-color: #FFB74D;    /* Turuncu ton - önemli bilgiler */
+  --card-bg: #FFFFFF;            /* Kart arka planı */
+  --surface-bg: #FFF8EE;         /* Yüzey arka planı */
+  --input-bg: #FFFFFF;           /* Form elemanları arka planı */
+  --border-color: rgba(124, 66, 19, 0.2); /* Sınır rengi */
+  --shadow-color: rgba(61, 32, 16, 0.1);  /* Gölge rengi */
+  --shadow-sm: 0 2px 4px var(--shadow-color);
+  --shadow-md: 0 4px 8px var(--shadow-color);
+  --shadow-lg: 0 8px 16px var(--shadow-color);
+  --divider-color: rgba(124, 66, 19, 0.1); /* Ayırıcı rengi */
+  --hover-bg: rgba(67, 97, 238, 0.1);      /* Hover arka planı */
+  --selection-bg: rgba(67, 97, 238, 0.2);  /* Seçim arka planı */
+  --nav-bg: rgba(255, 248, 238, 0.95);     /* Navbar arka planı */
+  --footer-bg: var(--deep-blue);           /* Footer arka planı */
+
+  /* Özel Renkler */
+  --success-color: #4CAF50;      /* Başarı */
+  --warning-color: #FF9800;      /* Uyarı */
+  --error-color: #F44336;        /* Hata */
+  --info-color: #2196F3;         /* Bilgi */
+
+  /* Font boyutları */
+  --font-size-xs: 0.75rem;       /* 12px */
+  --font-size-sm: 0.875rem;      /* 14px */
+  --font-size-base: 1rem;        /* 16px */
+  --font-size-md: 1.125rem;      /* 18px */
+  --font-size-lg: 1.25rem;       /* 20px */
+  --font-size-xl: 1.5rem;        /* 24px */
+  --font-size-xxl: 2rem;         /* 32px */
+  --font-size-xxxl: 2.5rem;      /* 40px */
+
+  /* Boşluklar */
+  --spacing-xs: 0.25rem;         /* 4px */
+  --spacing-sm: 0.5rem;          /* 8px */
+  --spacing-md: 1rem;            /* 16px */
+  --spacing-lg: 1.5rem;          /* 24px */
+  --spacing-xl: 2rem;            /* 32px */
+  --spacing-xxl: 3rem;           /* 48px */
+
+  /* Geçişler */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+
+  /* Border radius */
+  --border-radius-sm: 0.25rem;   /* 4px */
+  --border-radius-md: 0.5rem;    /* 8px */
+  --border-radius-lg: 1rem;      /* 16px */
+  --border-radius-xl: 1.5rem;    /* 24px */
+  --border-radius-full: 9999px;
+}
+
+/* Dark Mode Değişkenleri */
+body.dark-mode {
+  /* Ana Renkler - Dark Mode */
+  --primary-color: #4361EE;          /* Mavi - aynı */
+  --secondary-color: #C3AD90;        /* Bej/Kum - aynı */
+  --background-color: #1A1410;       /* Koyu kahverengimsi arka plan */
+  --accent-color: #C3AD90;           /* Bej rengi aksan olarak */
+  --dark-color: #FFF8EE;             /* Açık krem ters olarak */
+  --deep-blue: #4361EE;              /* Mavi - koyu temada daha belirgin */
+  --text-color: #F0E6DA;             /* Açık bej metin */
+
+  /* UI Renkleri - Dark Mode */
+  --light-accent: #2C231C;           /* Daha koyu vurgu alanları */
+  --highlight-color: #FFB74D;        /* Turuncu ton - aynı kalır */
+  --card-bg: #241D16;                /* Kartlar için koyu arka plan */
+  --surface-bg: #1E1812;             /* Yüzeyler için koyu arka plan */
+  --input-bg: #2C231C;               /* Form arka planı */
+  --border-color: rgba(195, 173, 144, 0.3); /* Sınır rengi */
+  --shadow-color: rgba(0, 0, 0, 0.3);       /* Gölge rengi */
+  --divider-color: rgba(195, 173, 144, 0.2); /* Ayırıcı rengi */
+  --hover-bg: rgba(67, 97, 238, 0.15);       /* Hover arka planı */
+  --selection-bg: rgba(67, 97, 238, 0.3);    /* Seçim arka planı */
+  --nav-bg: rgba(26, 20, 16, 0.95);          /* Navbar arka planı */
+  --footer-bg: #151210;                      /* Footer arka planı */
+}
+
+/* Genel stil sıfırlamaları ve varsayılanlar */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif; /* Varsayılan bir font, ileride Inter'a geçebiliriz */
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

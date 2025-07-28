@@ -1,0 +1,8 @@
+// Bu dosya, geliştirme ortamı için yapılandırma ayarlarını içerir.
+// 'ng serve' veya 'ng build' (varsayılan olarak) komutlarıyla derlendiğinde kullanılır.
+// Üretim ortamı için 'environment.ts' dosyasına bakın.
+export const environment = {
+  production: false, // Geliştirme ortamı olduğunu belirtir
+  apiUrl: 'http://localhost:8080/api' // Backend API'sinin geliştirme URL'si
+};
+

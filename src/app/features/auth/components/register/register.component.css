@@ -1,0 +1,178 @@
+/* register.component.css */
+
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--spacing-xxl) * 2); /* Header ve footer boşluğunu düş */
+  padding: var(--spacing-lg); /* Genel padding */
+  background-color: var(--background-color); /* Ana arka plan rengi */
+}
+
+.register-card {
+  background-color: var(--card-bg); /* Kart arka plan rengi */
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg); /* Büyük gölge */
+  width: 100%;
+  max-width: 450px; /* Maksimum genişlik, login'den biraz daha geniş olabilir */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.card-title {
+  color: var(--primary-color); /* Başlık rengi */
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.card-subtitle {
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xl);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md); /* Form grupları arasında boşluk */
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-group label {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--accent-color); /* Etiket rengi */
+  margin-bottom: var(--spacing-xs);
+  font-weight: 600;
+}
+
+.form-control {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color); /* Sınır rengi */
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  background-color: var(--input-bg); /* Input arka plan rengi */
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2); /* Odaklandığında hafif gölge */
+}
+
+.form-control.is-invalid {
+  border-color: var(--error-color); /* Hata durumunda kırmızı sınır */
+}
+
+.invalid-feedback {
+  color: var(--error-color); /* Hata mesajı rengi */
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+  text-align: left;
+}
+
+.alert {
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  margin-top: var(--spacing-md);
+  text-align: center;
+}
+
+.alert-error {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+
+.submit-button {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  margin-top: var(--spacing-lg);
+  transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Spinner Stilleri */
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.login-link {
+  margin-top: var(--spacing-xl);
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+}
+
+.login-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.login-link a:hover {
+  color: var(--deep-blue);
+  text-decoration: underline;
+}
+
+/* ========================================= */
+/* Duyarlı Tasarım (Responsive Design) */
+/* ========================================= */
+
+@media (max-width: 480px) {
+  .register-card {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md);
+  }
+
+  .card-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .card-subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .form-control {
+    padding: var(--spacing-sm);
+  }
+
+  .submit-button {
+    font-size: var(--font-size-base);
+    padding: var(--spacing-sm);
+  }
+}

@@ -1,0 +1,29 @@
+/* loading-spinner.component.css */
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  /* İsteğe bağlı: Spinner'ın arkasındaki içeriği karartmak için */
+  /* background-color: rgba(var(--dark-color-rgb), 0.2); */
+  /* position: absolute; */
+  /* top: 0; */
+  /* left: 0; */
+  /* z-index: 9999; */
+}
+
+.spinner {
+  border: 4px solid var(--border-color); /* Dış halka rengi */
+  border-top: 4px solid var(--primary-color); /* Dönme halkası rengi */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite; /* Dönme animasyonu */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

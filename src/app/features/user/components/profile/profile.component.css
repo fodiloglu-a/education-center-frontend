@@ -1,0 +1,167 @@
+/* profile.component.css */
+
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* İçeriği üste hizala */
+  min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px); /* Header ve footer boşluğunu düş, biraz daha yer bırak */
+  padding: var(--spacing-lg);
+  background-color: var(--background-color);
+  box-sizing: border-box;
+}
+
+.profile-card {
+  background-color: var(--card-bg);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 600px; /* Maksimum genişlik */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.card-title {
+  color: var(--primary-color);
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.card-subtitle {
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xl);
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  text-align: left;
+}
+
+.detail-item {
+  display: flex;
+  flex-wrap: wrap; /* Küçük ekranlarda sarılma için */
+  justify-content: space-between;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--divider-color);
+}
+
+.detail-item:last-child {
+  border-bottom: none; /* Son öğede alt çizgi olmasın */
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--accent-color);
+  font-size: var(--font-size-base);
+  flex-basis: 40%; /* Etiket için %40 genişlik */
+  min-width: 120px; /* Minimum genişlik */
+}
+
+.detail-value {
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  flex-basis: 55%; /* Değer için %55 genişlik */
+  text-align: right; /* Değeri sağa hizala */
+  word-break: break-word; /* Uzun kelimeleri kırma */
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column; /* Mobil için alt alta butonlar */
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.action-button {
+  width: 100%; /* Tam genişlik */
+  padding: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.action-button.primary-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.action-button.primary-btn:hover {
+  background-color: var(--deep-blue);
+  transform: translateY(-1px);
+}
+
+.action-button.secondary-btn {
+  background-color: var(--light-accent);
+  color: var(--accent-color);
+}
+
+.action-button.secondary-btn:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-1px);
+}
+
+.no-user-found {
+  text-align: center;
+  padding: var(--spacing-xl);
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--text-color);
+  max-width: 400px;
+  margin: var(--spacing-xxl) auto;
+}
+
+.no-user-found p {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ========================================= */
+/* Duyarlı Tasarım (Responsive Design) */
+/* ========================================= */
+
+@media (min-width: 600px) {
+  .profile-actions {
+    flex-direction: row; /* Daha büyük ekranlarda yan yana butonlar */
+    justify-content: center;
+  }
+
+  .action-button {
+    width: auto; /* Genişliği içeriğe göre ayarla */
+    min-width: 180px; /* Minimum genişlik */
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-card {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-md);
+  }
+
+  .card-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .card-subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .detail-label, .detail-value {
+    font-size: var(--font-size-sm);
+    flex-basis: 100%; /* Mobil küçük ekranlarda alt alta */
+    text-align: left; /* Mobil küçük ekranlarda sola hizala */
+  }
+
+  .detail-item {
+    flex-direction: column; /* Mobil küçük ekranlarda dikey düzen */
+    align-items: flex-start;
+  }
+}

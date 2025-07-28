@@ -1,0 +1,43 @@
+<!-- instructor-review-list.component.html -->
+
+<div class="instructor-review-list-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <h2 class="page-title">{{ 'MY_REVIEWS' | translate }}</h2>
+  <p class="page-subtitle">{{ 'REVIEWS_FOR_MY_COURSES_SUBTITLE' | translate }}</p>
+
+  <!-- Yorumlar Listesi -->
+  <div class="review-cards-grid" *ngIf="!isLoading && reviews.length > 0">
+    <div class="review-card" *ngFor="let review of reviews">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <span class="reviewer-name">{{ review.userName }}</span>
+          <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
+        </div>
+        <div class="review-stars">
+          <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="review.rating >= star">star</span>
+        </div>
+      </div>
+      <p class="review-course-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ review.courseTitle }}</strong></p>
+      <p class="review-comment">{{ review.comment }}</p>
+      <div class="review-actions" *ngIf="canModifyReview(review)">
+        <!-- Eğitmenler kendi yorumlarını düzenleyebilir, ancak burada sadece silme eylemi var -->
+        <!-- <button class="action-button secondary-btn" [routerLink]="['/reviews', 'edit', review.id]">{{ 'EDIT' | translate }}</button> -->
+        <button class="action-button danger-btn" (click)="deleteReview(review.id)">{{ 'DELETE' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Yorum Bulunamadı Mesajı -->
+  <div *ngIf="!isLoading && reviews.length === 0 && !errorMessage" class="no-reviews-found">
+    <p>{{ 'NO_INSTRUCTOR_REVIEWS_FOUND' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadInstructorReviews(instructorId || 0)">{{ 'RETRY_LOAD_REVIEWS' | translate }}</button>
+  </div>
+</div>

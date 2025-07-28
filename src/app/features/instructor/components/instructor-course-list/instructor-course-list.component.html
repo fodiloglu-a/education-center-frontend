@@ -1,0 +1,64 @@
+<!-- instructor-course-list.component.html -->
+
+<div class="instructor-course-list-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <h2 class="page-title">{{ 'MY_COURSES' | translate }}</h2>
+  <p class="page-subtitle">{{ 'MANAGE_YOUR_COURSES_SUBTITLE' | translate }}</p>
+
+  <!-- Yeni Kurs Oluştur Butonu -->
+  <div class="action-bar">
+    <button class="action-button primary-btn" routerLink="/courses/new">
+      <span class="material-icons">add_circle</span> {{ 'CREATE_NEW_COURSE' | translate }}
+    </button>
+  </div>
+
+  <!-- Eğitmen Kurs Kartları Listesi -->
+  <div class="course-cards-grid" *ngIf="!isLoading && courses.length > 0">
+    <div class="course-card" *ngFor="let course of courses">
+      <img [src]="course.imageUrl" alt="{{ course.title }}" class="course-image"
+           onerror="this.onerror=null;this.src='https://placehold.co/600x400/C3AD90/3D2010?text=Course+Image';" />
+      <div class="card-content">
+        <h3 class="course-title">{{ course.title }}</h3>
+        <p class="course-description">{{ course.description }}</p>
+        <div class="course-stats">
+          <div class="stat-item">
+            <span class="material-icons">menu_book</span>
+            <span>{{ course.totalLessons }} {{ 'LESSONS' | translate }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="material-icons">group</span>
+            <span>{{ course.totalEnrollments }} {{ 'STUDENTS' | translate }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="material-icons">star</span>
+            <span>{{ course.courseAverageRating | number:'1.1-1' }} ({{ course.courseAverageRating }} {{ 'REVIEWS' | translate }})</span>
+          </div>
+        </div>
+        <div class="course-actions">
+          <a [routerLink]="['/courses', course.id]" class="action-button primary-btn">{{ 'VIEW_DETAILS' | translate }}</a>
+          <a [routerLink]="['/courses', course.id, 'edit']" class="action-button secondary-btn">{{ 'EDIT_COURSE' | translate }}</a>
+          <button class="action-button" [ngClass]="course.published ? 'secondary-btn' : 'primary-btn'"
+                  (click)="toggleCoursePublishedStatus(course.id)">
+            <ng-container *ngIf="course.published">{{ 'UNPUBLISH_COURSE' | translate }}</ng-container>
+            <ng-container *ngIf="!course.published">{{ 'PUBLISH_COURSE' | translate }}</ng-container>
+          </button>
+          <button class="action-button danger-btn" (click)="deleteCourse(course.id)">{{ 'DELETE_COURSE' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kurs Bulunamadı Mesajı -->
+  <div *ngIf="!isLoading && courses.length === 0 && !errorMessage" class="no-courses-found">
+    <p>{{ 'NO_INSTRUCTOR_COURSES_FOUND' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadInstructorCourses(instructorId || 0)">{{ 'RETRY_LOAD_COURSES' | translate }}</button>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<!-- login.component.html -->
+
+<div class="login-container">
+  <div class="login-card">
+    <h2 class="card-title">{{ 'LOGIN' | translate }}</h2>
+    <p class="card-subtitle">{{ 'LOGIN_SUBTITLE' | translate }}</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- E-posta Alanı -->
+      <div class="form-group">
+        <label for="email">{{ 'EMAIL' | translate }}</label>
+        <input type="email" id="email" formControlName="email" class="form-control"
+               [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)"
+               placeholder="{{ 'EMAIL_PLACEHOLDER' | translate }}">
+        <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="invalid-feedback">
+          <div *ngIf="email?.errors?.['required']">{{ 'EMAIL_REQUIRED' | translate }}</div>
+          <div *ngIf="email?.errors?.['email']">{{ 'EMAIL_INVALID' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- Şifre Alanı -->
+      <div class="form-group">
+        <label for="password">{{ 'PASSWORD' | translate }}</label>
+        <input type="password" id="password" formControlName="password" class="form-control"
+               [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)"
+               placeholder="{{ 'PASSWORD_PLACEHOLDER' | translate }}">
+        <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="invalid-feedback">
+          <div *ngIf="password?.errors?.['required']">{{ 'PASSWORD_REQUIRED' | translate }}</div>
+          <div *ngIf="password?.errors?.['minlength']">{{ 'PASSWORD_MIN_LENGTH' | translate: '{min: 6}' }}</div>
+        </div>
+      </div>
+
+      <!-- Hata Mesajı -->
+      <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+      <!-- Giriş Butonu -->
+      <button type="submit" class="submit-button primary-btn" [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">{{ 'LOGIN' | translate }}</span>
+        <span *ngIf="isLoading" class="spinner"></span> <!-- Yükleme göstergesi -->
+      </button>
+    </form>
+
+    <p class="register-link">
+      {{ 'DONT_HAVE_ACCOUNT' | translate }} <a routerLink="/auth/register">{{ 'REGISTER_NOW' | translate }}</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<!-- certificate-list.component.html -->
+
+<div class="certificate-list-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <h2 class="page-title">{{ 'CERTIFICATES' | translate }}</h2>
+  <p class="page-subtitle">
+    <ng-container *ngIf="currentLoggedInUserId && !route.snapshot.paramMap.get('userId')">{{ 'MY_CERTIFICATES_SUBTITLE' | translate }}</ng-container>
+    <ng-container *ngIf="route.snapshot.paramMap.get('userId') && isAdmin">{{ 'USER_CERTIFICATES_SUBTITLE' | translate }}: <strong>{{ route.snapshot.paramMap.get('userId') }}</strong></ng-container>
+    <ng-container *ngIf="!currentLoggedInUserId && !route.snapshot.paramMap.get('userId')">{{ 'VIEW_CERTIFICATES_SUBTITLE' | translate }}</ng-container>
+  </p>
+
+  <!-- Sertifika Kartları Listesi -->
+  <div class="certificate-cards-grid" *ngIf="!isLoading && certificates.length > 0">
+    <div class="certificate-card" *ngFor="let cert of certificates">
+      <div class="card-content">
+        <h3 class="certificate-title">{{ cert.courseTitle }}</h3>
+        <p class="certificate-owner">{{ 'ISSUED_TO' | translate }}: {{ cert.userName }}</p>
+        <p class="issue-date">{{ 'ISSUE_DATE' | translate }}: {{ cert.issueDate | date:'shortDate' }}</p>
+        <p class="unique-code">{{ 'UNIQUE_CODE' | translate }}: <strong>{{ cert.uniqueCode }}</strong></p>
+        <div class="certificate-actions">
+          <a [routerLink]="['/certificates', cert.id]" class="action-button primary-btn">{{ 'VIEW_DETAILS' | translate }}</a>
+          <a *ngIf="cert.certificateUrl" [href]="cert.certificateUrl" target="_blank" class="action-button secondary-btn">{{ 'DOWNLOAD_CERTIFICATE' | translate }}</a>
+          <button *ngIf="canModifyCertificate(cert)" class="action-button danger-btn" (click)="deleteCertificate(cert.id)">{{ 'DELETE' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sertifika Bulunamadı Mesajı -->
+  <div *ngIf="!isLoading && certificates.length === 0 && !errorMessage" class="no-certificates-found">
+    <p>{{ 'NO_CERTIFICATES_FOUND' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadCertificatesByUserId(currentLoggedInUserId || 0)">{{ 'RETRY_LOAD_CERTIFICATES' | translate }}</button>
+  </div>
+</div>

@@ -1,0 +1,69 @@
+<!-- profile-edit.component.html -->
+
+<div class="profile-edit-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+  <div class="profile-edit-card" *ngIf="!isLoading && user">
+    <h2 class="card-title">{{ 'EDIT_PROFILE' | translate }}</h2>
+    <p class="card-subtitle">{{ 'EDIT_PROFILE_SUBTITLE' | translate }}</p>
+
+    <form [formGroup]="profileEditForm" (ngSubmit)="onSubmit()" class="profile-edit-form">
+      <!-- Ad Alanı -->
+      <div class="form-group">
+        <label for="firstName">{{ 'FIRST_NAME' | translate }}</label>
+        <input type="text" id="firstName" formControlName="firstName" class="form-control"
+               [class.is-invalid]="firstName?.invalid && (firstName?.dirty || firstName?.touched)"
+               placeholder="{{ 'FIRST_NAME_PLACEHOLDER' | translate }}">
+        <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)" class="invalid-feedback">
+          <div *ngIf="firstName?.errors?.['required']">{{ 'FIRST_NAME_REQUIRED' | translate }}</div>
+          <div *ngIf="firstName?.errors?.['minlength']">{{ 'FIRST_NAME_MIN_LENGTH' | translate: '{min: 2}' }}</div>
+        </div>
+      </div>
+
+      <!-- Soyad Alanı -->
+      <div class="form-group">
+        <label for="lastName">{{ 'LAST_NAME' | translate }}</label>
+        <input type="text" id="lastName" formControlName="lastName" class="form-control"
+               [class.is-invalid]="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+               placeholder="{{ 'LAST_NAME_PLACEHOLDER' | translate }}">
+        <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" class="invalid-feedback">
+          <div *ngIf="lastName?.errors?.['required']">{{ 'LAST_NAME_REQUIRED' | translate }}</div>
+          <div *ngIf="lastName?.errors?.['minlength']">{{ 'LAST_NAME_MIN_LENGTH' | translate: '{min: 2}' }}</div>
+        </div>
+      </div>
+
+      <!-- E-posta Alanı -->
+      <div class="form-group">
+        <label for="email">{{ 'EMAIL' | translate }}</label>
+        <input type="email" id="email" formControlName="email" class="form-control"
+               [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)"
+               placeholder="{{ 'EMAIL_PLACEHOLDER' | translate }}">
+        <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="invalid-feedback">
+          <div *ngIf="email?.errors?.['required']">{{ 'EMAIL_REQUIRED' | translate }}</div>
+          <div *ngIf="email?.errors?.['email']">{{ 'EMAIL_INVALID' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- Kaydet Butonu -->
+      <button type="submit" class="submit-button primary-btn" [disabled]="profileEditForm.invalid || isLoading">
+        <span *ngIf="!isLoading">{{ 'SAVE_CHANGES' | translate }}</span>
+        <span *ngIf="isLoading" class="spinner"></span> <!-- Yükleme göstergesi -->
+      </button>
+    </form>
+
+    <p class="back-link">
+      <a routerLink="/profile">{{ 'BACK_TO_PROFILE' | translate }}</a>
+    </p>
+  </div>
+
+  <div *ngIf="!isLoading && !user && !errorMessage" class="no-user-found">
+    <p>{{ 'USER_NOT_LOADED' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadUserProfile()">{{ 'RETRY_LOAD_PROFILE' | translate }}</button>
+  </div>
+</div>

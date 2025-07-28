@@ -1,0 +1,58 @@
+<!-- certificate-detail.component.html -->
+
+<div class="certificate-detail-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <div class="certificate-detail-card" *ngIf="!isLoading && certificate">
+    <h2 class="card-title">{{ 'CERTIFICATE_DETAILS' | translate }}</h2>
+    <p class="card-subtitle">{{ 'CERTIFICATE_DETAILS_SUBTITLE' | translate }}</p>
+
+    <div class="certificate-info-grid">
+      <div class="info-item">
+        <span class="info-label">{{ 'COURSE_TITLE' | translate }}:</span>
+        <span class="info-value">{{ certificate.courseTitle }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{ 'ISSUED_TO' | translate }}:</span>
+        <span class="info-value">{{ certificate.userName }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{ 'ISSUE_DATE' | translate }}:</span>
+        <span class="info-value">{{ certificate.issueDate | date:'shortDate' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{ 'UNIQUE_CODE' | translate }}:</span>
+        <span class="info-value unique-code-value">{{ certificate.uniqueCode }}</span>
+      </div>
+    </div>
+
+    <!-- Sertifika Görseli/PDF Gömme (Eğer URL varsa) -->
+    <div class="certificate-display" *ngIf="safeCertificateUrl">
+      <h3 class="section-title">{{ 'CERTIFICATE_PREVIEW' | translate }}</h3>
+      <iframe [src]="safeCertificateUrl" frameborder="0" allowfullscreen class="certificate-iframe"></iframe>
+      <p class="download-link">
+        <a [href]="certificate.certificateUrl" target="_blank" class="action-button primary-btn">{{ 'DOWNLOAD_CERTIFICATE' | translate }}</a>
+      </p>
+    </div>
+    <div *ngIf="!safeCertificateUrl && certificate.certificateUrl" class="no-preview-message">
+      <p>{{ 'NO_PREVIEW_AVAILABLE' | translate }}</p>
+      <a [href]="certificate.certificateUrl" target="_blank" class="action-button primary-btn">{{ 'DOWNLOAD_CERTIFICATE_ALT' | translate }}</a>
+    </div>
+    <div *ngIf="!certificate.certificateUrl" class="no-certificate-url-message">
+      <p>{{ 'CERTIFICATE_URL_NOT_PROVIDED' | translate }}</p>
+    </div>
+
+    <p class="back-link">
+      <a routerLink="/certificates">{{ 'BACK_TO_CERTIFICATES' | translate }}</a>
+    </p>
+  </div>
+
+  <div *ngIf="!isLoading && !certificate && !errorMessage" class="no-content-found">
+    <p>{{ 'CERTIFICATE_NOT_LOADED' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadCertificateById(certificateId || 0); loadCertificateByUniqueCode(uniqueCode || '')">{{ 'RETRY_LOAD_CERTIFICATE' | translate }}</button>
+  </div>
+</div>

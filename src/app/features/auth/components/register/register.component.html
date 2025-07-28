@@ -1,0 +1,83 @@
+<!-- register.component.html -->
+
+<div class="register-container">
+  <div class="register-card">
+    <h2 class="card-title">{{ 'REGISTER' | translate }}</h2>
+    <p class="card-subtitle">{{ 'REGISTER_SUBTITLE' | translate }}</p>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Ad Alanı -->
+      <div class="form-group">
+        <label for="firstName">{{ 'FIRST_NAME' | translate }}</label>
+        <input type="text" id="firstName" formControlName="firstName" class="form-control"
+               [class.is-invalid]="firstName?.invalid && (firstName?.dirty || firstName?.touched)"
+               placeholder="{{ 'FIRST_NAME_PLACEHOLDER' | translate }}">
+        <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)" class="invalid-feedback">
+          <div *ngIf="firstName?.errors?.['required']">{{ 'FIRST_NAME_REQUIRED' | translate }}</div>
+          <div *ngIf="firstName?.errors?.['minlength']">{{ 'FIRST_NAME_MIN_LENGTH' | translate: '{min: 2}' }}</div>
+        </div>
+      </div>
+
+      <!-- Soyad Alanı -->
+      <div class="form-group">
+        <label for="lastName">{{ 'LAST_NAME' | translate }}</label>
+        <input type="text" id="lastName" formControlName="lastName" class="form-control"
+               [class.is-invalid]="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+               placeholder="{{ 'LAST_NAME_PLACEHOLDER' | translate }}">
+        <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" class="invalid-feedback">
+          <div *ngIf="lastName?.errors?.['required']">{{ 'LAST_NAME_REQUIRED' | translate }}</div>
+          <div *ngIf="lastName?.errors?.['minlength']">{{ 'LAST_NAME_MIN_LENGTH' | translate: '{min: 2}' }}</div>
+        </div>
+      </div>
+
+      <!-- E-posta Alanı -->
+      <div class="form-group">
+        <label for="email">{{ 'EMAIL' | translate }}</label>
+        <input type="email" id="email" formControlName="email" class="form-control"
+               [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)"
+               placeholder="{{ 'EMAIL_PLACEHOLDER' | translate }}">
+        <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="invalid-feedback">
+          <div *ngIf="email?.errors?.['required']">{{ 'EMAIL_REQUIRED' | translate }}</div>
+          <div *ngIf="email?.errors?.['email']">{{ 'EMAIL_INVALID' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- Şifre Alanı -->
+      <div class="form-group">
+        <label for="password">{{ 'PASSWORD' | translate }}</label>
+        <input type="password" id="password" formControlName="password" class="form-control"
+               [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched)"
+               placeholder="{{ 'PASSWORD_PLACEHOLDER' | translate }}">
+        <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="invalid-feedback">
+          <div *ngIf="password?.errors?.['required']">{{ 'PASSWORD_REQUIRED' | translate }}</div>
+          <div *ngIf="password?.errors?.['minlength']">{{ 'PASSWORD_MIN_LENGTH' | translate: '{min: 6}' }}</div>
+        </div>
+      </div>
+
+      <!-- Rol Seçimi -->
+      <div class="form-group">
+        <label for="role">{{ 'SELECT_ROLE' | translate }}</label>
+        <select id="role" formControlName="role" class="form-control"
+                [class.is-invalid]="role?.invalid && (role?.dirty || role?.touched)">
+          <option *ngFor="let r of roles" [value]="r.value">{{ r.labelKey | translate }}</option>
+        </select>
+        <div *ngIf="role?.invalid && (role?.dirty || role?.touched)" class="invalid-feedback">
+          <div *ngIf="role?.errors?.['required']">{{ 'ROLE_REQUIRED' | translate }}</div>
+        </div>
+      </div>
+
+      <!-- Hata Mesajı -->
+      <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+      <!-- Kayıt Butonu -->
+      <button type="submit" class="submit-button primary-btn" [disabled]="registerForm.invalid || isLoading">
+        <span *ngIf="!isLoading">{{ 'REGISTER' | translate }}</span>
+        <span *ngIf="isLoading" class="spinner"></span> <!-- Yükleme göstergesi -->
+      </button>
+    </form>
+
+    <p class="login-link">
+      {{ 'ALREADY_HAVE_ACCOUNT' | translate }} <a routerLink="/auth/login">{{ 'LOGIN_NOW' | translate }}</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<!-- course-list.component.html -->
+
+<div class="course-list-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <h2 class="page-title">{{ 'COURSES' | translate }}</h2>
+  <p class="page-subtitle">{{ 'ALL_PUBLISHED_COURSES_SUBTITLE' | translate }}</p>
+
+  <!-- Eğitim Kartları Listesi -->
+  <div class="course-cards-grid" *ngIf="!isLoading && courses.length > 0">
+    <div class="course-card" *ngFor="let course of courses" [routerLink]="['/courses', course.id]">
+      <img [src]="course.imageUrl" alt="{{ course.title }}" class="course-image"
+           onerror="this.onerror=null;this.src='https://placehold.co/600x400/C3AD90/3D2010?text=Course+Image';" />
+      <div class="card-content">
+        <h3 class="course-title">{{ course.title }}</h3>
+        <p class="course-description">{{ course.description }}</p>
+        <div class="course-meta">
+          <span class="instructor-name">{{ 'INSTRUCTOR' | translate }}: {{ course.instructorName }}</span>
+          <span class="course-price">{{ course.price | currency:'USD':'symbol':'1.2-2':'uk' }}</span> <!-- Para birimi formatı -->
+        </div>
+        <button class="view-details-button primary-btn">{{ 'VIEW_DETAILS' | translate }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eğitim Bulunamadı Mesajı -->
+  <div *ngIf="!isLoading && courses.length === 0 && !errorMessage" class="no-courses-found">
+    <p>{{ 'NO_COURSES_FOUND' | translate }}</p>
+    <button class="action-button secondary-btn" (click)="loadCourses()">{{ 'RETRY_LOAD_COURSES' | translate }}</button>
+  </div>
+</div>

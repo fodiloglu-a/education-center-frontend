@@ -1,0 +1,93 @@
+/* alert-dialog.component.css */
+
+.alert-dialog-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-md); /* Birden fazla alert olduğunda aralarında boşluk */
+  font-size: var(--font-size-base);
+  position: relative; /* Kapatma butonu için */
+  overflow: hidden; /* İçerik taşmasını engelle */
+  box-sizing: border-box; /* Padding'in genişliğe dahil olmasını sağlar */
+  width: 100%; /* Mobil uyumluluk için */
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-grow: 1; /* Mesajın kalan alanı kaplamasını sağlar */
+}
+
+.alert-icon {
+  font-size: var(--font-size-xl);
+  flex-shrink: 0; /* Küçülmesini engelle */
+}
+
+.alert-message {
+  margin: 0;
+  flex-grow: 1;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: inherit; /* Üst elementin rengini miras alır */
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  transition: background-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1); /* Hafif karartma */
+}
+
+/* Alert Türlerine Göre Renkler */
+.alert-success {
+  background-color: rgba(76, 175, 80, 0.1); /* success-color'ın %10 şeffaflığı */
+  color: var(--success-color);
+  border: 1px solid var(--success-color);
+}
+
+.alert-error {
+  background-color: rgba(244, 67, 54, 0.1); /* error-color'ın %10 şeffaflığı */
+  color: var(--error-color);
+  border: 1px solid var(--error-color);
+}
+
+.alert-info {
+  background-color: rgba(33, 150, 243, 0.1); /* info-color'ın %10 şeffaflığı */
+  color: var(--info-color);
+  border: 1px solid var(--info-color);
+}
+
+.alert-warning {
+  background-color: rgba(255, 152, 0, 0.1); /* warning-color'ın %10 şeffaflığı */
+  color: var(--warning-color);
+  border: 1px solid var(--warning-color);
+}
+
+/* ========================================= */
+/* Duyarlı Tasarım (Responsive Design) */
+/* ========================================= */
+
+@media (max-width: 600px) {
+  .alert-dialog-container {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+
+  .alert-icon {
+    font-size: var(--font-size-lg);
+  }
+
+  .close-button {
+    font-size: var(--font-size-base);
+  }
+}

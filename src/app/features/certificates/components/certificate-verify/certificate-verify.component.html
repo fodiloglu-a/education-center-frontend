@@ -1,0 +1,65 @@
+<!-- certificate-verify.component.html -->
+
+<div class="verify-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+  <div class="verify-card" *ngIf="!isLoading">
+    <h2 class="card-title">{{ 'VERIFY_CERTIFICATE' | translate }}</h2>
+    <p class="card-subtitle">{{ 'VERIFY_CERTIFICATE_SUBTITLE' | translate }}</p>
+
+    <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()" class="verify-form">
+      <!-- Benzersiz Kod Alanı -->
+      <div class="form-group">
+        <label for="uniqueCode">{{ 'UNIQUE_CODE' | translate }}</label>
+        <input type="text" id="uniqueCode" formControlName="uniqueCode" class="form-control"
+               [class.is-invalid]="uniqueCode?.invalid && (uniqueCode?.dirty || uniqueCode?.touched)"
+               placeholder="{{ 'UNIQUE_CODE_PLACEHOLDER' | translate }}">
+        <div *ngIf="uniqueCode?.invalid && (uniqueCode?.dirty || uniqueCode?.touched)" class="invalid-feedback">
+          <div *ngIf="uniqueCode?.errors?.['required']">{{ 'UNIQUE_CODE_REQUIRED' | translate }}</div>
+          <div *ngIf="uniqueCode?.errors?.['minlength']">{{ 'UNIQUE_CODE_MIN_LENGTH' | translate: '{min: 5}' }}</div>
+        </div>
+      </div>
+
+      <!-- Doğrula Butonu -->
+      <button type="submit" class="submit-button primary-btn" [disabled]="verifyForm.invalid || isLoading">
+        <span *ngIf="!isLoading">{{ 'VERIFY_BUTTON' | translate }}</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </form>
+
+    <!-- Doğrulanmış Sertifika Bilgileri -->
+    <div class="verified-certificate-info" *ngIf="certificate">
+      <h3 class="section-title">{{ 'VERIFIED_CERTIFICATE_INFO' | translate }}</h3>
+      <div class="info-item">
+        <span class="info-label">{{ 'COURSE_TITLE' | translate }}:</span>
+        <span class="info-value">{{ certificate.courseTitle }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{ 'ISSUED_TO' | translate }}:</span>
+        <span class="info-value">{{ certificate.userName }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{ 'ISSUE_DATE' | translate }}:</span>
+        <span class="info-value">{{ certificate.issueDate | date:'shortDate' }}</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">{{ 'UNIQUE_CODE' | translate }}:</span>
+        <span class="info-value unique-code-value">{{ certificate.uniqueCode }}</span>
+      </div>
+      <p class="download-link" *ngIf="certificate.certificateUrl">
+        <a [href]="certificate.certificateUrl" target="_blank" class="action-button secondary-btn">{{ 'DOWNLOAD_CERTIFICATE' | translate }}</a>
+      </p>
+    </div>
+
+    <p class="back-link">
+      <a routerLink="/certificates">{{ 'BACK_TO_CERTIFICATES' | translate }}</a>
+    </p>
+  </div>
+</div>

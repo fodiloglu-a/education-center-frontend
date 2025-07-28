@@ -1,0 +1,100 @@
+education-center-frontend/
+├── src/
+│   ├── app/                                # Ana uygulama klasörü
+│   │   ├── app.component.css               # Ana bileşen stilleri
+│   │   ├── app.component.html              # Ana bileşen HTML şablonu
+│   │   ├── app.component.ts                # Ana bileşen TypeScript kodu
+│   │   ├── app.config.ts                   # Uygulama genelinde yapılandırma (Angular 17+ standalone için)
+│   │   ├── app.routes.ts                   # Ana yönlendirme tanımları (Lazy loading için kullanılacak)
+│   │   │
+│   │   ├── core/                           # Uygulama genelinde bir kez yüklenecek (singleton) servisler, interceptor'lar, guard'lar
+│   │   │   ├── services/                   # Tekil servisler (örn. AuthService, TokenService, ErrorService)
+│   │   │   │   └── auth.service.ts         # Kimlik doğrulama servisi
+│   │   │   │   └── token.service.ts        # JWT token yönetimi servisi
+│   │   │   │   └── error.service.ts        # Hata yönetimi servisi
+│   │   │   ├── interceptors/               # HTTP isteklerini yakalayan ve değiştiren interceptor'lar
+│   │   │   │   └── auth.interceptor.ts     # JWT token'ını isteklere ekler
+│   │   │   │   └── error.interceptor.ts    # API hatalarını yakalar
+│   │   │   ├── guards/                     # Rota korumaları (sayfalara erişimi kontrol eder)
+│   │   │   │   └── auth.guard.ts           # Giriş yapılmış mı kontrolü
+│   │   │   │   └── role.guard.ts           # Rol kontrolü
+│   │   │   └── core.module.ts              # (Eğer modüler yapı kullanılırsa, singleton servisleri sağlar)
+│   │   │
+│   │   ├── shared/                         # Uygulama genelinde birden fazla modülde kullanılacak paylaşılan bileşenler, direktifler, pipe'lar
+│   │   │   ├── components/                 # Yeniden kullanılabilir UI bileşenleri (örn. LoadingSpinnerComponent, AlertDialogComponent)
+│   │   │   │   └── loading-spinner/loading-spinner.component.ts
+│   │   │   │   └── alert-dialog/alert-dialog.component.ts
+│   │   │   ├── directives/                 # Özel direktifler
+│   │   │   ├── pipes/                      # Özel pipe'lar
+│   │   │   └── shared.module.ts            # (Eğer modüler yapı kullanılırsa, paylaşılanları dışa aktarır)
+│   │   │
+│   │   ├── features/                       # Uygulamanın ana özelliklerini içeren tembel yüklenecek modüller
+│   │   │   ├── auth/                       # Kimlik doğrulama ve kayıt özelliği
+│   │   │   │   ├── components/
+│   │   │   │   │   └── login/login.component.ts
+│   │   │   │   │   └── register/register.component.ts
+│   │   │   │   ├── models/                 # Auth ile ilgili arayüzler/DTO'lar (backend DTO'larına karşılık gelir)
+│   │   │   │   │   └── auth.models.ts      # LoginRequest, JwtResponse, RegisterRequest interfaces
+│   │   │   │   └── auth.routes.ts          # Auth modülüne özel yönlendirmeler
+│   │   │   │
+│   │   │   ├── user/                       # Kullanıcı profili ve yönetimi özelliği
+│   │   │   │   ├── components/
+│   │   │   │   │   └── profile/profile.component.ts
+│   │   │   │   │   └── profile-edit/profile-edit.component.ts
+│   │   │   │   │   └── password-change/password-change.component.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── user.service.ts     # Kullanıcı ile ilgili API çağrıları
+│   │   │   │   ├── models/                 # Kullanıcı ile ilgili arayüzler/DTO'lar
+│   │   │   │   │   └── user.models.ts      # UserResponse, UserUpdateRequest, PasswordChangeRequest interfaces
+│   │   │   │   └── user.routes.ts          # User modülüne özel yönlendirmeler
+│   │   │   │
+│   │   │   ├── courses/                    # Eğitimleri listeleme, detay görüntüleme, ders izleme özelliği
+│   │   │   │   ├── components/
+│   │   │   │   │   └── course-list/course-list.component.ts
+│   │   │   │   │   └── course-detail/course-detail.component.ts
+│   │   │   │   │   └── lesson-player/lesson-player.component.ts
+│   │   │   │   │   └── course-form/course-form.component.ts
+│   │   │   │   │   └── lesson-form/lesson-form.component.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── course.service.ts
+│   │   │   │   ├── models/                 # Eğitim, ders, kayıt, ilerleme arayüzleri/DTO'lar
+│   │   │   │   │   └── course.models.ts    # CourseResponse, CourseDetailsResponse, LessonDTO, EnrollmentDTO, ProgressInfo interfaces
+│   │   │   │   └── courses.routes.ts
+│   │   │   │
+│   │   │   ├── reviews/                    # Yorum yapma ve görüntüleme özelliği
+│   │   │   │   ├── components/
+│   │   │   │   │   └── review-list/review-list.component.ts
+│   │   │   │   │   └── review-form/review-form.component.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── review.service.ts
+│   │   │   │   ├── models/                 # Yorum arayüzleri/DTO'lar
+│   │   │   │   │   └── review.models.ts    # ReviewRequest, ReviewResponse interfaces
+│   │   │   │   └── reviews.routes.ts
+│   │   │   │
+│   │   │   └── certificates/               # Sertifikaları görüntüleme ve doğrulama özelliği
+│   │   │       ├── components/
+│   │   │       │   └── certificate-list/certificate-list.component.ts
+│   │   │       │   └── certificate-detail/certificate-detail.component.ts
+│   │   │       │   └── certificate-verify/certificate-verify.component.ts
+│   │   │       ├── services/
+│   │   │       │   └── certificate.service.ts
+│   │   │       ├── models/                 # Sertifika arayüzleri/DTO'lar
+│   │   │       │   └── certificate.models.ts # CertificateResponse interface
+│   │   │       └── certificates.routes.ts
+│   │   │
+│   ├── assets/                             # Resimler, ikonlar, fontlar gibi statik dosyalar
+│   │   ├── images/
+│   │   └── icons/
+│   │
+│   ├── environments/                       # Ortam değişkenleri (API URL'leri vb.)
+│   │   └── environment.ts
+│   │   └── environment.development.ts
+│   │
+│   ├── index.html                          # Uygulamanın ana HTML dosyası
+│   ├── main.ts                             # Uygulamanın başlangıç noktası
+│   └── styles.css                          # Global stil dosyamız (renk paleti burada)
+│
+├── angular.json                            # Angular CLI yapılandırma dosyası
+├── package.json                            # Proje bağımlılıkları ve script'leri
+├── tsconfig.json                           # TypeScript yapılandırması
+└── ... diğer dosyalar

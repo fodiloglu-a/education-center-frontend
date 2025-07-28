@@ -1,0 +1,50 @@
+<!-- profile.component.html -->
+
+<div class="profile-container">
+  <!-- Yükleme Spinner'ı -->
+  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+  <!-- Hata Mesajı -->
+  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" (closed)="clearMessages()"></app-alert-dialog>
+
+  <!-- Başarı Mesajı (İleride kullanılabilir) -->
+  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" (closed)="clearMessages()"></app-alert-dialog>
+
+  <div class="profile-card" *ngIf="!isLoading && user">
+    <h2 class="card-title">{{ 'PROFILE' | translate }}</h2>
+    <p class="card-subtitle">{{ 'PROFILE_SUBTITLE' | translate }}</p>
+
+    <div class="profile-details">
+      <div class="detail-item">
+        <span class="detail-label">{{ 'FIRST_NAME' | translate }}:</span>
+        <span class="detail-value">{{ user.firstName }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">{{ 'LAST_NAME' | translate }}:</span>
+        <span class="detail-value">{{ user.lastName }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">{{ 'EMAIL' | translate }}:</span>
+        <span class="detail-value">{{ user.email }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">{{ 'ROLE' | translate }}:</span>
+        <span class="detail-value">{{ getTranslatedRole(user.role) }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">{{ 'MEMBER_SINCE' | translate }}:</span>
+        <span class="detail-value">{{ user.createdAt | date:'shortDate' }}</span> <!-- Tarih formatı için Angular DatePipe -->
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="action-button primary-btn" routerLink="/profile/edit">{{ 'EDIT_PROFILE' | translate }}</button>
+      <button class="action-button secondary-btn" routerLink="/profile/change-password">{{ 'CHANGE_PASSWORD' | translate }}</button>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !user && !errorMessage" class="no-user-found">
+    <p>{{ 'USER_NOT_LOADED' | translate }}</p>
+    <button class="action-button primary-btn" (click)="loadUserProfile()">{{ 'RETRY_LOAD_PROFILE' | translate }}</button>
+  </div>
+</div>

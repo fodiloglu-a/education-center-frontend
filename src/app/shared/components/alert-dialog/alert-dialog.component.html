@@ -1,0 +1,11 @@
+<!-- alert-dialog.component.html -->
+
+<div class="alert-dialog-container" [ngClass]="'alert-' + type">
+  <div class="alert-content">
+    <span class="material-icons alert-icon">{{ getIconName() }}</span>
+    <p class="alert-message">{{ message | translate }}</p>
+  </div>
+  <button *ngIf="showCloseButton" class="close-button" (click)="close()">
+    <span class="material-icons">close</span>
+  </button>
+</div>
