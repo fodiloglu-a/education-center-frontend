@@ -9,7 +9,8 @@ import { CourseResponse } from '../../models/course.models'; // CourseResponse m
 import { catchError, finalize } from 'rxjs/operators'; // Hata yakalama ve tamamlanma için
 import { of } from 'rxjs'; // Observable oluşturmak için
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component'; // Loading Spinner için
-import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component'; // Alert Dialog için
+import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
+import {AuthService} from "../../../../core/services/auth.service"; // Alert Dialog için
 
 @Component({
   selector: 'app-course-list',
@@ -46,6 +47,7 @@ export class CourseListComponent implements OnInit {
     this.errorMessage = null;
 
     this.courseService.getAllPublishedCourses().pipe(
+
       catchError(error => {
         this.errorMessage = error.message || this.translate.instant('COURSE_LOAD_FAILED_GENERIC');
         return of([]); // Hata durumunda boş dizi döndür
