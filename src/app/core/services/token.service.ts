@@ -40,7 +40,7 @@ export class TokenService {
    */
   private initializeTokenState(): void {
     const token = this.getAccessToken();
-    if (token && this.isTokenValid()) {
+    if (token && this.isTokenValid(token)) {
       const user = this.getStoredUser();
       if (user) {
         this._isLoggedIn$.next(true);
@@ -63,8 +63,12 @@ export class TokenService {
    */
   private setStorageItem(key: string, value: string, useSessionStorage: boolean = false): void {
     if (isPlatformBrowser(this.platformId)) {
-      const storage = useSessionStorage ? window.sessionStorage : window.localStorage;
-      storage.setItem(key, value);
+      try {
+        const storage = useSessionStorage ? window.sessionStorage : window.localStorage;
+        storage.setItem(key, value);
+      } catch (error) {
+        console.error('Storage write error:', error);
+      }
     }
   }
 
@@ -73,8 +77,13 @@ export class TokenService {
    */
   private getStorageItem(key: string): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      // Önce localStorage'ı kontrol et, yoksa sessionStorage'a bak
-      return window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
+      try {
+        // Önce localStorage'ı kontrol et, yoksa sessionStorage'a bak
+        return window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
+      } catch (error) {
+        console.error('Storage read error:', error);
+        return null;
+      }
     }
     return null;
   }
@@ -84,8 +93,12 @@ export class TokenService {
    */
   private removeStorageItem(key: string): void {
     if (isPlatformBrowser(this.platformId)) {
-      window.localStorage.removeItem(key);
-      window.sessionStorage.removeItem(key);
+      try {
+        window.localStorage.removeItem(key);
+        window.sessionStorage.removeItem(key);
+      } catch (error) {
+        console.error('Storage remove error:', error);
+      }
     }
   }
 
@@ -103,7 +116,11 @@ export class TokenService {
       const useSessionStorage = !rememberMe;
 
       this.setStorageItem(this.ACCESS_TOKEN_KEY, accessToken, useSessionStorage);
-      this.setStorageItem(this.REFRESH_TOKEN_KEY, refreshToken, useSessionStorage);
+
+      if (refreshToken) {
+        this.setStorageItem(this.REFRESH_TOKEN_KEY, refreshToken, useSessionStorage);
+      }
+
       this.setStorageItem(this.REMEMBER_ME_KEY, rememberMe.toString(), false);
 
       // Token'dan kullanıcı bilgilerini çıkar ve sakla
@@ -111,10 +128,10 @@ export class TokenService {
       if (payload) {
         const userProfile: UserProfile = {
           id: payload.sub,
-          email: payload.email,
-          firstName: payload.firstName,
-          lastName: payload.lastName,
-          role: payload.role,
+          email: payload.email || '',
+          firstName: payload.firstName || '',
+          lastName: payload.lastName || '',
+          role: payload.role || 'USER',
           isEmailVerified: payload.isEmailVerified || false,
           createdAt: payload.createdAt || new Date().toISOString()
         };
@@ -165,12 +182,29 @@ export class TokenService {
   /**
    * JWT token'ı decode eder
    */
-  public decodeToken(token: string): TokenPayload | null {
+  public decodeToken(token: string | null): TokenPayload | null {
+    if (!token) {
+      console.warn('Attempted to decode a null or undefined token.');
+      return null;
+    }
+
     try {
-      const base64Url = token.split('.')[1];
+      // Token'ı parçalara ayır
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('Invalid JWT token format');
+        return null;
+      }
+
+      const base64Url = parts[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+      // Base64 padding ekle
+      const padLen = (4 - base64.length % 4) % 4;
+      const paddedBase64 = base64 + '='.repeat(padLen);
+
       const jsonPayload = decodeURIComponent(
-          atob(base64)
+          atob(paddedBase64)
               .split('')
               .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
               .join('')
@@ -186,7 +220,7 @@ export class TokenService {
   /**
    * Token'ın geçerli olup olmadığını kontrol eder
    */
-  public isTokenValid(token?: string): boolean {
+  public isTokenValid(token?: string | null): boolean {
     const tokenToCheck = token || this.getAccessToken();
 
     if (!tokenToCheck) {
@@ -240,7 +274,8 @@ export class TokenService {
    * Kullanıcının belirli bir role sahip olup olmadığını kontrol eder
    */
   public hasRole(role: string): boolean {
-    return this._userRole$.getValue() === role;
+    const currentUserRole = this._userRole$.getValue();
+    return currentUserRole === role;
   }
 
   /**
@@ -322,43 +357,37 @@ export class TokenService {
    * saveTokenAndUser metodu - eski JwtResponse formatı ile uyumluluk için
    */
   public saveTokenAndUser(jwtResponse: any): void {
-    if (!jwtResponse || !jwtResponse.token) {
-      console.error('TokenService: JWT Response or token is null/undefined. Not saving.');
+    if (!jwtResponse || !jwtResponse.accessToken) {
+      console.error('TokenService: JWT Response or accessToken is null/undefined. Not saving.');
       return;
     }
 
     if (isPlatformBrowser(this.platformId)) {
-      // Eski format için uyumluluk
       const rememberMe = this.isRememberMe();
       const useSessionStorage = !rememberMe;
 
-      // Token'ı sakla
-      this.setStorageItem(this.ACCESS_TOKEN_KEY, jwtResponse.token, useSessionStorage);
+      this.setStorageItem(this.ACCESS_TOKEN_KEY, jwtResponse.accessToken, useSessionStorage);
 
-      // Eğer refreshToken varsa onu da sakla
       if (jwtResponse.refreshToken) {
         this.setStorageItem(this.REFRESH_TOKEN_KEY, jwtResponse.refreshToken, useSessionStorage);
       }
 
-      // Kullanıcı bilgilerini sakla
       const userToStore = {
-        id: jwtResponse.id,
-        email: jwtResponse.email,
-        firstName: jwtResponse.firstName,
-        lastName: jwtResponse.lastName,
-        role: jwtResponse.role,
+        id: jwtResponse.id || 0,
+        email: jwtResponse.email || '',
+        firstName: jwtResponse.firstName || '',
+        lastName: jwtResponse.lastName || '',
+        role: jwtResponse.role || 'USER',
         isEmailVerified: jwtResponse.isEmailVerified || false,
         createdAt: jwtResponse.createdAt || new Date().toISOString()
       };
 
       this.setStorageItem(this.USER_KEY, JSON.stringify(userToStore), useSessionStorage);
 
-      // State'i güncelle
       this._isLoggedIn$.next(true);
       this._userRole$.next(userToStore.role);
 
-      // Token expiry hesapla
-      const payload = this.decodeToken(jwtResponse.token);
+      const payload = this.decodeToken(jwtResponse.accessToken);
       if (payload?.exp) {
         this._tokenExpiry$.next(new Date(payload.exp * 1000));
       }

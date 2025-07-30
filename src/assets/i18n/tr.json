@@ -350,5 +350,63 @@
   "VIEW_LESSON": "Dersi Görüntüle",
   "NO_REVIEWS_AND_NOTES_FOUND": "Hiç Yorum veya Not Bulunamadı.",
   "RETRY_LOAD_REVIEWS_AND_NOTES": "Yorumları ve Notları Yeniden Yükle",
-  "ERROR_COURSE_ID_MISSING_FOR_NOTE_NAVIGATION": "Not navigasyonu için kurs ID'si eksik."
+  "ERROR_COURSE_ID_MISSING_FOR_NOTE_NAVIGATION": "Not navigasyonu için kurs ID'si eksik.",
+
+
+  "EDUCATION_CENTER": "Eğitim Merkezi",
+  "EXPLORE_MORE_COURSES": "Daha Fazla Kurs Keşfet",
+  "EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_LOGGED_IN": "Size özel hazırlanmış kurs önerilerimizi keşfedin ve eğitim yolculuğunuza devam edin.",
+  "EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_NOT_LOGGED_IN": "Binlerce kaliteli kursu keşfedin ve yeni beceriler öğrenmeye başlayın.",
+  "GO_TO_EDUCATION_CENTER": "Eğitim Merkezine Git",
+  "RECOMMENDED_COURSES_TITLE": "Sizin İçin Önerilen Kurslar",
+  "TOP_SELLING_COURSES": "En Çok Satan Kurslar",
+  "PERSONALIZED_RECOMMENDATIONS_FOR_YOU": "Size özel hazırlanmış kurs önerileri",
+  "GENERAL_TOP_SELLING_COURSES_SUBTITLE": "En popüler ve beğenilen kurslarımızı keşfedin",
+  "STUDENTS": "Öğrenci",
+  "VIEW_DETAILS": "Detayları Görüntüle",
+  "MY_PURCHASED_COURSES": "Satın Aldığım Kurslar",
+  "BROWSE_MY_PURCHASED_COURSES_SUBTITLE": "Satın aldığınız kurslara erişin ve eğitiminize devam edin",
+  "DETAILS": "Detaylar",
+  "NO_PURCHASED_COURSES_FOUND": "Satın Alınmış Kurs Bulunamadı",
+  "NO_PURCHASED_COURSES_MESSAGE": "Henüz bir kurs satın almadınız. Eğitim merkezimizi ziyaret ederek size uygun kursları keşfedebilirsiniz.",
+  "REFRESH": "Yenile",
+  "COURSE_LOAD_ERROR": "Kurslar yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+
+  "CATEGORY": {
+    "PROGRAMMING": "Programlama",
+    "WEB_DEVELOPMENT": "Web Geliştirme",
+    "MOBILE_DEVELOPMENT": "Mobil Geliştirme",
+    "DATA_SCIENCE": "Veri Bilimi",
+    "ARTIFICIAL_INTELLIGENCE": "Yapay Zeka",
+    "MACHINE_LEARNING": "Makine Öğrenmesi",
+    "CYBERSECURITY": "Siber Güvenlik",
+    "CLOUD_COMPUTING": "Bulut Bilişim",
+    "DEVOPS": "DevOps",
+    "DATABASE": "Veritabanı",
+    "UI_UX_DESIGN": "UI/UX Tasarım",
+    "GRAPHIC_DESIGN": "Grafik Tasarım",
+    "DIGITAL_MARKETING": "Dijital Pazarlama",
+    "BUSINESS": "İşletme",
+    "PROJECT_MANAGEMENT": "Proje Yönetimi",
+    "LANGUAGE": "Dil Eğitimi",
+    "PERSONAL_DEVELOPMENT": "Kişisel Gelişim",
+    "PHOTOGRAPHY": "Fotoğrafçılık",
+    "VIDEO_EDITING": "Video Düzenleme",
+    "MUSIC": "Müzik",
+    "OTHER": "Diğer"
+  },
+
+  "LEVEL": {
+    "BEGINNER": "Başlangıç",
+    "INTERMEDIATE": "Orta",
+    "ADVANCED": "İleri",
+    "EXPERT": "Uzman",
+    "ALL_LEVELS": "Tüm Seviyeler"
+  },
+
+
+  "DURATION_HOURS_MINUTES": "{{hours}} saat {{minutes}} dakika",
+  "DURATION_HOURS": "{{hours}} saat",
+  "DURATION_MINUTES": "{{minutes}} dakika"
+
 }

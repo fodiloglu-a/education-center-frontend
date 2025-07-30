@@ -352,5 +352,55 @@
   "VIEW_LESSON": "Переглянути урок",
   "NO_REVIEWS_AND_NOTES_FOUND": "Відгуків або нотаток не знайдено.",
   "RETRY_LOAD_REVIEWS_AND_NOTES": "Повторити завантаження відгуків та нотаток",
-  "ERROR_COURSE_ID_MISSING_FOR_NOTE_NAVIGATION": "Відсутній ідентифікатор курсу для навігації до нотатки."
+  "ERROR_COURSE_ID_MISSING_FOR_NOTE_NAVIGATION": "Відсутній ідентифікатор курсу для навігації до нотатки.",
+  "EDUCATION_CENTER": "Освітній Центр",
+  "EXPLORE_MORE_COURSES": "Досліджуйте Більше Курсів",
+  "EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_LOGGED_IN": "Відкрийте для себе персоналізовані рекомендації курсів і продовжуйте свою освітню подорож.",
+  "EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_NOT_LOGGED_IN": "Відкрийте для себе тисячі якісних курсів і почніть вивчати нові навички.",
+  "GO_TO_EDUCATION_CENTER": "Перейти до Освітнього Центру",
+  "RECOMMENDED_COURSES_TITLE": "Рекомендовані Курси для Вас",
+  "TOP_SELLING_COURSES": "Найпопулярніші Курси",
+  "PERSONALIZED_RECOMMENDATIONS_FOR_YOU": "Персоналізовані рекомендації курсів для вас",
+  "GENERAL_TOP_SELLING_COURSES_SUBTITLE": "Відкрийте наші найпопулярніші та найвищі за рейтингом курси",
+  "STUDENTS": "Студентів",
+  "VIEW_DETAILS": "Переглянути Деталі",
+  "MY_PURCHASED_COURSES": "Мої Придбані Курси",
+  "BROWSE_MY_PURCHASED_COURSES_SUBTITLE": "Отримуйте доступ до ваших придбаних курсів і продовжуйте навчання",
+  "DETAILS": "Деталі",
+  "NO_PURCHASED_COURSES_FOUND": "Придбаних Курсів Не Знайдено",
+  "NO_PURCHASED_COURSES_MESSAGE": "Ви ще не придбали жодного курсу. Відвідайте наш освітній центр, щоб знайти курси, які вам підходять.",
+  "REFRESH": "Оновити",
+  "COURSE_LOAD_ERROR": "Сталася помилка під час завантаження курсів. Будь ласка, спробуйте ще раз.",
+
+  "CATEGORY": {
+    "PROGRAMMING": "Програмування",
+    "WEB_DEVELOPMENT": "Веб-розробка",
+    "MOBILE_DEVELOPMENT": "Мобільна розробка",
+    "DATA_SCIENCE": "Наука про дані",
+    "ARTIFICIAL_INTELLIGENCE": "Штучний інтелект",
+    "MACHINE_LEARNING": "Машинне навчання",
+    "CYBERSECURITY": "Кібербезпека",
+    "CLOUD_COMPUTING": "Хмарні обчислення",
+    "DEVOPS": "DevOps",
+    "DATABASE": "База даних",
+    "UI_UX_DESIGN": "UI/UX Дизайн",
+    "GRAPHIC_DESIGN": "Графічний дизайн",
+    "DIGITAL_MARKETING": "Цифровий маркетинг",
+    "BUSINESS": "Бізнес",
+    "PROJECT_MANAGEMENT": "Управління проектами",
+    "LANGUAGE": "Вивчення мов",
+    "PERSONAL_DEVELOPMENT": "Особистий розвиток",
+    "PHOTOGRAPHY": "Фотографія",
+    "VIDEO_EDITING": "Відеомонтаж",
+    "MUSIC": "Музика",
+    "OTHER": "Інше"
+  },
+
+
+
+
+
+  "DURATION_HOURS_MINUTES": "{{hours}} год {{minutes}} хв",
+  "DURATION_HOURS": "{{hours}} год",
+  "DURATION_MINUTES": "{{minutes}} хв"
 }

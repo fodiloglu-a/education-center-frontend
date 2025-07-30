@@ -1,17 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
+import { Subject, interval, Subscription } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 // Services
 import { CourseService } from '../../services/course.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TokenService } from '../../../../core/services/token.service';
 
 // Models
-import { CourseResponse, TopSellingCoursesResponse, CourseCategory } from '../../models/course.models';
+import { CourseResponse, CourseCategory } from '../../models/course.models';
 
 // Components
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -32,16 +33,27 @@ import { AlertDialogComponent } from '../../../../shared/components/alert-dialog
 })
 export class CourseListComponent implements OnInit, OnDestroy {
   // Ana değişkenler
-  topSellingCourses: CourseResponse[] = [];
-  allCourses: CourseResponse[] = [];
+  topSellingCourses: CourseResponse[] = []; // Reklam/öneri alanı
+  allCourses: CourseResponse[] = []; // Satın Alınan Kurslar alanı
   isLoading: boolean = true;
   errorMessage: string | null = null;
-  showNoDataMessage: boolean = false;
+
+  // Yeni eklenen: Reklam alanında CTA gösterilmesi gerekip gerekmediğini belirtir
+  showCallToActionForTopSelling: boolean = false;
 
   // Kullanıcı durumu
   isLoggedIn: boolean = false;
-  userHasPurchases: boolean = false;
+  currentUserId: number | null = null;
   personalizedCategory: CourseCategory | null = null;
+
+  // Slider properties
+  currentSlide = 0;
+  maxSlide = 0;
+  slideWidth = 100;
+  slideIndicators: number[] = [];
+  autoSlideInterval?: Subscription;
+  autoSlideEnabled = true;
+  slidesPerView = 1;
 
   // Component lifecycle management
   private destroy$ = new Subject<void>();
@@ -52,103 +64,269 @@ export class CourseListComponent implements OnInit, OnDestroy {
   constructor(
       private courseService: CourseService,
       private authService: AuthService,
-      private translate: TranslateService
+      private translate: TranslateService,
+      private tokenService: TokenService
   ) { }
 
   ngOnInit(): void {
-    this.checkUserStatus();
-    this.loadTopSellingCourses();
-    this.loadAllCourses();
+    // Window resize listener
+    this.calculateResponsiveSlides();
+
+    // Kullanıcı durumu değiştiğinde kursları yeniden yükle
+    this.authService.getCurrentUser()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(user => {
+          this.isLoggedIn = !!user;
+          this.currentUserId = user ? user.id : null;
+          this.loadTopSellingCourses(); // Kullanıcı durumu değiştiğinde önerileri yükle
+          this.loadPurchasedCourses();       // Satın alınan kursları yükle
+        });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.stopAutoSlide();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(): void {
+    this.calculateResponsiveSlides();
+    this.updateSliderDimensions();
   }
 
   /**
-   * Kullanıcı durumunu kontrol eder
-   */
-  private checkUserStatus(): void {
-    this.authService.getCurrentUser()
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(user => {
-          this.isLoggedIn = !!user;
-        });
-  }
-
-  /**
-   * En çok satan kursları yükler (kişiselleştirilmiş veya genel)
+   * Reklam/öneri alanı için kursları yükler (kişiselleştirilmiş veya genel).
+   * Kullanıcının satın aldığı kurslar varsa, onlara benzer kurslar önerir.
+   * Hiç satın alım yoksa veya giriş yapılmamışsa, en çok satanları gösterir ve yönlendirme butonu açar.
    */
   loadTopSellingCourses(): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.showNoDataMessage = false;
+    this.showCallToActionForTopSelling = false; // Her yüklemede sıfırla
 
-    this.courseService.getTopSellingCourses(5, this.isLoggedIn)
-        .pipe(
-            takeUntil(this.destroy$),
-            catchError(error => {
-              console.error('En çok satan kurslar yüklenirken hata:', error);
-              // Hata durumunda genel kursları göstermeyi dene
-              if (this.isLoggedIn) {
-                return this.courseService.getTopSellingCourses(5, false).pipe(
-                    catchError((innerError) => { // İç hata yakalama
-                      console.error('Genel en çok satan kurslar yüklenirken hata:', innerError);
-                      this.showNoDataMessage = true;
-                      // Hata durumunda boş bir yanıt dön
-                      return of({ isPersonalized: false, courses: [], totalCount: 0, category: undefined } as TopSellingCoursesResponse);
-                    })
-                );
-              }
-              this.showNoDataMessage = true;
-              // Hata durumunda boş bir yanıt dön
-              return of({ isPersonalized: false, courses: [], totalCount: 0, category: undefined } as TopSellingCoursesResponse);
-            }),
-            finalize(() => {
-              this.isLoading = false;
-            })
-        )
-        .subscribe(response => {
-          // BURADAKİ KONTROL EKLENDİ
-          if (response && response.courses) { // response ve response.courses'ın varlığını kontrol et
-            if (response.courses.length > 0) {
-              this.topSellingCourses = response.courses;
-              this.personalizedCategory = response.category || null;
-              this.userHasPurchases = response.isPersonalized;
+    let fetchObservable: Observable<CourseResponse[]>;
+    let isPersonalizedAttempt = false;
+
+    if (this.isLoggedIn && this.currentUserId) {
+      isPersonalizedAttempt = true;
+      // Giriş yapmış kullanıcılar için önerilen kursları çekmeyi dene
+      fetchObservable = this.courseService.getRecommendedCourses(this.currentUserId, 5).pipe(
+          catchError(err => {
+            console.warn('Kişiselleştirilmiş öneriler yüklenirken hata, genel en çok satanlara düşülüyor:', err);
+            // Hata durumunda genel en çok satanlara fallback yap
+            isPersonalizedAttempt = false; // Kişiselleştirme başarısız oldu
+            return this.courseService.getTopSellingCourses(5, false, null); // personalized: false, userId: null
+          })
+      );
+    } else {
+      // Kullanıcı giriş yapmamışsa, doğrudan genel en çok satanları yükle
+      fetchObservable = this.courseService.getTopSellingCourses(5, false, null); // personalized: false, userId: null
+    }
+
+    fetchObservable.pipe(
+        takeUntil(this.destroy$),
+        catchError(error => {
+          console.error('Öneri/En çok satan kurslar yüklenirken genel hata:', error);
+          this.topSellingCourses = []; // Hata durumunda boş dizi dön
+          this.showCallToActionForTopSelling = true; // Yönlendirme butonunu göster
+          return of([]);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+    ).subscribe(courses => {
+      if (courses && courses.length > 0) {
+        this.topSellingCourses = courses;
+        this.showCallToActionForTopSelling = false; // Kursları göster, yönlendirme yok
+        this.personalizedCategory = isPersonalizedAttempt && courses[0]?.category ? courses[0].category : null;
+
+        // Slider'ı initialize et
+        this.initializeSlider();
+      } else {
+        // Kurs bulunamadıysa (kişiselleştirilmiş veya genel) veya hata varsa
+        this.topSellingCourses = [];
+        this.showCallToActionForTopSelling = true; // Yönlendirme butonunu göster
+        this.personalizedCategory = null;
+      }
+    });
+  }
+
+  /**
+   * "Satın Alınan Kurslar" bölümü için kursları yükler.
+   * Sadece giriş yapmış kullanıcının satın aldığı kursları gösterir.
+   * Giriş yapmamışsa veya satın almamışsa boş liste gösterir.
+   */
+  loadPurchasedCourses(): void { // loadAllCourses yerine loadPurchasedCourses olarak isim değişti
+    this.isLoading = true;
+    this.errorMessage = null;
+    console.log('isLoggedIn',this.isLoggedIn, 'currentUserId' ,this.currentUserId)
+    if (this.isLoggedIn && this.currentUserId) {
+      // Giriş yapmış kullanıcılar için satın alınan kursları çek
+      this.courseService.getPurchasedCoursesByUserId(this.currentUserId)
+          .pipe(
+              takeUntil(this.destroy$),
+              catchError(error => {
+                console.error('Satın alınan kurslar yüklenirken hata:', error);
+                this.errorMessage = this.translate.instant('COURSE_LOAD_ERROR');
+                return of([]); // Hata durumunda boş dizi dön
+              }),
+              finalize(() => {
+                this.isLoading = false;
+              })
+          )
+          .subscribe(courses => {
+            if (courses) {
+              this.allCourses = courses; // `allCourses` değişkeni satın alınan kursları tutacak
             } else {
-              this.showNoDataMessage = true;
+              this.allCourses = [];
             }
-          } else {
-            // Eğer response veya response.courses undefined/null ise buraya düşer
-            this.showNoDataMessage = true;
-            this.topSellingCourses = []; // topSellingCourses'ı boş bir dizi olarak ayarla
-          }
+          });
+    } else {
+      // Kullanıcı giriş yapmamışsa, satın alınan kurslar boş olacak
+      this.allCourses = [];
+      this.isLoading = false; // Yükleme bitti
+    }
+  }
+
+  // ========== SLIDER METHODS ==========
+
+  /**
+   * Slider'ı initialize eder
+   */
+  private initializeSlider(): void {
+    if (this.topSellingCourses.length === 0) return;
+
+    this.calculateResponsiveSlides();
+    this.updateSliderDimensions();
+    this.createSlideIndicators();
+    this.startAutoSlide();
+  }
+
+  /**
+   * Ekran boyutuna göre gösterilecek slide sayısını hesaplar
+   */
+  private calculateResponsiveSlides(): void {
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth < 481) {
+      this.slidesPerView = 1;
+    } else if (screenWidth < 768) {
+      this.slidesPerView = 1;
+    } else if (screenWidth < 1024) {
+      this.slidesPerView = 2;
+    } else {
+      this.slidesPerView = 3;
+    }
+  }
+
+  /**
+   * Slider boyutlarını günceller
+   */
+  private updateSliderDimensions(): void {
+    if (this.topSellingCourses.length === 0) return;
+
+    this.slideWidth = 100 / this.slidesPerView;
+    this.maxSlide = Math.max(0, Math.ceil(this.topSellingCourses.length / this.slidesPerView) - 1);
+
+    // Mevcut slide'ı sınırlar içinde tut
+    if (this.currentSlide > this.maxSlide) {
+      this.currentSlide = this.maxSlide;
+    }
+  }
+
+  /**
+   * Slide indicator'larını oluşturur
+   */
+  private createSlideIndicators(): void {
+    const totalSlides = Math.ceil(this.topSellingCourses.length / this.slidesPerView);
+    this.slideIndicators = Array.from({ length: totalSlides }, (_, i) => i);
+  }
+
+  /**
+   * Otomatik slide'ı başlatır
+   */
+  private startAutoSlide(): void {
+    if (!this.autoSlideEnabled || this.topSellingCourses.length <= this.slidesPerView) return;
+
+    this.stopAutoSlide(); // Önceki interval'ı temizle
+
+    this.autoSlideInterval = interval(4000) // 4 saniyede bir değiş
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.nextSlide();
         });
   }
 
   /**
-   * Tüm yayınlanmış kursları yükler
+   * Otomatik slide'ı durdurur
    */
-  loadAllCourses(): void {
-    this.courseService.getAllPublishedCourses()
-        .pipe(
-            takeUntil(this.destroy$),
-            catchError(error => {
-              console.error('Tüm kurslar yüklenirken hata:', error);
-              this.errorMessage = this.translate.instant('COURSE_LOAD_ERROR');
-              return of([]);
-            })
-        )
-        .subscribe(courses => {
-          // BURADAKİ KONTROL EKLENDİ
-          if (courses) { // courses'ın varlığını kontrol et
-            this.allCourses = courses;
-          } else {
-            this.allCourses = []; // allCourses'ı boş bir dizi olarak ayarla
-          }
-        });
+  private stopAutoSlide(): void {
+    if (this.autoSlideInterval) {
+      this.autoSlideInterval.unsubscribe();
+      this.autoSlideInterval = undefined;
+    }
   }
+
+  /**
+   * Sonraki slide'a geçer
+   */
+  nextSlide(): void {
+    if (this.currentSlide < this.maxSlide) {
+      this.currentSlide++;
+    } else {
+      this.currentSlide = 0; // Başa dön
+    }
+    this.restartAutoSlide();
+  }
+
+  /**
+   * Önceki slide'a geçer
+   */
+  previousSlide(): void {
+    if (this.currentSlide > 0) {
+      this.currentSlide--;
+    } else {
+      this.currentSlide = this.maxSlide; // Sona git
+    }
+    this.restartAutoSlide();
+  }
+
+  /**
+   * Belirtilen slide'a gider
+   */
+  goToSlide(slideIndex: number): void {
+    this.currentSlide = Math.min(slideIndex, this.maxSlide);
+    this.restartAutoSlide();
+  }
+
+  /**
+   * Otomatik slide'ı yeniden başlatır
+   */
+  private restartAutoSlide(): void {
+    if (this.autoSlideEnabled) {
+      this.stopAutoSlide();
+      setTimeout(() => this.startAutoSlide(), 1000); // 1 saniye bekle sonra otomatik slide'ı başlat
+    }
+  }
+
+  /**
+   * Slider mouse enter event
+   */
+  onSliderMouseEnter(): void {
+    this.stopAutoSlide();
+  }
+
+  /**
+   * Slider mouse leave event
+   */
+  onSliderMouseLeave(): void {
+    if (this.autoSlideEnabled) {
+      this.startAutoSlide();
+    }
+  }
+
+  // ========== UTILITY METHODS ==========
 
   /**
    * Harici satın alma platformuna yönlendirir
@@ -229,14 +407,13 @@ export class CourseListComponent implements OnInit, OnDestroy {
    */
   refreshPage(): void {
     this.loadTopSellingCourses();
-    this.loadAllCourses();
+    this.loadPurchasedCourses();
   }
 
   /**
    * Kursa tıklandığında
    */
   onCourseClick(courseId: number): void {
-    // Analytics veya diğer işlemler için
     console.log('Kursa tıklandı:', courseId);
   }
 }

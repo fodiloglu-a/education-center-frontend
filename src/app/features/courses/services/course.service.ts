@@ -133,14 +133,19 @@ export class CourseService {
    * En çok satan kursları getirir. Kullanıcı giriş yapmışsa kişiselleştirilmiş sonuçlar döner.
    * @param limit Döndürülecek kurs sayısı (varsayılan: 5)
    * @param personalized Kişiselleştirilmiş sonuçlar istenip istenmediği
-   * @returns En çok satan kursların TopSellingCoursesResponse nesnesini içeren Observable.
+   * @param userId Kişiselleştirme için kullanıcı ID'si (opsiyonel)
+   * @returns En çok satan kursların CourseResponse dizisini içeren Observable.
    */
-  getTopSellingCourses(limit: number = 5, personalized: boolean = true): Observable<TopSellingCoursesResponse> {
-    const params = new HttpParams()
+  getTopSellingCourses(limit: number = 5, personalized: boolean = true, userId: number | null = null): Observable<CourseResponse[]> {
+    let params = new HttpParams()
         .set('limit', limit.toString())
         .set('personalized', personalized.toString());
-
-    return this.http.get<TopSellingCoursesResponse>(`${this.apiUrl}/top-selling`, { params });
+    // Backend'de userId parametresi @RequestParam olarak alınmıyorsa burada göndermeyin
+    // Ancak CourseService'iniz bunu alıyorsa, burada eklemek doğru olur
+    // if (userId !== null) {
+    //   params = params.set('userId', userId.toString());
+    // }
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/top-selling`, { params });
   }
 
   /**
@@ -173,7 +178,6 @@ export class CourseService {
   }): Observable<CourseResponse[]> {
     let params = new HttpParams();
 
-    // Sadece tanımlı olan filtreleri ekle
     Object.keys(filters).forEach(key => {
       const value = filters[key as keyof typeof filters];
       if (value !== undefined && value !== null) {
@@ -186,13 +190,21 @@ export class CourseService {
 
   /**
    * Kullanıcının satın aldığı kurslara göre önerilen kursları getirir.
+   * @param userId Kullanıcının ID'si
    * @param limit Döndürülecek kurs sayısı (varsayılan: 10)
    * @returns Önerilen kursların CourseResponse dizisini içeren Observable.
    */
-  getRecommendedCourses(limit: number = 10): Observable<CourseResponse[]> {
+  getRecommendedCourses(userId: number, limit: number = 10): Observable<CourseResponse[]> {
     const params = new HttpParams().set('limit', limit.toString());
+    // Backend endpoint'inizde userId'yi path variable olarak mı yoksa request param olarak mı aldığınıza dikkat edin.
+    // Şuan ki Controller'ınızda RequestParam olarak alıyor, ancak eğer satın alınan kursları fetch edip onlardan kategori alıyorsanız
+    // o zaman bu endpoint'in userId'yi doğrudan path variable olarak alması daha mantıklı olabilir.
+    // Örneğin: /api/courses/recommended/user/{userId}
+    // Ancak şimdilik mevcut backend controller'ınızdaki /api/courses/recommended?limit={limit} yapısına göre ayarlıyorum.
+    // Backend'de personalized logic userId'ye göre yapılıyor.
     return this.http.get<CourseResponse[]>(`${this.apiUrl}/recommended`, { params });
   }
+
 
   /**
    * Belirli bir kategorideki kursları getirir.
@@ -243,5 +255,15 @@ export class CourseService {
    */
   getDiscountedCourses(): Observable<CourseResponse[]> {
     return this.http.get<CourseResponse[]>(`${this.apiUrl}/discounted`);
+  }
+
+  /**
+   * Kullanıcının satın aldığı tüm kursları getirir.
+   * @param userId Kullanıcının ID'si.
+   * @returns Satın alınan kursların CourseResponse dizisini içeren Observable.
+   */
+  getPurchasedCoursesByUserId(userId: number): Observable<CourseResponse[]> {
+    // Backend Controller'ınızdaki ilgili endpoint: @GetMapping("/purchased/user/{userId}")
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/purchased/user/${userId}`);
   }
 }
