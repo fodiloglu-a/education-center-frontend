@@ -2,10 +2,12 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink, Router } from '@angular/router'; // Router import edildi
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CourseService } from '../../services/course.service';
-import { CourseDetailsResponse, LessonDTO } from '../../models/course.models';
+import { CourseDetailsResponse, LessonDTO, CourseCategory, CourseLevel } from '../../models/course.models';
+import { ReviewService } from '../../../reviews/services/review.service';
+import { ReviewResponse } from '../../../reviews/models/review.models'; // ReviewResponse import edildi
 
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -30,19 +32,24 @@ export class CourseDetailComponent implements OnInit {
   course: CourseDetailsResponse | null = null;
   isLoading: boolean = true;
   errorMessage: string | null = null;
-  successMessage: string | null = null; // Başarı mesajı eklendi
+  successMessage: string | null = null;
   courseId: number | null = null;
   isInstructorOrAdmin: boolean = false;
+  currentUserId: number | null = null;
+  hasUserReviewed: boolean = false;
 
   constructor(
-    private route: ActivatedRoute,
-    private courseService: CourseService,
-    private translate: TranslateService,
-    private tokenService: TokenService,
-    private router: Router // Router enjekte edildi
+      private route: ActivatedRoute,
+      private courseService: CourseService,
+      private translate: TranslateService,
+      private tokenService: TokenService,
+      private router: Router,
+      private reviewService: ReviewService
   ) { }
 
   ngOnInit(): void {
+    this.currentUserId = this.tokenService.getUser()?.id || null;
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('courseId');
       if (id) {
@@ -66,24 +73,46 @@ export class CourseDetailComponent implements OnInit {
   loadCourseDetails(id: number): void {
     this.isLoading = true;
     this.errorMessage = null;
-    this.successMessage = null; // Mesajları temizle
+    this.successMessage = null;
 
     this.courseService.getCourseDetailsById(id).pipe(
-      catchError(error => {
-        this.errorMessage = error.message || this.translate.instant('COURSE_DETAIL_LOAD_FAILED_GENERIC');
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
+        catchError(error => {
+          this.errorMessage = error.message || this.translate.instant('COURSE_DETAIL_LOAD_FAILED_GENERIC');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
     ).subscribe(course => {
       if (course) {
         this.course = course;
         if (this.course.lessons) {
           this.course.lessons = [...this.course.lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
         }
+        // Yorumları işlerken kullanıcının kendi yorumu olup olmadığını kontrol et
+        if (this.course.reviews && this.currentUserId) {
+          // Kullanıcının bu kursa yorum yapıp yapmadığını kontrol et
+          this.hasUserReviewed = this.course.reviews.some(review => review.userId === this.currentUserId);
+          // Her yoruma kendi yorumu olup olmadığını belirten bir bayrak ekle
+          this.course.reviews = this.course.reviews.map(review => ({
+            ...review,
+            isCurrentUserReview: review.userId === this.currentUserId
+          }));
+        }
       }
     });
+  }
+
+  /**
+   * Mevcut kullanıcının bu kursa yaptığı yorumun ID'sini döndürür.
+   * Eğer yorum yapmamışsa null döner.
+   */
+  getUsersReviewId(): number | null {
+    if (this.course && this.course.reviews && this.currentUserId) {
+      const userReview = this.course.reviews.find(review => review.userId === this.currentUserId);
+      return userReview ? userReview.id : null;
+    }
+    return null;
   }
 
   /**
@@ -120,23 +149,27 @@ export class CourseDetailComponent implements OnInit {
    * @param courseId Silinecek eğitimin ID'si.
    */
   deleteCourse(courseId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_COURSE')); // Onay mesajı
+    // confirm yerine AlertDialogComponent kullanmalıyız
+    // const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_COURSE'));
+    // if (confirmation) { ... }
+    // Şimdilik confirm kullanmaya devam ediyorum, ancak gerçek uygulamada bu değiştirilmeli.
+    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_COURSE'));
     if (confirmation) {
       this.isLoading = true;
       this.courseService.deleteCourse(courseId).pipe(
-        catchError(error => {
-          this.errorMessage = error.message || this.translate.instant('DELETE_COURSE_FAILED_GENERIC');
-          return of(null);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
+          catchError(error => {
+            this.errorMessage = error.message || this.translate.instant('DELETE_COURSE_FAILED_GENERIC');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading = false;
+          })
       ).subscribe(response => {
-        if (response === null) { // Hata durumunda null döner
+        if (response === null) {
           return;
         }
         this.successMessage = this.translate.instant('DELETE_COURSE_SUCCESS');
-        this.router.navigate(['/courses']); // Başarılı silme sonrası eğitim listesine yönlendir
+        this.router.navigate(['/courses']);
       });
     }
   }
@@ -146,20 +179,20 @@ export class CourseDetailComponent implements OnInit {
    * @param courseId Durumu değiştirilecek eğitimin ID'si.
    */
   toggleCoursePublishedStatus(courseId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_TOGGLE_PUBLISH')); // Onay mesajı
+    const confirmation = confirm(this.translate.instant('CONFIRM_TOGGLE_PUBLISH'));
     if (confirmation) {
       this.isLoading = true;
       this.courseService.toggleCoursePublishedStatus(courseId).pipe(
-        catchError(error => {
-          this.errorMessage = error.message || this.translate.instant('TOGGLE_PUBLISH_FAILED_GENERIC');
-          return of(null);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
+          catchError(error => {
+            this.errorMessage = error.message || this.translate.instant('TOGGLE_PUBLISH_FAILED_GENERIC');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading = false;
+          })
       ).subscribe(updatedCourse => {
         if (updatedCourse) {
-          this.course!.published = updatedCourse.published; // UI'ı güncelle
+          this.course!.published = updatedCourse.published;
           this.successMessage = this.translate.instant('TOGGLE_PUBLISH_SUCCESS');
         }
       });
@@ -172,24 +205,96 @@ export class CourseDetailComponent implements OnInit {
    * @param lessonId Silinecek dersin ID'si.
    */
   deleteLesson(courseId: number, lessonId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_LESSON')); // Onay mesajı
+    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_LESSON'));
     if (confirmation) {
       this.isLoading = true;
       this.courseService.deleteLessonFromCourse(courseId, lessonId).pipe(
-        catchError(error => {
-          this.errorMessage = error.message || this.translate.instant('DELETE_LESSON_FAILED_GENERIC');
-          return of(null);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
+          catchError(error => {
+            this.errorMessage = error.message || this.translate.instant('DELETE_LESSON_FAILED_GENERIC');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading = false;
+          })
       ).subscribe(response => {
-        if (response === null) { // Hata durumunda null döner
+        if (response === null) {
           return;
         }
         this.successMessage = this.translate.instant('DELETE_LESSON_SUCCESS');
-        this.loadCourseDetails(courseId); // Ders listesini yenile
+        this.loadCourseDetails(courseId);
       });
     }
+  }
+
+  /**
+   * Bir yorumu silme işlemini başlatır.
+   * @param reviewId Silinecek yorumun ID'si.
+   */
+  deleteReview(reviewId: number): void {
+    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_REVIEW'));
+    if (confirmation) {
+      this.isLoading = true;
+      this.reviewService.deleteReview(reviewId).pipe(
+          catchError(error => {
+            this.errorMessage = error.message || this.translate.instant('DELETE_REVIEW_FAILED_GENERIC');
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoading = false;
+          })
+      ).subscribe(response => {
+        if (response === null) {
+          return;
+        }
+        this.successMessage = this.translate.instant('DELETE_REVIEW_SUCCESS');
+        this.loadCourseDetails(this.courseId!);
+      });
+    }
+  }
+
+  /**
+   * Bir yorumu düzenleme veya silme yetkisi olup olmadığını kontrol eder.
+   * Kullanıcı kendi yorumunu veya admin/eğitmen herhangi bir yorumu düzenleyebilir/silebilir.
+   * @param review Yorum nesnesi.
+   * @returns Yetki varsa true, aksi takdirde false.
+   */
+  canModifyReview(review: ReviewResponse): boolean {
+    // isCurrentUserReview bayrağını kullanıyoruz
+    return review.isCurrentUserReview || this.isInstructorOrAdmin;
+  }
+
+  // Yeni eklenen alanlar için çeviri helper'ları
+  getCategoryTranslation(category: CourseCategory): string {
+    return this.translate.instant(`CATEGORY.${category}`);
+  }
+
+  getLevelTranslation(level: CourseLevel): string {
+    return this.translate.instant(`LEVEL.${level}`);
+  }
+
+  formatDuration(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+
+    if (hours > 0 && mins > 0) {
+      return this.translate.instant('DURATION_HOURS_MINUTES', { hours, minutes: mins });
+    } else if (hours > 0) {
+      return this.translate.instant('DURATION_HOURS', { hours });
+    } else {
+      return this.translate.instant('DURATION_MINUTES', { minutes: mins });
+    }
+  }
+
+  formatPrice(price: number): string {
+    const lang = this.translate.currentLang;
+    const currency = lang === 'tr' ? 'TRY' : 'UAH';
+    const locale = lang === 'tr' ? 'tr-TR' : 'uk-UA';
+
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price);
   }
 }

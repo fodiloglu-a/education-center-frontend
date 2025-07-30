@@ -86,14 +86,16 @@
 }
 
 .lesson-description-card,
-.lesson-navigation-card {
+.lesson-navigation-card,
+.user-notes-section { /* Notlar bölümü için de aynı kart stili */
   background-color: var(--surface-bg);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-lg);
   box-shadow: var(--shadow-sm);
 }
 
-.card-title {
+.card-title,
+.section-title { /* Ortak başlık stili */
   color: var(--accent-color);
   font-size: var(--font-size-xxl);
   margin-top: 0;
@@ -107,7 +109,45 @@
   color: var(--text-color);
   font-size: var(--font-size-base);
   line-height: 1.6;
+  margin-bottom: var(--spacing-lg); /* Kaynaklarla arasına boşluk */
 }
+
+/* Ders Kaynakları */
+.lesson-resources {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--divider-color);
+}
+
+.resources-title {
+  font-size: var(--font-size-lg);
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.resources-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.resources-list li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.resources-list a {
+  color: var(--link-color);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  transition: color var(--transition-fast);
+}
+
+.resources-list a:hover {
+  color: var(--deep-blue);
+  text-decoration: underline;
+}
+
 
 /* Ders Navigasyon Listesi */
 .lesson-list {
@@ -235,6 +275,62 @@
   transform: translateY(-1px);
 }
 
+.action-button.danger-btn { /* Danger butonu için stil (deleteNote'da kullanılabilir) */
+  background-color: var(--error-color);
+  color: white;
+}
+
+.action-button.danger-btn:hover {
+  background-color: #d32f2f;
+  transform: translateY(-1px);
+}
+
+/* Not Alma Bölümü */
+.user-notes-section {
+  margin-top: var(--spacing-xl);
+}
+
+.note-textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  background-color: var(--input-bg);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing: border-box;
+  resize: vertical; /* Dikey yeniden boyutlandırmaya izin ver */
+  min-height: 100px;
+}
+
+.note-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+}
+
+.note-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  justify-content: flex-end; /* Butonları sağa hizala */
+}
+
+.save-note-button, .delete-note-button {
+  flex-grow: 0; /* Butonların esnemesini engelle */
+  width: auto;
+  min-width: 120px;
+}
+
+.note-timestamp {
+  font-size: var(--font-size-sm);
+  color: var(--dark-color);
+  text-align: right;
+  margin-top: var(--spacing-sm);
+}
+
+
 /* İçerik Bulunamadı Mesajı */
 .no-content-found {
   text-align: center;
@@ -280,6 +376,10 @@
   .lesson-player-actions {
     flex-direction: row; /* Butonları yatay hizala */
   }
+
+  .note-actions {
+    justify-content: flex-end; /* Not butonlarını sağa hizala */
+  }
 }
 
 @media (max-width: 767px) {
@@ -299,7 +399,7 @@
     font-size: var(--font-size-sm);
   }
 
-  .card-title {
+  .card-title, .section-title {
     font-size: var(--font-size-xl);
   }
 
@@ -322,5 +422,14 @@
   .action-button {
     font-size: var(--font-size-sm);
     padding: var(--spacing-sm);
+  }
+
+  .note-actions {
+    flex-direction: column; /* Mobil için alt alta */
+    align-items: stretch; /* Tam genişlik */
+  }
+
+  .save-note-button, .delete-note-button {
+    width: 100%;
   }
 }

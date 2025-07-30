@@ -19,4 +19,5 @@ export interface ReviewResponse {
   rating: number;       // Eğitime verilen puan
   comment: string;      // Kullanıcının yazdığı yorum metni
   createdAt: string;    // Yorumun yapıldığı tarih ve saat (ISO 8601 string formatında)
+  isCurrentUserReview?: boolean; // YENİ EKLENEN: Mevcut kullanıcının yorumu mu? (Frontend tarafından eklenir)
 }

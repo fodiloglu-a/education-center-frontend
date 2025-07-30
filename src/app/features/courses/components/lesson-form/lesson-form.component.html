@@ -1,95 +1,107 @@
-<!-- lesson-form.component.html -->
-
 <div class="lesson-form-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <!-- Başarı Mesajı -->
-  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <div class="lesson-form-card" *ngIf="!isLoading">
-    <h2 class="card-title">
-      <ng-container *ngIf="isEditMode">{{ 'EDIT_LESSON' | translate }}</ng-container>
-      <ng-container *ngIf="!isEditMode">{{ 'ADD_NEW_LESSON' | translate }}</ng-container>
-    </h2>
-    <p class="card-subtitle">
-      <ng-container *ngIf="isEditMode">{{ 'EDIT_LESSON_SUBTITLE' | translate }}</ng-container>
-      <ng-container *ngIf="!isEditMode">{{ 'ADD_NEW_LESSON_SUBTITLE' | translate }}</ng-container>
-    </p>
-    <p class="course-context-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ courseTitle }}</strong></p>
+    <div class="lesson-form-card" *ngIf="!isLoading">
+        <h2 class="card-title">
+            <ng-container *ngIf="isEditMode">{{ 'EDIT_LESSON' | translate }}</ng-container>
+            <ng-container *ngIf="!isEditMode">{{ 'ADD_NEW_LESSON' | translate }}</ng-container>
+        </h2>
+        <p class="card-subtitle">
+            <ng-container *ngIf="isEditMode">{{ 'EDIT_LESSON_SUBTITLE' | translate }}</ng-container>
+            <ng-container *ngIf="!isEditMode">{{ 'ADD_NEW_LESSON_SUBTITLE' | translate }}</ng-container>
+        </p>
+        <p class="course-context-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ courseTitle }}</strong></p>
 
-    <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()" class="lesson-form">
-      <!-- Başlık Alanı -->
-      <div class="form-group">
-        <label for="title">{{ 'LESSON_TITLE' | translate }}</label>
-        <input type="text" id="title" formControlName="title" class="form-control"
-               [class.is-invalid]="title?.invalid && (title?.dirty || title?.touched)"
-               placeholder="{{ 'LESSON_TITLE_PLACEHOLDER' | translate }}">
-        <div *ngIf="title?.invalid && (title?.dirty || title?.touched)" class="invalid-feedback">
-          <div *ngIf="title?.errors?.['required']">{{ 'LESSON_TITLE_REQUIRED' | translate }}</div>
-          <div *ngIf="title?.errors?.['minlength']">{{ 'LESSON_TITLE_MIN_LENGTH' | translate: '{min: 3}' }}</div>
-        </div>
-      </div>
+        <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()" class="lesson-form">
+            <div class="form-group">
+                <label for="title">{{ 'LESSON_TITLE' | translate }}</label>
+                <input type="text" id="title" formControlName="title" class="form-control"
+                       [class.is-invalid]="title?.invalid && (title?.dirty || title?.touched)"
+                       placeholder="{{ 'LESSON_TITLE_PLACEHOLDER' | translate }}">
+                <div *ngIf="title?.invalid && (title?.dirty || title?.touched)" class="invalid-feedback">
+                    <div *ngIf="title?.errors?.['required']">{{ 'LESSON_TITLE_REQUIRED' | translate }}</div>
+                    <div *ngIf="title?.errors?.['minlength']">{{ 'LESSON_TITLE_MIN_LENGTH' | translate: '{min: 3}' }}</div>
+                </div>
+            </div>
 
-      <!-- Açıklama Alanı -->
-      <div class="form-group">
-        <label for="description">{{ 'LESSON_DESCRIPTION' | translate }}</label>
-        <textarea id="description" formControlName="description" class="form-control" rows="5"
-                  [class.is-invalid]="description?.invalid && (description?.dirty || description?.touched)"
-                  placeholder="{{ 'LESSON_DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
-        <div *ngIf="description?.invalid && (description?.dirty || description?.touched)" class="invalid-feedback">
-          <div *ngIf="description?.errors?.['required']">{{ 'LESSON_DESCRIPTION_REQUIRED' | translate }}</div>
-          <div *ngIf="description?.errors?.['minlength']">{{ 'LESSON_DESCRIPTION_MIN_LENGTH' | translate: '{min: 10}' }}</div>
-        </div>
-      </div>
+            <div class="form-group">
+                <label for="description">{{ 'LESSON_DESCRIPTION' | translate }}</label>
+                <textarea id="description" formControlName="description" class="form-control" rows="5"
+                          [class.is-invalid]="description?.invalid && (description?.dirty || description?.touched)"
+                          placeholder="{{ 'LESSON_DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
+                <div *ngIf="description?.invalid && (description?.dirty || description?.touched)" class="invalid-feedback">
+                    <div *ngIf="description?.errors?.['required']">{{ 'LESSON_DESCRIPTION_REQUIRED' | translate }}</div>
+                    <div *ngIf="description?.errors?.['minlength']">{{ 'LESSON_DESCRIPTION_MIN_LENGTH' | translate: '{min: 10}' }}</div>
+                </div>
+            </div>
 
-      <!-- Video URL Alanı -->
-      <div class="form-group">
-        <label for="videoUrl">{{ 'VIDEO_URL' | translate }}</label>
-        <input type="url" id="videoUrl" formControlName="videoUrl" class="form-control"
-               [class.is-invalid]="videoUrl?.invalid && (videoUrl?.dirty || videoUrl?.touched)"
-               placeholder="{{ 'VIDEO_URL_PLACEHOLDER' | translate }}">
-        <div *ngIf="videoUrl?.invalid && (videoUrl?.dirty || videoUrl?.touched)" class="invalid-feedback">
-          <div *ngIf="videoUrl?.errors?.['required']">{{ 'VIDEO_URL_REQUIRED' | translate }}</div>
-          <div *ngIf="videoUrl?.errors?.['pattern']">{{ 'VIDEO_URL_INVALID' | translate }}</div>
-        </div>
-      </div>
+            <div class="form-group">
+                <label for="videoUrl">{{ 'VIDEO_URL' | translate }}</label>
+                <input type="url" id="videoUrl" formControlName="videoUrl" class="form-control"
+                       [class.is-invalid]="videoUrl?.invalid && (videoUrl?.dirty || videoUrl?.touched)"
+                       placeholder="{{ 'VIDEO_URL_PLACEHOLDER' | translate }}">
+                <div *ngIf="videoUrl?.invalid && (videoUrl?.dirty || videoUrl?.touched)" class="invalid-feedback">
+                    <div *ngIf="videoUrl?.errors?.['required']">{{ 'VIDEO_URL_REQUIRED' | translate }}</div>
+                    <div *ngIf="videoUrl?.errors?.['pattern']">{{ 'VIDEO_URL_INVALID' | translate }}</div>
+                </div>
+            </div>
 
-      <!-- Ders Sırası Alanı -->
-      <div class="form-group">
-        <label for="lessonOrder">{{ 'LESSON_ORDER' | translate }}</label>
-        <input type="number" id="lessonOrder" formControlName="lessonOrder" class="form-control"
-               [class.is-invalid]="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)"
-               placeholder="{{ 'LESSON_ORDER_PLACEHOLDER' | translate }}">
-        <div *ngIf="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)" class="invalid-feedback">
-          <div *ngIf="lessonOrder?.errors?.['required']">{{ 'LESSON_ORDER_REQUIRED' | translate }}</div>
-          <div *ngIf="lessonOrder?.errors?.['min']">{{ 'LESSON_ORDER_MIN_VALUE' | translate: '{min: 1}' }}</div>
-        </div>
-      </div>
+            <div class="form-group">
+                <label for="duration">{{ 'DURATION_MINUTES' | translate }}</label>
+                <input type="number" id="duration" formControlName="duration" class="form-control"
+                       [class.is-invalid]="duration?.invalid && (duration?.dirty || duration?.touched)"
+                       placeholder="{{ 'DURATION_PLACEHOLDER' | translate }}">
+                <div *ngIf="duration?.invalid && (duration?.dirty || duration?.touched)" class="invalid-feedback">
+                    <div *ngIf="duration?.errors?.['required']">{{ 'DURATION_REQUIRED' | translate }}</div>
+                    <div *ngIf="duration?.errors?.['min']">{{ 'DURATION_MIN_VALUE' | translate: '{min: 0}' }}</div>
+                </div>
+            </div>
 
-      <!-- Hata Mesajı -->
-      <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+            <div class="form-group">
+                <label for="lessonOrder">{{ 'LESSON_ORDER' | translate }}</label>
+                <input type="number" id="lessonOrder" formControlName="lessonOrder" class="form-control"
+                       [class.is-invalid]="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)"
+                       placeholder="{{ 'LESSON_ORDER_PLACEHOLDER' | translate }}">
+                <div *ngIf="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)" class="invalid-feedback">
+                    <div *ngIf="lessonOrder?.errors?.['required']">{{ 'LESSON_ORDER_REQUIRED' | translate }}</div>
+                    <div *ngIf="lessonOrder?.errors?.['min']">{{ 'LESSON_ORDER_MIN_VALUE' | translate: '{min: 1}' }}</div>
+                </div>
+            </div>
 
-      <!-- Kaydet Butonu -->
-      <button type="submit" class="submit-button primary-btn" [disabled]="lessonForm.invalid || isLoading">
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="isPreview" formControlName="isPreview" class="form-checkbox">
+                <label for="isPreview">{{ 'IS_PREVIEW_LESSON' | translate }}</label>
+            </div>
+
+            <div class="form-group">
+                <label for="resources">{{ 'LESSON_RESOURCES' | translate }}</label>
+                <textarea id="resources" formControlName="resources" class="form-control" rows="3"
+                          placeholder="{{ 'LESSON_RESOURCES_PLACEHOLDER' | translate }}"></textarea>
+            </div>
+
+
+            <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
+
+            <button type="submit" class="submit-button primary-btn" [disabled]="lessonForm.invalid || isLoading">
         <span *ngIf="!isLoading">
           <ng-container *ngIf="isEditMode">{{ 'SAVE_CHANGES' | translate }}</ng-container>
           <ng-container *ngIf="!isEditMode">{{ 'ADD_LESSON_BUTTON' | translate }}</ng-container>
         </span>
-        <span *ngIf="isLoading" class="spinner"></span>
-      </button>
-    </form>
+                <span *ngIf="isLoading" class="spinner"></span>
+            </button>
+        </form>
 
-    <p class="back-link">
-      <a [routerLink]="['/courses', courseId]">{{ 'BACK_TO_COURSE_DETAIL' | translate }}</a>
-    </p>
-  </div>
+        <p class="back-link">
+            <a [routerLink]="['/courses', courseId]">{{ 'BACK_TO_COURSE_DETAIL' | translate }}</a>
+        </p>
+    </div>
 
-  <div *ngIf="!isLoading && !courseId && !errorMessage" class="no-content-found">
-    <p>{{ 'COURSE_ID_MISSING_FOR_LESSON_SAVE' | translate }}</p>
-    <button class="action-button primary-btn" routerLink="/courses">{{ 'BACK_TO_COURSES' | translate }}</button>
-  </div>
+    <div *ngIf="!isLoading && !courseId && !errorMessage" class="no-content-found">
+        <p>{{ 'COURSE_ID_MISSING_FOR_LESSON_SAVE' | translate }}</p>
+        <button class="action-button primary-btn" routerLink="/courses">{{ 'BACK_TO_COURSES' | translate }}</button>
+    </div>
 </div>

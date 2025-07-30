@@ -63,7 +63,33 @@
   font-size: var(--font-size-md);
   color: var(--dark-color);
   margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap; /* Yeni eklenen metadataların sığması için */
+  justify-content: center;
 }
+
+/* Yeni eklenen metadata bilgileri için genel stil */
+.course-category-display,
+.course-level-display,
+.course-language-display,
+.course-duration-display,
+.course-certificate-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: var(--light-accent);
+  color: var(--accent-color);
+  padding: 5px 10px;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin-top: var(--spacing-xs); /* Metalar arasında dikey boşluk */
+}
+
+.course-certificate-display .material-icons {
+  font-size: var(--font-size-base);
+  color: var(--primary-color);
+}
+
 
 .instructor-name {
   font-weight: 600;
@@ -139,7 +165,15 @@
   transform: translateY(-1px);
 }
 
-.course-actions {
+.course-actions-main {
+  display: flex;
+  flex-direction: column; /* Mobil için dikey */
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.course-actions,
+.general-course-actions {
   display: flex;
   flex-wrap: wrap; /* Butonların sarılmasını sağlar */
   gap: var(--spacing-sm);
@@ -147,7 +181,12 @@
   margin-top: var(--spacing-md);
 }
 
-/* Section Card (Dersler, Yorumlar) */
+.external-link-btn .material-icons {
+  margin-right: 5px; /* İkon ile metin arasına boşluk */
+}
+
+
+/* Section Card (Detaylı Açıklama, Ön Gereksinimler, Neler Öğreneceksiniz, Hedef Kitle, Dersler, Yorumlar) */
 .section-card {
   background-color: var(--surface-bg);
   border-radius: var(--border-radius-md);
@@ -164,6 +203,38 @@
   border-bottom: 2px solid var(--divider-color);
   padding-bottom: var(--spacing-sm);
 }
+
+/* Detaylı Açıklama Bölümü */
+.long-description {
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+}
+
+/* Bilgi Listeleri (Ön Gereksinimler, Neler Öğreneceksiniz, Hedef Kitle) */
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-list li {
+  color: var(--text-color);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-xs);
+  padding-left: 20px;
+  position: relative;
+}
+
+.info-list li::before {
+  content: '✓'; /* Kontrol işareti veya başka bir ikon */
+  color: var(--success-color);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-weight: 700;
+}
+
 
 /* Dersler Bölümü */
 .lesson-list {
@@ -201,6 +272,23 @@
 .lesson-title {
   font-size: var(--font-size-base);
   color: var(--text-color);
+}
+
+.lesson-duration {
+  font-size: var(--font-size-sm);
+  color: var(--dark-color);
+  font-weight: 500;
+  margin-left: 5px;
+}
+
+.lesson-preview-badge {
+  background-color: var(--highlight-color);
+  color: white;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  margin-left: 10px;
 }
 
 .lesson-actions {
@@ -260,6 +348,14 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Kullanıcının kendi yorumu için özel stil */
+.review-item.my-review-item {
+  border: 2px solid var(--primary-color); /* Vurgulu kenarlık */
+  background-color: rgba(var(--primary-color-rgb), 0.05); /* Hafif arka plan vurgusu */
+  box-shadow: var(--shadow-md);
+}
+
+
 .review-header {
   display: flex;
   justify-content: space-between;
@@ -301,6 +397,15 @@
   margin-top: var(--spacing-sm);
   line-height: 1.5;
 }
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: flex-end; /* Butonları sağa hizala */
+  margin-top: var(--spacing-md);
+}
+
 
 .no-content-message {
   text-align: center;
@@ -363,9 +468,25 @@
   .course-meta-info {
     flex-direction: row; /* Masaüstünde yatay */
     gap: var(--spacing-lg);
+    justify-content: flex-start;
   }
 
-  .course-actions {
+  /* Yeni metadata alanları yan yana */
+  .course-category-display,
+  .course-level-display,
+  .course-language-display,
+  .course-duration-display,
+  .course-certificate-display {
+    margin-top: 0;
+  }
+
+  .course-actions-main {
+    flex-direction: row; /* Masaüstünde yatay */
+    justify-content: space-between;
+  }
+
+  .course-actions,
+  .general-course-actions {
     justify-content: flex-start; /* Butonları sola hizala */
   }
 
@@ -442,5 +563,25 @@
 
   .add-review-button {
     max-width: 100%;
+  }
+
+  .course-meta-info {
+    flex-direction: column; /* Mobil için dikey */
+    align-items: center; /* Ortala */
+  }
+
+  /* Yeni metadata alanları alt alta */
+  .course-category-display,
+  .course-level-display,
+  .course-language-display,
+  .course-duration-display,
+  .course-certificate-display {
+    width: 100%; /* Tam genişlik */
+    justify-content: center; /* Ortala */
+    margin-top: var(--spacing-sm);
+  }
+
+  .review-actions {
+    justify-content: center; /* Mobil butonları ortala */
   }
 }

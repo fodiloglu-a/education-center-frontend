@@ -1,95 +1,161 @@
 <!-- course-detail.component.html -->
 
 <div class="course-detail-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <!-- Yükleme Spinner'ı -->
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Hata Mesajı -->
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <!-- Başarı Mesajı -->
-  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Başarı Mesajı -->
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <div class="course-content-wrapper" *ngIf="!isLoading && course">
-    <!-- Eğitim Başlık ve Genel Bilgiler -->
-    <div class="course-header-section">
-      <img [src]="course.imageUrl" alt="{{ course.title }}" class="course-detail-image"
-           onerror="this.onerror=null;this.src='https://placehold.co/800x450/C3AD90/3D2010?text=Course+Image';" />
-      <div class="header-info">
-        <h1 class="course-title">{{ course.title }}</h1>
-        <p class="course-description-short">{{ course.description }}</p>
-        <div class="course-meta-info">
-          <span class="instructor-name">{{ 'ROLE_INSTRUCTOR' | translate }}: {{ course.instructorName }}</span>
-          <span class="course-price">{{ course.price | currency:'USD':'symbol':'1.2-2':'uk' }}</span>
-          <span class="average-rating">
+    <div class="course-content-wrapper" *ngIf="!isLoading && course">
+        <!-- Eğitim Başlık ve Genel Bilgiler -->
+        <div class="course-header-section">
+            <img [src]="course.imageUrl" alt="{{ course.title }}" class="course-detail-image"
+                 onerror="this.onerror=null;this.src='https://placehold.co/800x450/C3AD90/3D2010?text=Course+Image';" />
+            <div class="header-info">
+                <h1 class="course-title">{{ course.title }}</h1>
+                <p class="course-description-short">{{ course.description }}</p>
+                <div class="course-meta-info">
+                    <span class="instructor-name">{{ 'ROLE_INSTRUCTOR' | translate }}: {{ course.instructorName }}</span>
+                    <span class="course-price">{{ formatPrice(course.price) }}</span>
+                    <span class="average-rating">
             <span class="material-icons star-icon">star</span>
-            {{ getAverageRating() | number:'1.1-1' }} ({{ course.reviews.length }} {{ 'REVIEWS' | translate }})
+                        {{ getAverageRating() | number:'1.1-1' }} ({{ course.reviews.length }} {{ 'REVIEWS' | translate }})
           </span>
-        </div>
-        <!-- Eğitmen/Admin Eylemleri -->
-        <div class="course-actions" *ngIf="isInstructorOrAdmin">
-          <button class="action-button primary-btn" [routerLink]="['/courses', course.id, 'edit']">{{ 'EDIT_COURSE' | translate }}</button>
-          <button class="action-button danger-btn" (click)="deleteCourse(course.id)">{{ 'DELETE_COURSE' | translate }}</button>
-          <button class="action-button" [ngClass]="course.published ? 'secondary-btn' : 'primary-btn'"
-                  (click)="toggleCoursePublishedStatus(course.id)">
-            <ng-container *ngIf="course.published">{{ 'UNPUBLISH_COURSE' | translate }}</ng-container>
-            <ng-container *ngIf="!course.published">{{ 'PUBLISH_COURSE' | translate }}</ng-container>
-          </button>
-          <button class="action-button primary-btn" [routerLink]="['/courses', course.id, 'lessons', 'new']">{{ 'ADD_LESSON' | translate }}</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Dersler Bölümü -->
-    <div class="section-card lessons-section">
-      <h2 class="section-title">{{ 'COURSE_LESSONS' | translate }}</h2>
-      <ul class="lesson-list" *ngIf="course.lessons && course.lessons.length > 0">
-        <li class="lesson-item" *ngFor="let lesson of course.lessons; let i = index">
-          <div class="lesson-info">
-            <span class="lesson-order">{{ i + 1 }}.</span>
-            <span class="lesson-title">{{ lesson.title }}</span>
-          </div>
-          <div class="lesson-actions">
-            <a [routerLink]="['/courses', course.id, 'lessons', lesson.id]" class="play-lesson-button primary-btn">{{ 'PLAY_LESSON' | translate }}</a>
-            <button *ngIf="isInstructorOrAdmin" class="edit-lesson-button secondary-btn" [routerLink]="['/courses', course.id, 'lessons', lesson.id, 'edit']">{{ 'EDIT_LESSON' | translate }}</button>
-            <button *ngIf="isInstructorOrAdmin" class="delete-lesson-button danger-btn" (click)="deleteLesson(course.id, lesson.id)">{{ 'DELETE_LESSON' | translate }}</button>
-          </div>
-        </li>
-      </ul>
-      <p *ngIf="!course.lessons || course.lessons.length === 0" class="no-content-message">{{ 'NO_LESSONS_YET' | translate }}</p>
-    </div>
-
-    <!-- Yorumlar Bölümü -->
-    <div class="section-card reviews-section">
-      <h2 class="section-title">{{ 'COURSE_REVIEWS' | translate }}</h2>
-      <div class="review-summary">
-        <span class="summary-text">{{ 'AVERAGE_RATING' | translate }}:</span>
-        <span class="summary-rating">{{ getAverageRating() | number:'1.1-1' }} / 5</span>
-        <div class="stars">
-          <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="getAverageRating() >= star">star</span>
-        </div>
-        <span class="summary-count">({{ course.reviews.length }} {{ 'REVIEWS' | translate }})</span>
-      </div>
-
-      <div class="review-list" *ngIf="course.reviews && course.reviews.length > 0">
-        <div class="review-item" *ngFor="let review of course.reviews">
-          <div class="review-header">
-            <span class="reviewer-name">{{ review.userName }}</span>
-            <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
-            <div class="review-stars">
-              <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="review.rating >= star">star</span>
+                    <!-- YENİ EKLENEN KURS METADATA BİLGİLERİ -->
+                    <span *ngIf="course.category" class="course-category-display">
+            {{ 'CATEGORY' | translate }}: {{ getCategoryTranslation(course.category) }}
+          </span>
+                    <span *ngIf="course.level" class="course-level-display">
+            {{ 'LEVEL' | translate }}: {{ getLevelTranslation(course.level) }}
+          </span>
+                    <span *ngIf="course.language" class="course-language-display">
+            {{ 'LANGUAGE_OF_COURSE' | translate }}: {{ 'LANGUAGE.' + course.language.toUpperCase() | translate }}
+          </span>
+                    <span *ngIf="course.duration > 0" class="course-duration-display">
+            {{ 'DURATION' | translate }}: {{ formatDuration(course.duration) }}
+          </span>
+                    <span *ngIf="course.certificateAvailable" class="course-certificate-display">
+            <span class="material-icons">badge</span> {{ 'CERTIFICATE_AVAILABLE' | translate }}
+          </span>
+                </div>
+                <div class="course-actions-main">
+                    <!-- Eğitmen/Admin Eylemleri -->
+                    <div class="course-actions" *ngIf="isInstructorOrAdmin">
+                        <button class="action-button primary-btn" [routerLink]="['/courses', course.id, 'edit']">{{ 'EDIT_COURSE' | translate }}</button>
+                        <button class="action-button danger-btn" (click)="deleteCourse(course.id)">{{ 'DELETE_COURSE' | translate }}</button>
+                        <button class="action-button" [ngClass]="course.published ? 'secondary-btn' : 'primary-btn'"
+                                (click)="toggleCoursePublishedStatus(course.id)">
+                            <ng-container *ngIf="course.published">{{ 'UNPUBLISH_COURSE' | translate }}</ng-container>
+                            <ng-container *ngIf="!course.published">{{ 'PUBLISH_COURSE' | translate }}</ng-container>
+                        </button>
+                        <button class="action-button primary-btn" [routerLink]="['/courses', course.id, 'lessons', 'new']">{{ 'ADD_LESSON' | translate }}</button>
+                    </div>
+                    <!-- Genel Kullanıcı Eylemleri -->
+                    <div class="general-course-actions">
+                        <a *ngIf="course.externalPurchaseUrl" [href]="course.externalPurchaseUrl" target="_blank" class="action-button primary-btn external-link-btn">
+                            <span class="material-icons">launch</span> {{ 'EXTERNAL_PURCHASE' | translate }}
+                        </a>
+                        <!-- Kaydol veya Satın Al butonu buraya eklenebilir -->
+                    </div>
+                </div>
             </div>
-          </div>
-          <p class="review-comment">{{ review.comment }}</p>
         </div>
-      </div>
-      <p *ngIf="!course.reviews || course.reviews.length === 0" class="no-content-message">{{ 'NO_REVIEWS_YET' | translate }}</p>
-      <button class="action-button primary-btn add-review-button" [routerLink]="['/reviews', 'new', course.id]">{{ 'ADD_REVIEW' | translate }}</button>
-    </div>
-  </div>
 
-  <div *ngIf="!isLoading && !course && !errorMessage" class="no-course-found">
-    <p>{{ 'COURSE_NOT_LOADED' | translate }}</p>
-    <button class="action-button primary-btn" (click)="loadCourseDetails(courseId || 0)">{{ 'RETRY_LOAD_COURSE' | translate }}</button>
-  </div>
+        <!-- Detaylı Açıklama Bölümü -->
+        <div class="section-card detail-description-section" *ngIf="course.description">
+            <h2 class="section-title">{{ 'ABOUT_COURSE' | translate }}</h2>
+            <p class="long-description">{{ course.description }}</p>
+        </div>
+
+        <!-- Ön Gereksinimler Bölümü -->
+        <div class="section-card requirements-section" *ngIf="course.requirements && course.requirements.length > 0">
+            <h2 class="section-title">{{ 'REQUIREMENTS' | translate }}</h2>
+            <ul class="info-list">
+                <li *ngFor="let req of course.requirements">{{ req }}</li>
+            </ul>
+        </div>
+
+        <!-- Neler Öğreneceksiniz Bölümü -->
+        <div class="section-card learn-section" *ngIf="course.whatYouWillLearn && course.whatYouWillLearn.length > 0">
+            <h2 class="section-title">{{ 'WHAT_YOU_WILL_LEARN' | translate }}</h2>
+            <ul class="info-list">
+                <li *ngFor="let item of course.whatYouWillLearn">{{ item }}</li>
+            </ul>
+        </div>
+
+        <!-- Hedef Kitle Bölümü -->
+        <div class="section-card target-audience-section" *ngIf="course.targetAudience && course.targetAudience.length > 0">
+            <h2 class="section-title">{{ 'TARGET_AUDIENCE' | translate }}</h2>
+            <ul class="info-list">
+                <li *ngFor="let audience of course.targetAudience">{{ audience }}</li>
+            </ul>
+        </div>
+
+        <!-- Dersler Bölümü -->
+        <div class="section-card lessons-section">
+            <h2 class="section-title">{{ 'COURSE_LESSONS' | translate }}</h2>
+            <ul class="lesson-list" *ngIf="course.lessons && course.lessons.length > 0">
+                <li class="lesson-item" *ngFor="let lesson of course.lessons; let i = index">
+                    <div class="lesson-info">
+                        <span class="lesson-order">{{ i + 1 }}.</span>
+                        <span class="lesson-title">{{ lesson.title }}</span>
+                        <span *ngIf="lesson.duration > 0" class="lesson-duration">({{ formatDuration(lesson.duration) }})</span>
+                        <span *ngIf="lesson.isPreview" class="lesson-preview-badge">{{ 'PREVIEW' | translate }}</span>
+                    </div>
+                    <div class="lesson-actions">
+                        <a [routerLink]="['/courses', course.id, 'lessons', lesson.id]" class="play-lesson-button primary-btn">{{ 'PLAY_LESSON' | translate }}</a>
+                        <button *ngIf="isInstructorOrAdmin" class="edit-lesson-button secondary-btn" [routerLink]="['/courses', course.id, 'lessons', lesson.id, 'edit']">{{ 'EDIT_LESSON' | translate }}</button>
+                        <button *ngIf="isInstructorOrAdmin" class="delete-lesson-button danger-btn" (click)="deleteLesson(course.id, lesson.id)">{{ 'DELETE_LESSON' | translate }}</button>
+                    </div>
+                </li>
+            </ul>
+            <p *ngIf="!course.lessons || course.lessons.length === 0" class="no-content-message">{{ 'NO_LESSONS_YET' | translate }}</p>
+        </div>
+
+        <!-- Yorumlar Bölümü -->
+        <div class="section-card reviews-section">
+            <h2 class="section-title">{{ 'COURSE_REVIEWS' | translate }}</h2>
+            <div class="review-summary">
+                <span class="summary-text">{{ 'AVERAGE_RATING' | translate }}:</span>
+                <span class="summary-rating">{{ getAverageRating() | number:'1.1-1' }} / 5</span>
+                <div class="stars">
+                    <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="getAverageRating() >= star">star</span>
+                </div>
+                <span class="summary-count">({{ course.reviews.length }} {{ 'REVIEWS' | translate }})</span>
+            </div>
+
+            <div class="review-list" *ngIf="course.reviews && course.reviews.length > 0">
+                <div class="review-item" *ngFor="let review of course.reviews" [class.my-review-item]="review.isCurrentUserReview">
+                    <div class="review-header">
+                        <span class="reviewer-name">{{ review.userName }}</span>
+                        <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
+                        <div class="review-stars">
+                            <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="review.rating >= star">star</span>
+                        </div>
+                    </div>
+                    <p class="review-comment">{{ review.comment }}</p>
+                    <div class="review-actions" *ngIf="canModifyReview(review)">
+                        <button class="action-button secondary-btn" [routerLink]="['/reviews', 'edit', review.id]">{{ 'EDIT' | translate }}</button>
+                        <button class="action-button danger-btn" (click)="deleteReview(review.id)">{{ 'DELETE' | translate }}</button>
+                    </div>
+                </div>
+            </div>
+            <p *ngIf="!course.reviews || course.reviews.length === 0" class="no-content-message">{{ 'NO_REVIEWS_YET' | translate }}</p>
+            <!-- Kullanıcı henüz yorum yapmadıysa 'Yorum Yap' butonunu göster -->
+            <button *ngIf="!hasUserReviewed && (currentUserId || isInstructorOrAdmin)" class="action-button primary-btn add-review-button" [routerLink]="['/reviews', 'new', course.id]">{{ 'ADD_REVIEW' | translate }}</button>
+            <!-- Kullanıcı yorum yaptıysa 'Yorumu Düzenle' butonunu göster -->
+            <button *ngIf="hasUserReviewed && (currentUserId || isInstructorOrAdmin)" class="action-button secondary-btn add-review-button" [routerLink]="['/reviews', 'edit', getUsersReviewId()]">
+                {{ 'EDIT_MY_REVIEW' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && !course && !errorMessage" class="no-course-found">
+        <p>{{ 'COURSE_NOT_LOADED' | translate }}</p>
+        <button class="action-button primary-btn" (click)="loadCourseDetails(courseId || 0)">{{ 'RETRY_LOAD_COURSE' | translate }}</button>
+    </div>
 </div>

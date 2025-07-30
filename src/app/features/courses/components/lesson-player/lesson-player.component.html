@@ -1,67 +1,90 @@
-<!-- lesson-player.component.html -->
-
 <div class="lesson-player-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-loading-spinner *ngIf="isLoading || isSavingNote"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <div class="lesson-player-content" *ngIf="!isLoading && course && currentLesson">
-    <h1 class="lesson-title">{{ currentLesson.title }}</h1>
-    <p class="course-title-link">
-      <a [routerLink]="['/courses', course.id]">{{ course.title }}</a>
-    </p>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-    <!-- Video Oynatıcı -->
-    <div class="video-player-wrapper">
-      <ng-container *ngIf="videoUrl">
-        <iframe [src]="videoUrl" frameborder="0" allowfullscreen class="video-iframe"></iframe>
-      </ng-container>
-      <div *ngIf="!videoUrl" class="no-video-message">
-        <p>{{ 'NO_VIDEO_AVAILABLE' | translate }}</p>
-      </div>
-    </div>
+    <div class="lesson-player-content" *ngIf="!isLoading && course && currentLesson">
+        <h1 class="lesson-title">{{ currentLesson.title }}</h1>
+        <p class="course-title-link">
+            <a [routerLink]="['/courses', course.id]">{{ course.title }}</a>
+        </p>
 
-    <div class="lesson-details-and-navigation">
-      <div class="lesson-description-card">
-        <h2 class="card-title">{{ 'DESCRIPTION' | translate }}</h2>
-        <p class="lesson-description">{{ currentLesson.description }}</p>
-      </div>
-
-      <div class="lesson-navigation-card">
-        <h2 class="card-title">{{ 'COURSE_LESSONS' | translate }}</h2>
-        <ul class="lesson-list">
-          <li *ngFor="let lesson of course.lessons"
-              [class.active-lesson]="lesson.id === currentLesson.id"
-              (click)="goToLesson(lesson)">
-            <span class="lesson-order">{{ lesson.lessonOrder }}.</span>
-            <span class="lesson-nav-title">{{ lesson.title }}</span>
-            <span class="material-icons play-icon" *ngIf="lesson.id === currentLesson.id">play_circle_filled</span>
-          </li>
-        </ul>
-        <div class="lesson-player-actions">
-          <button class="action-button secondary-btn"
-                  (click)="goToPreviousLesson()"
-                  [disabled]="isCurrentLessonFirst()">
-            <span class="material-icons">skip_previous</span>
-            {{ 'PREVIOUS_LESSON' | translate }}
-          </button>
-
-          <button class="action-button primary-btn"
-                  (click)="goToNextLesson()"
-                  [disabled]="isCurrentLessonLast()">
-            {{ 'NEXT_LESSON' | translate }}
-            <span class="material-icons">skip_next</span>
-          </button>
-
+        <div class="video-player-wrapper">
+            <ng-container *ngIf="videoUrl">
+                <iframe [src]="videoUrl" frameborder="0" allowfullscreen class="video-iframe"></iframe>
+            </ng-container>
+            <div *ngIf="!videoUrl" class="no-video-message">
+                <p>{{ 'NO_VIDEO_AVAILABLE' | translate }}</p>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div *ngIf="!isLoading && (!course || !currentLesson) && !errorMessage" class="no-content-found">
-    <p>{{ 'LESSON_NOT_LOADED' | translate }}</p>
-    <button class="action-button primary-btn" (click)="loadCourseAndLessonDetails(courseId || 0, lessonId || 0)">{{ 'RETRY_LOAD_LESSON' | translate }}</button>
-  </div>
+        <div class="lesson-details-and-navigation">
+            <div class="lesson-description-card">
+                <h2 class="card-title">{{ 'DESCRIPTION' | translate }}</h2>
+                <p class="lesson-description">{{ currentLesson.description }}</p>
+                <div class="lesson-resources" *ngIf="currentLesson.resources && currentLesson.resources.length > 0">
+                    <h3 class="resources-title">{{ 'LESSON_RESOURCES' | translate }}</h3>
+                    <ul class="resources-list">
+                        <li *ngFor="let resource of currentLesson.resources">
+                            <a [href]="resource" target="_blank">{{ resource }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="lesson-navigation-card">
+                <h2 class="card-title">{{ 'COURSE_LESSONS' | translate }}</h2>
+                <ul class="lesson-list">
+                    <li *ngFor="let lesson of course.lessons"
+                        [class.active-lesson]="lesson.id === currentLesson.id"
+                        (click)="goToLesson(lesson)">
+                        <span class="lesson-order">{{ lesson.lessonOrder }}.</span>
+                        <span class="lesson-nav-title">{{ lesson.title }}</span>
+                        <span class="material-icons play-icon" *ngIf="lesson.id === currentLesson.id">play_circle_filled</span>
+                    </li>
+                </ul>
+                <div class="lesson-player-actions">
+                    <button class="action-button secondary-btn"
+                            (click)="goToPreviousLesson()"
+                            [disabled]="isPreviousButtonDisabled()">
+                        <span class="material-icons">skip_previous</span>
+                        {{ 'PREVIOUS_LESSON' | translate }}
+                    </button>
+
+                    <button class="action-button primary-btn"
+                            (click)="goToNextLesson()"
+                            [disabled]="isNextButtonDisabled()">
+                        {{ 'NEXT_LESSON' | translate }}
+                        <span class="material-icons">skip_next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card user-notes-section" *ngIf="isLoggedIn">
+            <h2 class="section-title">{{ 'YOUR_NOTES' | translate }}</h2>
+            <textarea [formControl]="noteContentControl" rows="8" class="note-textarea"
+                      placeholder="{{ 'NOTE_PLACEHOLDER' | translate }}"></textarea>
+            <div class="note-actions">
+                <button class="action-button primary-btn save-note-button" (click)="saveNote()" [disabled]="isSavingNote || !noteContentControl.value?.trim()">
+                    <ng-container *ngIf="currentNote">{{ 'UPDATE_NOTE' | translate }}</ng-container>
+                    <ng-container *ngIf="!currentNote">{{ 'ADD_NOTE' | translate }}</ng-container>
+                </button>
+                <button *ngIf="currentNote" class="action-button danger-btn delete-note-button" (click)="deleteNote()" [disabled]="isSavingNote">
+                    {{ 'DELETE_NOTE' | translate }}
+                </button>
+            </div>
+            <p *ngIf="currentNote" class="note-timestamp">
+                <ng-container *ngIf="currentNote.updatedAt">{{ 'LAST_UPDATED' | translate }}: {{ currentNote.updatedAt | date:'short' }}</ng-container>
+                <ng-container *ngIf="!currentNote.updatedAt">{{ 'CREATED_AT' | translate }}: {{ currentNote.createdAt | date:'short' }}</ng-container>
+            </p>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && (!course || !currentLesson) && !errorMessage" class="no-content-found">
+        <p>{{ 'LESSON_NOT_LOADED' | translate }}</p>
+        <button class="action-button primary-btn" (click)="loadCourseAndLessonDetails(courseId || 0, lessonId || 0)">{{ 'RETRY_LOAD_LESSON' | translate }}</button>
+    </div>
 </div>

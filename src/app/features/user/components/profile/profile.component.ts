@@ -50,7 +50,7 @@ export class ProfileComponent implements OnInit {
     this.errorMessage = null;
     this.successMessage = null;
 
-    const userId = this.tokenService.getUser()?.id; // TokenService'den kullanıcının ID'sini al
+    const userId = this.tokenService.getStoredUser()?.id; // TokenService'den kullanıcının ID'sini al
 
     if (!userId) {
       this.errorMessage = this.translate.instant('USER_ID_NOT_FOUND');

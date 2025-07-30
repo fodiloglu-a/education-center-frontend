@@ -91,6 +91,27 @@
   text-align: left;
 }
 
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.form-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-color); /* Checkbox rengi */
+}
+
+.checkbox-group label {
+  margin-bottom: 0;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+}
+
 .alert {
   padding: var(--spacing-sm);
   border-radius: var(--border-radius-md);

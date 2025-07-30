@@ -1,10 +1,17 @@
 // course.service.ts
 
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CourseResponse, CourseDetailsResponse, LessonDTO } from '../models/course.models'; // Eğitim modellerini import ediyoruz
-import { environment } from '../../../../environments/environment'; // Ortam değişkenlerini import ediyoruz
+import {
+  CourseResponse,
+  CourseDetailsResponse,
+  LessonDTO,
+  TopSellingCoursesResponse,
+  CourseCategory,
+  CourseLevel
+} from '../models/course.models';
+import { environment } from '../../../../environments/environment';
 
 // CourseService, eğitimlerle ilgili backend API çağrılarını yönetir.
 // Eğitim oluşturma, güncelleme, silme, listeleme ve ders yönetimi gibi işlemleri kapsar.
@@ -12,7 +19,7 @@ import { environment } from '../../../../environments/environment'; // Ortam de�
   providedIn: 'root' // Bu servisin uygulamanın kök seviyesinde (singleton) sağlanacağını belirtir.
 })
 export class CourseService {
-  private apiUrl = environment.apiUrl; // Backend API URL'sini ortam değişkenlerinden alıyoruz
+  private apiUrl = `${environment.apiUrl}/courses`; // Backend API URL'sini ortam değişkenlerinden alıyoruz
 
   constructor(private http: HttpClient) { }
 
@@ -22,7 +29,7 @@ export class CourseService {
    * @returns Oluşturulan eğitimin CourseResponse nesnesini içeren Observable.
    */
   createCourse(courseDetails: CourseDetailsResponse): Observable<CourseResponse> {
-    return this.http.post<CourseResponse>(`${this.apiUrl}/courses`, courseDetails);
+    return this.http.post<CourseResponse>(this.apiUrl, courseDetails);
   }
 
   /**
@@ -32,7 +39,7 @@ export class CourseService {
    * @returns Güncellenen eğitimin CourseResponse nesnesini içeren Observable.
    */
   updateCourse(courseId: number, courseDetails: CourseDetailsResponse): Observable<CourseResponse> {
-    return this.http.put<CourseResponse>(`${this.apiUrl}/courses/${courseId}`, courseDetails);
+    return this.http.put<CourseResponse>(`${this.apiUrl}/${courseId}`, courseDetails);
   }
 
   /**
@@ -41,7 +48,7 @@ export class CourseService {
    * @returns İşlemin başarılı olup olmadığını belirten Observable<void>.
    */
   deleteCourse(courseId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/courses/${courseId}`);
+    return this.http.delete<void>(`${this.apiUrl}/${courseId}`);
   }
 
   /**
@@ -50,7 +57,7 @@ export class CourseService {
    * @returns Eğitimin detaylı bilgilerini içeren CourseDetailsResponse nesnesini içeren Observable.
    */
   getCourseDetailsById(courseId: number): Observable<CourseDetailsResponse> {
-    return this.http.get<CourseDetailsResponse>(`${this.apiUrl}/courses/${courseId}`);
+    return this.http.get<CourseDetailsResponse>(`${this.apiUrl}/${courseId}`);
   }
 
   /**
@@ -58,7 +65,7 @@ export class CourseService {
    * @returns Yayınlanmış eğitimlerin CourseResponse dizisini içeren Observable.
    */
   getAllPublishedCourses(): Observable<CourseResponse[]> {
-    return this.http.get<CourseResponse[]>(`${this.apiUrl}/courses/published`);
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/published`);
   }
 
   /**
@@ -67,7 +74,7 @@ export class CourseService {
    * @returns Eğitmene ait eğitimlerin CourseResponse dizisini içeren Observable.
    */
   getCoursesByInstructorId(instructorId: number): Observable<CourseResponse[]> {
-    return this.http.get<CourseResponse[]>(`${this.apiUrl}/courses/instructor/${instructorId}`);
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/instructor/${instructorId}`);
   }
 
   /**
@@ -77,7 +84,7 @@ export class CourseService {
    * @returns Güncellenen eğitimin CourseDetailsResponse nesnesini içeren Observable.
    */
   addLessonToCourse(courseId: number, lesson: LessonDTO): Observable<CourseDetailsResponse> {
-    return this.http.post<CourseDetailsResponse>(`${this.apiUrl}/courses/${courseId}/lessons`, lesson);
+    return this.http.post<CourseDetailsResponse>(`${this.apiUrl}/${courseId}/lessons`, lesson);
   }
 
   /**
@@ -88,7 +95,7 @@ export class CourseService {
    * @returns Güncellenen eğitimin CourseDetailsResponse nesnesini içeren Observable.
    */
   updateLessonInCourse(courseId: number, lessonId: number, lesson: LessonDTO): Observable<CourseDetailsResponse> {
-    return this.http.put<CourseDetailsResponse>(`${this.apiUrl}/courses/${courseId}/lessons/${lessonId}`, lesson);
+    return this.http.put<CourseDetailsResponse>(`${this.apiUrl}/${courseId}/lessons/${lessonId}`, lesson);
   }
 
   /**
@@ -98,7 +105,7 @@ export class CourseService {
    * @returns İşlemin başarılı olup olmadığını belirten Observable<void>.
    */
   deleteLessonFromCourse(courseId: number, lessonId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/courses/${courseId}/lessons/${lessonId}`);
+    return this.http.delete<void>(`${this.apiUrl}/${courseId}/lessons/${lessonId}`);
   }
 
   /**
@@ -107,7 +114,7 @@ export class CourseService {
    * @returns Güncellenen eğitimin CourseResponse nesnesini içeren Observable.
    */
   toggleCoursePublishedStatus(courseId: number): Observable<CourseResponse> {
-    return this.http.patch<CourseResponse>(`${this.apiUrl}/courses/${courseId}/toggle-publish`, {}); // PATCH isteği, boş body ile
+    return this.http.patch<CourseResponse>(`${this.apiUrl}/${courseId}/toggle-publish`, {});
   }
 
   /**
@@ -116,6 +123,125 @@ export class CourseService {
    * @returns Başlıkta arama metnini içeren yayınlanmış eğitimlerin CourseResponse dizisini içeren Observable.
    */
   searchCoursesByTitle(title: string): Observable<CourseResponse[]> {
-    return this.http.get<CourseResponse[]>(`${this.apiUrl}/courses/search?title=${title}`);
+    const params = new HttpParams().set('title', title);
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/search`, { params });
+  }
+
+  // ==================== YENİ EKLENEN METODLAR ====================
+
+  /**
+   * En çok satan kursları getirir. Kullanıcı giriş yapmışsa kişiselleştirilmiş sonuçlar döner.
+   * @param limit Döndürülecek kurs sayısı (varsayılan: 5)
+   * @param personalized Kişiselleştirilmiş sonuçlar istenip istenmediği
+   * @returns En çok satan kursların TopSellingCoursesResponse nesnesini içeren Observable.
+   */
+  getTopSellingCourses(limit: number = 5, personalized: boolean = true): Observable<TopSellingCoursesResponse> {
+    const params = new HttpParams()
+        .set('limit', limit.toString())
+        .set('personalized', personalized.toString());
+
+    return this.http.get<TopSellingCoursesResponse>(`${this.apiUrl}/top-selling`, { params });
+  }
+
+  /**
+   * Belirli bir kategorideki en çok satan kursları getirir.
+   * @param category Kurs kategorisi
+   * @param limit Döndürülecek kurs sayısı (varsayılan: 5)
+   * @returns Kategoriye göre en çok satan kursların CourseResponse dizisini içeren Observable.
+   */
+  getTopSellingCoursesByCategory(category: CourseCategory, limit: number = 5): Observable<CourseResponse[]> {
+    const params = new HttpParams()
+        .set('category', category)
+        .set('limit', limit.toString());
+
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/top-selling/category`, { params });
+  }
+
+  /**
+   * Kursları çeşitli kriterlere göre filtreler.
+   * @param filters Filtre kriterleri
+   * @returns Filtrelenmiş kursların CourseResponse dizisini içeren Observable.
+   */
+  filterCourses(filters: {
+    category?: CourseCategory;
+    level?: CourseLevel;
+    minPrice?: number;
+    maxPrice?: number;
+    minRating?: number;
+    language?: string;
+    searchTerm?: string;
+  }): Observable<CourseResponse[]> {
+    let params = new HttpParams();
+
+    // Sadece tanımlı olan filtreleri ekle
+    Object.keys(filters).forEach(key => {
+      const value = filters[key as keyof typeof filters];
+      if (value !== undefined && value !== null) {
+        params = params.set(key, value.toString());
+      }
+    });
+
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/filter`, { params });
+  }
+
+  /**
+   * Kullanıcının satın aldığı kurslara göre önerilen kursları getirir.
+   * @param limit Döndürülecek kurs sayısı (varsayılan: 10)
+   * @returns Önerilen kursların CourseResponse dizisini içeren Observable.
+   */
+  getRecommendedCourses(limit: number = 10): Observable<CourseResponse[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/recommended`, { params });
+  }
+
+  /**
+   * Belirli bir kategorideki kursları getirir.
+   * @param category Kurs kategorisi
+   * @returns Kategorideki kursların CourseResponse dizisini içeren Observable.
+   */
+  getCoursesByCategory(category: CourseCategory): Observable<CourseResponse[]> {
+    const params = new HttpParams().set('category', category);
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/by-category`, { params });
+  }
+
+  /**
+   * Popüler kategorileri ve her kategorideki kurs sayısını getirir.
+   * @returns Kategori istatistiklerini içeren Observable.
+   */
+  getPopularCategories(): Observable<{ category: CourseCategory; count: number; }[]> {
+    return this.http.get<{ category: CourseCategory; count: number; }[]>(`${this.apiUrl}/popular-categories`);
+  }
+
+  /**
+   * Belirli bir kursa benzer kursları getirir.
+   * @param courseId Referans kursun ID'si
+   * @param limit Döndürülecek kurs sayısı (varsayılan: 5)
+   * @returns Benzer kursların CourseResponse dizisini içeren Observable.
+   */
+  getSimilarCourses(courseId: number, limit: number = 5): Observable<CourseResponse[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/${courseId}/similar`, { params });
+  }
+
+  /**
+   * Yeni eklenen kursları getirir.
+   * @param days Son kaç gün içinde eklenenler (varsayılan: 30)
+   * @param limit Döndürülecek kurs sayısı (varsayılan: 10)
+   * @returns Yeni kursların CourseResponse dizisini içeren Observable.
+   */
+  getNewCourses(days: number = 30, limit: number = 10): Observable<CourseResponse[]> {
+    const params = new HttpParams()
+        .set('days', days.toString())
+        .set('limit', limit.toString());
+
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/new`, { params });
+  }
+
+  /**
+   * İndirimli kursları getirir.
+   * @returns İndirimli kursların CourseResponse dizisini içeren Observable.
+   */
+  getDiscountedCourses(): Observable<CourseResponse[]> {
+    return this.http.get<CourseResponse[]>(`${this.apiUrl}/discounted`);
   }
 }

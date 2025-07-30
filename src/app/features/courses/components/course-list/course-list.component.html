@@ -1,35 +1,186 @@
 <!-- course-list.component.html -->
 
 <div class="course-list-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <!-- Yükleme Spinner'ı -->
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Hata Mesajı -->
+    <app-alert-dialog
+            *ngIf="errorMessage"
+            [message]="errorMessage"
+            type="error"
+            [autoClose]="true"
+            (closed)="clearMessages()">
+    </app-alert-dialog>
 
-  <h2 class="page-title">{{ 'COURSES' | translate }}</h2>
-  <p class="page-subtitle">{{ 'ALL_PUBLISHED_COURSES_SUBTITLE' | translate }}</p>
+    <!-- En Çok Satan Kurslar Bölümü -->
+    <section class="top-selling-section" *ngIf="!isLoading">
+        <h2 class="section-title">
+            <span class="highlight-text">{{ 'TOP_SELLING_COURSES' | translate }}</span>
+            <span class="category-badge" *ngIf="personalizedCategory">
+        {{ getCategoryTranslation(personalizedCategory) }}
+      </span>
+        </h2>
 
-  <!-- Eğitim Kartları Listesi -->
-  <div class="course-cards-grid" *ngIf="!isLoading && courses.length > 0">
-    <div class="course-card" *ngFor="let course of courses" [routerLink]="['/courses', course.id]">
-      <img [src]="course.imageUrl" alt="{{ course.title }}" class="course-image"
-           onerror="this.onerror=null;this.src='https://placehold.co/600x400/C3AD90/3D2010?text=Course+Image';" />
-      <div class="card-content">
-        <h3 class="course-title">{{ course.title }}</h3>
-        <p class="course-description">{{ course.description }}</p>
-        <div class="course-meta">
-          <span class="instructor-name">{{ 'ROLE_INSTRUCTOR' | translate }}: {{ course.instructorName }}</span>
-          <span class="course-price">{{ course.price | currency:'USD':'symbol':'1.2-2':'uk' }}</span> <!-- Para birimi formatı -->
+        <p class="section-subtitle" *ngIf="userHasPurchases">
+            {{ 'PERSONALIZED_RECOMMENDATIONS' | translate }}
+        </p>
+
+        <!-- En Çok Satan Kurslar Grid -->
+        <div class="featured-courses-grid" *ngIf="topSellingCourses.length > 0">
+            <div class="course-card featured"
+                 *ngFor="let course of topSellingCourses"
+                 [routerLink]="['/courses', course.id]"
+                 (click)="onCourseClick(course.id)">
+
+                <!-- Kurs Görseli -->
+                <div class="course-image-wrapper">
+                    <img [src]="course.imageUrl"
+                         [alt]="course.title"
+                         class="course-image"
+                         onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
+
+                    <!-- Satış Sayısı Badge -->
+                    <span class="sales-badge" *ngIf="course.enrollmentCount > 100">
+            <i class="icon-fire"></i>
+                        {{ course.enrollmentCount }}+ {{ 'STUDENTS' | translate }}
+          </span>
+
+                    <!-- Seviye Badge -->
+                    <span class="level-badge" [class]="'level-' + course.level.toLowerCase()">
+            {{ getLevelTranslation(course.level) }}
+          </span>
+                </div>
+
+                <div class="card-content">
+                    <!-- Kurs Başlığı -->
+                    <h3 class="course-title">{{ course.title }}</h3>
+
+                    <!-- Kurs Açıklaması -->
+                    <p class="course-description">{{ course.description }}</p>
+
+                    <!-- Kurs Meta Bilgileri -->
+                    <div class="course-meta">
+                        <div class="instructor-info">
+                            <i class="icon-user"></i>
+                            <span class="instructor-name">{{ course.instructorName }}</span>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="rating-info" *ngIf="course.averageRating > 0">
+                            <div class="stars">
+                                <i class="star"
+                                   *ngFor="let star of getStarArray(course.averageRating)"
+                                   [class.filled]="star"></i>
+                            </div>
+                            <span class="rating-text">
+                {{ course.averageRating | number:'1.1-1' }}
+                                ({{ course.totalReviews }})
+              </span>
+                        </div>
+                    </div>
+
+                    <!-- Alt Bilgiler -->
+                    <div class="course-footer">
+                        <div class="course-info">
+              <span class="duration">
+                <i class="icon-clock"></i>
+                  {{ formatDuration(course.duration) }}
+              </span>
+                            <span class="language">
+                <i class="icon-globe"></i>
+                                {{ 'LANGUAGE.' + course.language.toUpperCase() | translate }}
+              </span>
+                        </div>
+
+                        <div class="price-section">
+                            <span class="course-price">{{ formatPrice(course.price) }}</span>
+                        </div>
+                    </div>
+
+                    <button class="view-details-button primary-btn">
+                        {{ 'VIEW_DETAILS' | translate }}
+                    </button>
+                </div>
+            </div>
         </div>
-        <button class="view-details-button primary-btn">{{ 'VIEW_DETAILS' | translate }}</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Eğitim Bulunamadı Mesajı -->
-  <div *ngIf="!isLoading && courses.length === 0 && !errorMessage" class="no-courses-found">
-    <p>{{ 'NO_COURSES_FOUND' | translate }}</p>
-    <button class="action-button secondary-btn" (click)="loadCourses()">{{ 'RETRY_LOAD_COURSES' | translate }}</button>
-  </div>
+        <!-- Veri Yok Durumu -->
+        <div class="no-data-section" *ngIf="showNoDataMessage && !isLoading">
+            <div class="no-data-content">
+                <img src="assets/logo/Logo.png"
+                     alt="{{ 'EDUCATION_CENTER' | translate }}"
+                     class="no-data-image" />
+
+                <h3 class="no-data-title">{{ 'NO_COURSES_AVAILABLE' | translate }}</h3>
+                <p class="no-data-description">{{ 'VISIT_EDUCATION_CENTER_MESSAGE' | translate }}</p>
+
+                <button class="action-button primary-btn large" (click)="goToExternalPurchaseSite()">
+                    <i class="icon-external-link"></i>
+                    {{ 'GO_TO_EDUCATION_CENTER' | translate }}
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tüm Kurslar Bölümü -->
+    <section class="all-courses-section" *ngIf="!isLoading && allCourses.length > 0">
+        <h2 class="section-title">{{ 'ALL_COURSES' | translate }}</h2>
+        <p class="section-subtitle">{{ 'BROWSE_ALL_COURSES_SUBTITLE' | translate }}</p>
+
+        <!-- Tüm Kurslar Grid -->
+        <div class="course-cards-grid">
+            <div class="course-card"
+                 *ngFor="let course of allCourses"
+                 [routerLink]="['/courses', course.id]"
+                 (click)="onCourseClick(course.id)">
+
+                <div class="course-image-wrapper">
+                    <img [src]="course.imageUrl"
+                         [alt]="course.title"
+                         class="course-image"
+                         onerror="this.onerror=null;this.src='assets/logo/<Logo>.png';" />
+
+                    <span class="category-badge">
+            {{ getCategoryTranslation(course.category) }}
+          </span>
+                </div>
+
+                <div class="card-content">
+                    <h3 class="course-title">{{ course.title }}</h3>
+                    <p class="course-description">{{ course.description }}</p>
+
+                    <div class="course-meta">
+            <span class="instructor-name">
+              <i class="icon-user"></i>
+                {{ course.instructorName }}
+            </span>
+
+                        <div class="rating-info compact" *ngIf="course.averageRating > 0">
+                            <i class="star filled"></i>
+                            <span>{{ course.averageRating | number:'1.1-1' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="course-footer">
+                        <span class="course-price">{{ formatPrice(course.price) }}</span>
+                        <button class="view-details-button secondary-btn">
+                            {{ 'DETAILS' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hiç Kurs Yok Durumu -->
+    <div *ngIf="!isLoading && allCourses.length === 0 && !showNoDataMessage" class="empty-state">
+        <i class="icon-book-open empty-icon"></i>
+        <h3>{{ 'NO_COURSES_FOUND' | translate }}</h3>
+        <p>{{ 'NO_COURSES_MESSAGE' | translate }}</p>
+        <button class="action-button secondary-btn" (click)="refreshPage()">
+            <i class="icon-refresh"></i>
+            {{ 'REFRESH' | translate }}
+        </button>
+    </div>
 </div>

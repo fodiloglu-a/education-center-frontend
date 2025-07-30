@@ -226,3 +226,7 @@
     padding: var(--spacing-sm);
   }
 }
+
+/* Yeni eklenebilecek ek responsive ayarlar */
+/* Örneğin, daha büyük ekranlarda iki sütunlu form düzeni vb. */
+/* Şu anki temel responsive yapı çoğu şeyi iyi ele alacaktır */

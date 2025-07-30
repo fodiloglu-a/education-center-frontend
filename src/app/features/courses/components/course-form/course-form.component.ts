@@ -6,7 +6,8 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CourseService } from '../../services/course.service';
-import { CourseDetailsResponse } from '../../models/course.models';
+// CourseCategory ve CourseLevel enumlarını import ediyoruz
+import { CourseDetailsResponse, CourseCategory, CourseLevel } from '../../models/course.models';
 import { catchError, finalize } from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
@@ -36,12 +37,26 @@ export class CourseFormComponent implements OnInit {
   successMessage: string | null = null;
   currentUserId: number | null = null;
 
+  // Enum değerlerini şablonda kullanmak için
+  courseCategories = Object.values(CourseCategory);
+  courseLevels = Object.values(CourseLevel);
+
+  // Dil seçenekleri (basit bir örnek)
+  // Gerçek projede bu bir servisten veya dış kaynaktan gelmelidir.
+  languageOptions = [
+    { value: 'TR', labelKey: 'LANGUAGE.TR' },
+    { value: 'EN', labelKey: 'LANGUAGE.EN' },
+    { value: 'UK', labelKey: 'LANGUAGE.UK' },
+    // Diğer diller eklenebilir
+  ];
+
+
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private courseService: CourseService,
-    private translate: TranslateService,
-    private tokenService: TokenService
+      private route: ActivatedRoute,
+      private router: Router,
+      private courseService: CourseService,
+      private translate: TranslateService,
+      private tokenService: TokenService
   ) { }
 
   ngOnInit(): void {
@@ -52,26 +67,39 @@ export class CourseFormComponent implements OnInit {
       if (id) {
         this.courseId = +id;
         this.isEditMode = true;
-        this.loadCourseDetails(this.courseId);
       } else {
         this.isEditMode = false;
-        this.isLoading = false;
       }
-      this.initForm();
+      this.initForm(); // Formu burada başlat
+      if (this.isEditMode && this.courseId) {
+        this.loadCourseDetails(this.courseId); // Düzenleme modundaysa detayları yükle
+      } else {
+        this.isLoading = false; // Yeni kurs oluşturuluyorsa yükleme bitti
+      }
     });
   }
 
   /**
    * Eğitim formunu başlatır.
+   * Yeni eklenen alanlar için FormControl'ler eklendi.
    */
   initForm(): void {
     this.courseForm = new FormGroup({
       title: new FormControl('', [Validators.required, Validators.minLength(3)]),
       description: new FormControl('', [Validators.required, Validators.minLength(10)]),
-      // Düzeltilen satır: Daha genel bir URL doğrulama deseni kullanıldı
       imageUrl: new FormControl('', [Validators.required, Validators.pattern('^(https?:\/\/[^\\s\/$.?#].[^\\s]*)$')]),
       price: new FormControl(0, [Validators.required, Validators.min(0)]),
-      published: new FormControl(false)
+      published: new FormControl(false),
+      // YENİ EKLENEN FORM KONTROLLERİ
+      category: new FormControl(null, [Validators.required]), // Enum için başlangıçta null veya varsayılan bir değer
+      duration: new FormControl(0, [Validators.required, Validators.min(0)]),
+      level: new FormControl(null, [Validators.required]), // Enum için başlangıçta null veya varsayılan bir değer
+      language: new FormControl(null, [Validators.required]), // Dil seçimi
+      externalPurchaseUrl: new FormControl(''), // Opsiyonel olduğu için required değil
+      requirements: new FormControl(''), // Textarea'dan diziye dönüştürülecek
+      whatYouWillLearn: new FormControl(''), // Textarea'dan diziye dönüştürülecek
+      targetAudience: new FormControl(''), // Textarea'dan diziye dönüştürülecek
+      certificateAvailable: new FormControl(false)
     });
   }
 
@@ -81,9 +109,21 @@ export class CourseFormComponent implements OnInit {
   get imageUrl() { return this.courseForm.get('imageUrl'); }
   get price() { return this.courseForm.get('price'); }
   get published() { return this.courseForm.get('published'); }
+  // YENİ EKLENEN GETTER'LAR
+  get category() { return this.courseForm.get('category'); }
+  get duration() { return this.courseForm.get('duration'); }
+  get level() { return this.courseForm.get('level'); }
+  get language() { return this.courseForm.get('language'); }
+  get externalPurchaseUrl() { return this.courseForm.get('externalPurchaseUrl'); }
+  get requirements() { return this.courseForm.get('requirements'); }
+  get whatYouWillLearn() { return this.courseForm.get('whatYouWillLearn'); }
+  get targetAudience() { return this.courseForm.get('targetAudience'); }
+  get certificateAvailable() { return this.courseForm.get('certificateAvailable'); }
+
 
   /**
    * Düzenleme modundaysa eğitimin detaylarını yükler ve formu doldurur.
+   * Yeni eklenen alanlar için patchValue eklendi.
    * @param id Eğitimin ID'si.
    */
   loadCourseDetails(id: number): void {
@@ -92,17 +132,19 @@ export class CourseFormComponent implements OnInit {
 
     if (!this.currentUserId) {
       this.isLoading = false;
+      this.errorMessage = this.translate.instant('AUTHENTICATION_REQUIRED');
+      this.router.navigate(['/auth/login']); // Kullanıcı yoksa giriş sayfasına yönlendir
       return;
     }
 
     this.courseService.getCourseDetailsById(id).pipe(
-      catchError(error => {
-        this.errorMessage = error.message || this.translate.instant('COURSE_LOAD_FAILED_GENERIC');
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
+        catchError(error => {
+          this.errorMessage = error.message || this.translate.instant('COURSE_LOAD_FAILED_GENERIC');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
     ).subscribe(course => {
       if (course) {
         this.courseForm.patchValue({
@@ -110,7 +152,17 @@ export class CourseFormComponent implements OnInit {
           description: course.description,
           imageUrl: course.imageUrl,
           price: course.price,
-          published: course.published
+          published: course.published,
+          // YENİ EKLENEN ALANLARIN PATCH EDİLMESİ
+          category: course.category,
+          duration: course.duration,
+          level: course.level,
+          language: course.language,
+          externalPurchaseUrl: course.externalPurchaseUrl || '', // null ise boş string
+          requirements: course.requirements ? course.requirements.join('\n') : '', // Diziyi textarea için stringe çevir
+          whatYouWillLearn: course.whatYouWillLearn ? course.whatYouWillLearn.join('\n') : '',
+          targetAudience: course.targetAudience ? course.targetAudience.join('\n') : '',
+          certificateAvailable: course.certificateAvailable
         });
       } else {
         this.errorMessage = this.translate.instant('COURSE_NOT_LOADED');
@@ -121,6 +173,7 @@ export class CourseFormComponent implements OnInit {
   /**
    * Eğitim formunu gönderir.
    * Yeni eğitim oluşturur veya mevcut eğitimi günceller.
+   * Yeni eklenen alanların dönüşümü yapıldı.
    */
   onSubmit(): void {
     this.errorMessage = null;
@@ -132,11 +185,29 @@ export class CourseFormComponent implements OnInit {
       return;
     }
 
-
     this.isLoading = true;
 
-    const courseData: CourseDetailsResponse = this.courseForm.value;
-    console.log(courseData);
+    const rawCourseData = this.courseForm.value;
+
+    // String dizisi alanlarını newline karakterine göre böl
+    const courseData: CourseDetailsResponse = {
+      ...rawCourseData,
+      requirements: rawCourseData.requirements ? rawCourseData.requirements.split('\n').filter((item: string) => item.trim() !== '') : [],
+      whatYouWillLearn: rawCourseData.whatYouWillLearn ? rawCourseData.whatYouWillLearn.split('\n').filter((item: string) => item.trim() !== '') : [],
+      targetAudience: rawCourseData.targetAudience ? rawCourseData.targetAudience.split('\n').filter((item: string) => item.trim() !== '') : [],
+      // Diğer eksik alanları CourseDetailsResponse tipine uygun şekilde doldur
+      // Bu alanlar genellikle entity'de bulunmayan, ancak DTO'da beklenen türetilmiş veya ilişkisel verilerdir.
+      // Backend'e gönderirken bunları boş veya varsayılan değerlerle göndermek genellikle kabul edilebilir.
+      instructorName: '', // Frontend'de formdan gelmiyor, backend instructorId'den alacak
+      lessons: [],
+      reviews: [],
+      enrollmentCount: 0,
+      averageRating: 0,
+      totalReviews: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: null // Güncelleme modunda backend tarafından set edilecek
+    };
+
     let operation: Observable<any>;
     if (this.isEditMode && this.courseId) {
       operation = this.courseService.updateCourse(this.courseId, courseData);
@@ -145,13 +216,13 @@ export class CourseFormComponent implements OnInit {
     }
 
     operation.pipe(
-      catchError(error => {
-        this.errorMessage = error.message || this.translate.instant('COURSE_SAVE_FAILED_GENERIC');
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
+        catchError(error => {
+          this.errorMessage = error.message || this.translate.instant('COURSE_SAVE_FAILED_GENERIC');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
     ).subscribe(response => {
       if (response) {
         this.successMessage = this.translate.instant('COURSE_SAVE_SUCCESS');
