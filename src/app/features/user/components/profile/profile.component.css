@@ -3,8 +3,8 @@
 .profile-container {
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* İçeriği üste hizala */
-  min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px); /* Header ve footer boşluğunu düş, biraz daha yer bırak */
+  align-items: flex-start;
+  min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px);
   padding: var(--spacing-lg);
   background-color: var(--background-color);
   box-sizing: border-box;
@@ -16,76 +16,133 @@
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 600px; /* Maksimum genişlik */
+  max-width: 700px; /* Daha geniş ve modern bir profil kartı için */
   text-align: center;
   box-sizing: border-box;
+  animation: fadeIn 0.8s ease-out forwards; /* Kart için giriş animasyonu */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.profile-header {
+  margin-bottom: var(--spacing-xl);
 }
 
 .card-title {
   color: var(--primary-color);
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-xxxl); /* Daha büyük başlık */
   margin-bottom: var(--spacing-sm);
+  font-weight: 700;
 }
 
 .card-subtitle {
   color: var(--text-color);
-  font-size: var(--font-size-base);
-  margin-bottom: var(--spacing-xl);
+  font-size: var(--font-size-lg); /* Daha belirgin alt başlık */
+  opacity: 0.8;
 }
 
-.profile-details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
+.profile-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Esnek grid yapısı */
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xxl);
   text-align: left;
 }
 
 .detail-item {
   display: flex;
-  flex-wrap: wrap; /* Küçük ekranlarda sarılma için */
-  justify-content: space-between;
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--divider-color);
+  align-items: center;
+  padding: var(--spacing-md);
+  background-color: var(--surface-bg); /* Hafif farklı arka plan */
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
-.detail-item:last-child {
-  border-bottom: none; /* Son öğede alt çizgi olmasın */
+.detail-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.detail-icon {
+  font-size: var(--font-size-xxl); /* Daha büyük ikonlar */
+  color: var(--accent-color);
+  margin-right: var(--spacing-md);
+  flex-shrink: 0; /* Küçülmesini engelle */
+}
+
+.detail-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .detail-label {
   font-weight: 600;
-  color: var(--accent-color);
-  font-size: var(--font-size-base);
-  flex-basis: 40%; /* Etiket için %40 genişlik */
-  min-width: 120px; /* Minimum genişlik */
+  color: var(--text-color);
+  font-size: var(--font-size-sm); /* Etiket daha küçük ve net */
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 
 .detail-value {
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  flex-basis: 55%; /* Değer için %55 genişlik */
-  text-align: right; /* Değeri sağa hizala */
-  word-break: break-word; /* Uzun kelimeleri kırma */
+  color: var(--dark-color);
+  font-size: var(--font-size-base); /* Değer normal boyutta */
+  word-break: break-all;
+  font-weight: 500;
+}
+
+/* Eylem Bölümü */
+.profile-actions-section {
+  margin-top: var(--spacing-xxl);
+}
+
+.section-title {
+  color: var(--accent-color);
+  font-size: var(--font-size-xxl);
+  margin-top: 0;
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+  border-bottom: 2px solid var(--divider-color);
+  padding-bottom: var(--spacing-sm);
 }
 
 .profile-actions {
   display: flex;
-  flex-direction: column; /* Mobil için alt alta butonlar */
+  flex-direction: column; /* Mobil için alt alta */
   gap: var(--spacing-md);
   margin-top: var(--spacing-lg);
+  align-items: center; /* Ortala */
 }
 
 .action-button {
-  width: 100%; /* Tam genişlik */
+  width: 100%; /* Mobil için tam genişlik */
+  max-width: 280px; /* Maksimum genişlik */
   padding: var(--spacing-md);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
+  font-size: var(--font-size-base); /* Buton yazıları normal */
+  font-weight: 600;
   border: none;
   border-radius: var(--border-radius-md);
   cursor: pointer;
   transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
   box-shadow: var(--shadow-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm); /* İkon ve metin arası boşluk */
+}
+
+.action-button .material-icons {
+  font-size: var(--font-size-lg);
 }
 
 .action-button.primary-btn {
@@ -115,7 +172,7 @@
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
   color: var(--text-color);
-  max-width: 400px;
+  max-width: 500px;
   margin: var(--spacing-xxl) auto;
 }
 
@@ -128,15 +185,26 @@
 /* Duyarlı Tasarım (Responsive Design) */
 /* ========================================= */
 
-@media (min-width: 600px) {
+@media (min-width: 768px) {
   .profile-actions {
-    flex-direction: row; /* Daha büyük ekranlarda yan yana butonlar */
+    flex-direction: row; /* Tablet ve üzeri için yan yana butonlar */
     justify-content: center;
+    max-width: none; /* Kısıtlamayı kaldır */
   }
 
   .action-button {
     width: auto; /* Genişliği içeriğe göre ayarla */
     min-width: 180px; /* Minimum genişlik */
+  }
+
+  .profile-details-grid {
+    grid-template-columns: repeat(2, 1fr); /* Tablet ve üzeri için 2 sütun */
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-details-grid {
+    grid-template-columns: repeat(3, 1fr); /* Daha büyük ekranlarda 3 sütun */
   }
 }
 
@@ -147,21 +215,33 @@
   }
 
   .card-title {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-xxl);
   }
 
   .card-subtitle {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
+  }
+
+  .detail-item {
+    padding: var(--spacing-sm);
+    flex-direction: row; /* İkon ve içerik yine yan yana */
+    align-items: center;
+  }
+
+  .detail-icon {
+    font-size: var(--font-size-xl);
+    margin-right: var(--spacing-sm);
   }
 
   .detail-label, .detail-value {
     font-size: var(--font-size-sm);
-    flex-basis: 100%; /* Mobil küçük ekranlarda alt alta */
-    text-align: left; /* Mobil küçük ekranlarda sola hizala */
   }
 
-  .detail-item {
-    flex-direction: column; /* Mobil küçük ekranlarda dikey düzen */
+  .detail-content {
     align-items: flex-start;
+  }
+
+  .profile-actions {
+    align-items: stretch; /* Mobil dikeyde tam genişlik */
   }
 }

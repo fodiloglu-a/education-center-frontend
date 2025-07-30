@@ -1,50 +1,75 @@
-<!-- profile.component.html -->
-
 <div class="profile-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" (closed)="clearMessages()"></app-alert-dialog>
 
-  <!-- Başarı Mesajı (İleride kullanılabilir) -->
-  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" (closed)="clearMessages()"></app-alert-dialog>
 
-  <div class="profile-card" *ngIf="!isLoading && user">
-    <h2 class="card-title">{{ 'PROFILE' | translate }}</h2>
-    <p class="card-subtitle">{{ 'PROFILE_SUBTITLE' | translate }}</p>
+    <div class="profile-card" *ngIf="!isLoading && user">
+        <div class="profile-header">
+            <h2 class="card-title">{{ 'PROFILE' | translate }}</h2>
+            <p class="card-subtitle">{{ 'PROFILE_SUBTITLE' | translate }}</p>
+        </div>
 
-    <div class="profile-details">
-      <div class="detail-item">
-        <span class="detail-label">{{ 'FIRST_NAME' | translate }}:</span>
-        <span class="detail-value">{{ user.firstName }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">{{ 'LAST_NAME' | translate }}:</span>
-        <span class="detail-value">{{ user.lastName }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">{{ 'EMAIL' | translate }}:</span>
-        <span class="detail-value">{{ user.email }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">{{ 'ROLE' | translate }}:</span>
-        <span class="detail-value">{{ getTranslatedRole(user.role) }}</span>
-      </div>
-      <div class="detail-item">
-        <span class="detail-label">{{ 'MEMBER_SINCE' | translate }}:</span>
-        <span class="detail-value">{{ user.createdAt | date:'shortDate' }}</span> <!-- Tarih formatı için Angular DatePipe -->
-      </div>
+        <div class="profile-details-grid">
+            <div class="detail-item">
+                <span class="detail-icon material-icons">person</span>
+                <div class="detail-content">
+                    <span class="detail-label">{{ 'FIRST_NAME' | translate }}:</span>
+                    <span class="detail-value">{{ user.firstName }}</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon material-icons">person_outline</span>
+                <div class="detail-content">
+                    <span class="detail-label">{{ 'LAST_NAME' | translate }}:</span>
+                    <span class="detail-value">{{ user.lastName }}</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon material-icons">email</span>
+                <div class="detail-content">
+                    <span class="detail-label">{{ 'EMAIL' | translate }}:</span>
+                    <span class="detail-value">{{ user.email }}</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon material-icons">assignment_ind</span>
+                <div class="detail-content">
+                    <span class="detail-label">{{ 'ROLE' | translate }}:</span>
+                    <span class="detail-value">{{ getTranslatedRole(user.role) }}</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon material-icons">event</span>
+                <div class="detail-content">
+                    <span class="detail-label">{{ 'MEMBER_SINCE' | translate }}:</span>
+                    <span class="detail-value">{{ user.createdAt | date:'shortDate' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-actions-section">
+            <h3 class="section-title">{{ 'ACCOUNT_ACTIONS' | translate }}</h3>
+            <div class="profile-actions">
+                <button class="action-button primary-btn" routerLink="/profile/edit">
+                    <span class="material-icons">edit</span> {{ 'EDIT_PROFILE' | translate }}
+                </button>
+                <button class="action-button secondary-btn" routerLink="/profile/change-password">
+                    <span class="material-icons">vpn_key</span> {{ 'CHANGE_PASSWORD' | translate }}
+                </button>
+                <button class="action-button secondary-btn" routerLink="/certificates">
+                    <span class="material-icons">receipt_long</span> {{ 'MY_CERTIFICATES' | translate }}
+                </button>
+                <button class="action-button secondary-btn" routerLink="/reviews/user/{{user.id}}">
+                    <span class="material-icons">rate_review</span> {{ 'MY_REVIEWS' | translate }}
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="profile-actions">
-      <button class="action-button primary-btn" routerLink="/profile/edit">{{ 'EDIT_PROFILE' | translate }}</button>
-      <button class="action-button secondary-btn" routerLink="/profile/change-password">{{ 'CHANGE_PASSWORD' | translate }}</button>
+    <div *ngIf="!isLoading && !user && !errorMessage" class="no-user-found">
+        <p>{{ 'USER_NOT_LOADED' | translate }}</p>
+        <button class="action-button primary-btn" (click)="loadUserProfile()">{{ 'RETRY_LOAD_PROFILE' | translate }}</button>
     </div>
-  </div>
-
-  <div *ngIf="!isLoading && !user && !errorMessage" class="no-user-found">
-    <p>{{ 'USER_NOT_LOADED' | translate }}</p>
-    <button class="action-button primary-btn" (click)="loadUserProfile()">{{ 'RETRY_LOAD_PROFILE' | translate }}</button>
-  </div>
 </div>

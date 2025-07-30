@@ -1,45 +1,65 @@
-<!-- review-list.component.html -->
-
 <div class="review-list-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <!-- Başarı Mesajı -->
-  <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <h2 class="page-title">{{ 'REVIEWS' | translate }}</h2>
-  <p class="page-subtitle">
-    <ng-container *ngIf="courseId">{{ 'REVIEWS_FOR_COURSE' | translate }}: <strong>{{ courseId }}</strong></ng-container>
-    <ng-container *ngIf="userId">{{ 'REVIEWS_BY_USER' | translate }}: <strong>{{ userId }}</strong></ng-container>
-    <ng-container *ngIf="!courseId && !userId">{{ 'ALL_REVIEWS_SUBTITLE' | translate }}</ng-container>
-  </p>
+    <h2 class="page-title">{{ 'REVIEWS_AND_NOTES' | translate }}</h2>
+    <p class="page-subtitle">
+        <ng-container *ngIf="courseId">{{ 'REVIEWS_FOR_COURSE' | translate }}: <strong>{{ courseId }}</strong></ng-container>
+        <ng-container *ngIf="userId">{{ 'REVIEWS_AND_NOTES_BY_USER' | translate }}: <strong>{{ userId }}</strong></ng-container>
+        <ng-container *ngIf="!courseId && !userId">{{ 'ALL_REVIEWS_AND_NOTES_SUBTITLE' | translate }}</ng-container>
+    </p>
 
-  <!-- Yorumlar Listesi -->
-  <div class="review-cards-grid" *ngIf="!isLoading && reviews.length > 0">
-    <div class="review-card" *ngFor="let review of reviews">
-      <div class="review-header">
-        <div class="reviewer-info">
-          <span class="reviewer-name">{{ review.userName }}</span>
-          <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
+    <div class="section-card reviews-section" *ngIf="!isLoading && reviews.length > 0">
+        <h3 class="section-title">{{ 'MY_REVIEWS' | translate }}</h3>
+        <div class="review-cards-grid">
+            <div class="review-card" *ngFor="let review of reviews">
+                <div class="review-header">
+                    <div class="reviewer-info">
+                        <span class="reviewer-name">{{ review.userName }}</span>
+                        <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
+                    </div>
+                    <div class="review-stars">
+                        <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="review.rating >= star">star</span>
+                    </div>
+                </div>
+                <p class="review-course-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ review.courseTitle }}</strong></p>
+                <p class="review-comment">{{ review.comment }}</p>
+                <div class="review-actions">
+                    <button class="action-button secondary-btn" (click)="goToCourseDetail(review.courseId)">{{ 'VIEW_COURSE' | translate }}</button>
+                    <ng-container *ngIf="canModifyReview(review)">
+                        <button class="action-button secondary-btn" [routerLink]="['/reviews', 'edit', review.id]">{{ 'EDIT' | translate }}</button>
+                        <button class="action-button danger-btn" (click)="deleteReview(review.id)">{{ 'DELETE' | translate }}</button>
+                    </ng-container>
+                </div>
+            </div>
         </div>
-        <div class="review-stars">
-          <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="review.rating >= star">star</span>
-        </div>
-      </div>
-      <p class="review-comment">{{ review.comment }}</p>
-      <div class="review-actions" *ngIf="canModifyReview(review)">
-        <button class="action-button secondary-btn" [routerLink]="['/reviews', 'edit', review.id]">{{ 'EDIT' | translate }}</button>
-        <button class="action-button danger-btn" (click)="deleteReview(review.id)">{{ 'DELETE' | translate }}</button>
-      </div>
     </div>
-  </div>
 
-  <!-- Yorum Bulunamadı Mesajı -->
-  <div *ngIf="!isLoading && reviews.length === 0 && !errorMessage" class="no-reviews-found">
-    <p>{{ 'NO_REVIEWS_FOUND' | translate }}</p>
-    <button class="action-button primary-btn" (click)="courseId ? loadReviewsByCourse(courseId) : (userId ? loadReviewsByUser(userId) : null)">{{ 'RETRY_LOAD_REVIEWS' | translate }}</button>
-  </div>
+    <div class="section-card notes-section" *ngIf="!isLoading && userNotes.length > 0">
+        <h3 class="section-title">{{ 'MY_NOTES' | translate }}</h3>
+        <div class="note-cards-grid">
+            <div class="note-card" *ngFor="let note of userNotes">
+                <div class="note-header">
+                    <span class="note-lesson-title">{{ note.lessonTitle }}</span>
+                    <span class="note-date">{{ note.createdAt | date:'shortDate' }}</span>
+                </div>
+                <p class="note-course-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ note.courseTitle }}</strong></p>
+                <p class="note-content">{{ note.content }}</p>
+                <div class="note-actions">
+                    <button class="action-button primary-btn" (click)="goToLessonPlayer(note.courseId, note.lessonId)">{{ 'VIEW_LESSON' | translate }}</button>
+                    <ng-container *ngIf="canModifyNote(note)">
+                        <button class="action-button danger-btn" (click)="deleteNote(note.id)">{{ 'DELETE' | translate }}</button>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && reviews.length === 0 && userNotes.length === 0 && !errorMessage" class="no-content-found">
+        <p>{{ 'NO_REVIEWS_AND_NOTES_FOUND' | translate }}</p>
+        <button class="action-button primary-btn" (click)="loadReviewsAndNotesForContext()">{{ 'RETRY_LOAD_REVIEWS_AND_NOTES' | translate }}</button>
+    </div>
 </div>

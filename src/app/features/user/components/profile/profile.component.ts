@@ -1,16 +1,16 @@
 // profile.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // ngIf, ngFor gibi direktifler için
-import { Router, RouterLink } from '@angular/router'; // Yönlendirme ve routerLink için
-import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ngx-translate için
-import { UserService } from '../../services/user.service'; // UserService'i import ediyoruz
-import { TokenService } from '../../../../core/services/token.service'; // TokenService'i import ediyoruz
-import { UserResponse } from '../../models/user.models'; // UserResponse modelini import ediyoruz
-import { catchError, finalize } from 'rxjs/operators'; // Hata yakalama ve tamamlanma için
-import { of } from 'rxjs'; // Observable oluşturmak için
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component'; // Loading Spinner için
-import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component'; // Alert Dialog için
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { UserService } from '../../services/user.service';
+import { TokenService } from '../../../../core/services/token.service';
+import { UserResponse } from '../../models/user.models';
+import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-profile',
@@ -19,23 +19,23 @@ import { AlertDialogComponent } from '../../../../shared/components/alert-dialog
     CommonModule,
     RouterLink,
     TranslateModule,
-    LoadingSpinnerComponent, // Yükleme spinner'ı için
-    AlertDialogComponent // Hata/başarı mesajları için
+    LoadingSpinnerComponent,
+    AlertDialogComponent
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit {
-  user: UserResponse | null = null; // Kullanıcı bilgileri
-  isLoading: boolean = true; // Yükleme durumu
-  errorMessage: string | null = null; // Hata mesajı
-  successMessage: string | null = null; // Başarı mesajı
+  user: UserResponse | null = null;
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   constructor(
-    private userService: UserService,
-    private tokenService: TokenService,
-    private router: Router,
-    private translate: TranslateService
+      private userService: UserService,
+      private tokenService: TokenService,
+      private router: Router,
+      private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -50,24 +50,24 @@ export class ProfileComponent implements OnInit {
     this.errorMessage = null;
     this.successMessage = null;
 
-    const userId = this.tokenService.getStoredUser()?.id; // TokenService'den kullanıcının ID'sini al
+    const userId = this.tokenService.getStoredUser()?.id;
 
     if (!userId) {
       this.errorMessage = this.translate.instant('USER_ID_NOT_FOUND');
       this.isLoading = false;
-      this.tokenService.signOut(); // Geçersiz durum, çıkış yap
+      this.tokenService.signOut();
       this.router.navigate(['/auth/login']);
       return;
     }
 
     this.userService.getUserById(userId).pipe(
-      catchError(error => {
-        this.errorMessage = error.message || this.translate.instant('PROFILE_LOAD_FAILED');
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
+        catchError(error => {
+          this.errorMessage = error.message || this.translate.instant('PROFILE_LOAD_FAILED');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
     ).subscribe(user => {
       if (user) {
         this.user = user;
