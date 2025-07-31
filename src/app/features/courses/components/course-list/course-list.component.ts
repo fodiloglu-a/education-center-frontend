@@ -20,31 +20,23 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import {UserProfile} from "../../../auth/models/auth.models";
 
-// Interfaces
-interface SliderConfig {
-  currentSlide: number;
-  maxSlide: number;
-  slideWidth: number;
-  slidesPerView: number;
-  autoSlideEnabled: boolean;
-  autoSlideInterval: number;
-}
-
-interface ResponsiveBreakpoints {
-  mobile: number;
-  tablet: number;
-  desktop: number;
-  large: number;
-}
-
+// Interfaces (Slider ile ilgili olanlar kaldırıldı)
 interface ComponentState {
   isLoading: boolean;
   errorMessage: string | null;
   successMessage: string | null;
-  showCallToActionForTopSelling: boolean;
+  showCallToActionForTopSelling: boolean; // Her zaman true olacak
   isLoggedIn: boolean;
   currentUser: UserProfile | null;
 }
+
+// Responsive Breakpoints artık sadece CSS'te yönetiliyor veya burada kullanılmıyor.
+// interface ResponsiveBreakpoints {
+//   mobile: number;
+//   tablet: number;
+//   desktop: number;
+//   large: number;
+// }
 
 @Component({
   selector: 'app-course-list',
@@ -62,20 +54,17 @@ interface ComponentState {
 })
 export class CourseListComponent implements OnInit, OnDestroy {
 
-  // ViewChild references
-  @ViewChild('sliderWrapper', { static: false }) sliderWrapper!: ElementRef<HTMLDivElement>;
-
   // Data properties
-  topSellingCourses: CourseResponse[] = [];
+  // topSellingCourses: CourseResponse[] = []; // KALDIRILDI
   allCourses: CourseResponse[] = [];
-  personalizedCategory: CourseCategory | null = null;
+  personalizedCategory: CourseCategory | null = null; // Bu değişkenin kullanımı azalacak/değişecek
 
   // State management
   private componentState$ = new BehaviorSubject<ComponentState>({
     isLoading: true,
     errorMessage: null,
     successMessage: null,
-    showCallToActionForTopSelling: false,
+    showCallToActionForTopSelling: true, // Her zaman true olarak ayarlandı
     isLoggedIn: false,
     currentUser: null
   });
@@ -89,28 +78,17 @@ export class CourseListComponent implements OnInit, OnDestroy {
   get currentUser(): UserProfile | null { return this.componentState$.value.currentUser; }
   get currentUserId(): number | null { return this.currentUser?.id ? parseInt(String(this.currentUser.id)) : null; }
 
-  // Slider configuration
-  private sliderConfig$ = new BehaviorSubject<SliderConfig>({
-    currentSlide: 0,
-    maxSlide: 0,
-    slideWidth: 100,
-    slidesPerView: 1,
-    autoSlideEnabled: true,
-    autoSlideInterval: 4000
-  });
+  // Slider configuration (Kaldırıldı)
+  // private sliderConfig$ = new BehaviorSubject<SliderConfig>(...);
+  // Public slider getters (Kaldırıldı)
+  // get currentSlide(): number { ... }
+  // get maxSlide(): number { ... }
+  // get slideWidth(): number { ... }
+  // get slidesPerView(): number { ... }
+  // get slideIndicators(): number[] { ... }
 
-  // Public slider getters
-  get currentSlide(): number { return this.sliderConfig$.value.currentSlide; }
-  get maxSlide(): number { return this.sliderConfig$.value.maxSlide; }
-  get slideWidth(): number { return this.sliderConfig$.value.slideWidth; }
-  get slidesPerView(): number { return this.sliderConfig$.value.slidesPerView; }
-  get slideIndicators(): number[] {
-    const totalSlides = Math.ceil(this.topSellingCourses.length / this.slidesPerView);
-    return Array.from({ length: totalSlides }, (_, i) => i);
-  }
-
-  // Configuration constants
-  private readonly BREAKPOINTS: ResponsiveBreakpoints = {
+  // Configuration constants (Breakpointler hala CSS için kullanılabilir)
+  private readonly BREAKPOINTS = { // Sadece TypeScript'te kullanılıyorsa tanımlı kalsın
     mobile: 480,
     tablet: 768,
     desktop: 1024,
@@ -120,13 +98,13 @@ export class CourseListComponent implements OnInit, OnDestroy {
   private readonly EXTERNAL_PURCHASE_URL = 'https://egitimmerkezi.com';
   private readonly DEFAULT_PLACEHOLDER_IMAGE = 'assets/images/course-placeholder.jpg';
 
-  // Subscriptions
-  private autoSlideSubscription?: Subscription;
-  private resizeSubscription?: Subscription;
+  // Subscriptions (Slider ile ilgili olanlar kaldırıldı)
+  // private autoSlideSubscription?: Subscription;
+  private resizeSubscription?: Subscription; // Resize hala kullanılabilir
   private destroy$ = new Subject<void>();
 
-  // Performance optimization
-  private resizeSubject$ = new Subject<Event>();
+  // Performance optimization (Kaldırıldı)
+  // private resizeSubject$ = new Subject<Event>();
 
   constructor(
       private courseService: CourseService,
@@ -136,7 +114,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
       private cdr: ChangeDetectorRef,
       @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    this.setupResizeHandler();
+    // this.setupResizeHandler(); // Slider kaldırıldığı için buna gerek kalmayabilir
   }
 
   ngOnInit(): void {
@@ -147,29 +125,22 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.cleanup();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: Event): void {
-    // Only handle resize in browser environment
-    if (isPlatformBrowser(this.platformId)) {
-      this.resizeSubject$.next(event);
-    }
-  }
+  // @HostListener('window:resize', ['$event']) (Kaldırıldı)
+  // onResize(event: Event): void { ... }
 
   // ========== INITIALIZATION METHODS ==========
 
   private initializeComponent(): void {
-    this.updateState({ isLoading: true });
+    this.updateState({ isLoading: true, showCallToActionForTopSelling: true }); // Her zaman CTA göster
 
-    // Setup user authentication state
     this.setupAuthenticationListener();
 
-    // Setup window resize handler (only in browser)
-    if (isPlatformBrowser(this.platformId)) {
-      this.calculateResponsiveSlides();
-    } else {
-      // Set default values for server-side rendering
-      this.updateSliderConfig({ slidesPerView: 1 });
-    }
+    // Slider kaldırıldığı için responsive slide hesaplamasına gerek kalmadı.
+    // if (isPlatformBrowser(this.platformId)) {
+    //   this.calculateResponsiveSlides();
+    // } else {
+    //   this.updateSliderConfig({ slidesPerView: 1 });
+    // }
   }
 
   private setupAuthenticationListener(): void {
@@ -183,7 +154,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
                 currentUser: user
               });
             }),
-            switchMap(() => this.loadAllData())
+            // Sadece satın alınan kursları yükle (TopSelling artık sadece CTA)
+            switchMap(() => this.loadPurchasedCoursesObservable())
         )
         .subscribe({
           next: () => {
@@ -191,100 +163,36 @@ export class CourseListComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
           },
           error: (error) => {
-            this.handleError('Failed to load user data', error);
+            this.handleError('Failed to load user data or courses', error);
           }
         });
   }
 
-  private setupResizeHandler(): void {
-    // Only setup resize handler in browser environment
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
-
-    this.resizeSubscription = this.resizeSubject$
-        .pipe(
-            debounceTime(150),
-            takeUntil(this.destroy$)
-        )
-        .subscribe(() => {
-          this.calculateResponsiveSlides();
-          this.updateSliderDimensions();
-          this.cdr.markForCheck();
-        });
-  }
+  // private setupResizeHandler(): void { ... } // Slider kaldırıldığı için kaldırıldı
 
   // ========== DATA LOADING METHODS ==========
 
-  private loadAllData(): Observable<void> {
-    return new Observable(observer => {
-      combineLatest([
-        this.loadTopSellingCoursesObservable(),
-        this.loadPurchasedCoursesObservable()
-      ]).pipe(
-          takeUntil(this.destroy$),
-          finalize(() => {
-            this.initializeSlider();
-            observer.complete();
-          })
-      ).subscribe({
-        next: ([topSelling, purchased]) => {
-          this.topSellingCourses = topSelling;
-          this.allCourses = purchased;
-          observer.next();
-        },
-        error: (error) => {
-          observer.error(error);
-        }
-      });
-    });
-  }
+  // loadAllData kaldırıldı, çünkü artık sadece loadPurchasedCoursesObservable çağrılıyor
+  // private loadAllData(): Observable<void> { ... }
 
+  // loadTopSellingCoursesObservable metodunun kendisi basitleştirildi
   private loadTopSellingCoursesObservable(): Observable<CourseResponse[]> {
+    // Top selling kursları çekme mantığı kaldırıldı, her zaman boş bir dizi dönecek
+    // Çünkü bu bölüm sadece CTA için kullanılacak.
     this.updateState({
-      showCallToActionForTopSelling: false,
+      showCallToActionForTopSelling: true, // Her zaman CTA göster
       errorMessage: null
     });
-
-    let fetchObservable: Observable<CourseResponse[]>;
-    let isPersonalizedAttempt = false;
-
-    if (this.isLoggedIn && this.currentUserId) {
-      isPersonalizedAttempt = true;
-      fetchObservable = this.courseService.getRecommendedCourses(this.currentUserId, 8).pipe(
-          catchError(err => {
-            console.warn('Personalized recommendations failed, falling back to top selling:', err);
-            isPersonalizedAttempt = false;
-            return this.courseService.getTopSellingCourses(8, false, null);
-          })
-      );
-    } else {
-      fetchObservable = this.courseService.getTopSellingCourses(8, false, null);
-    }
-
-    return fetchObservable.pipe(
-        catchError(error => {
-          console.error('Error loading top selling courses:', error);
-          this.updateState({
-            showCallToActionForTopSelling: true,
-            errorMessage: this.translate.instant('COURSE_LOAD_ERROR')
-          });
-          return of([]);
-        }),
-        tap(courses => {
-          if (courses && courses.length > 0) {
-            this.updateState({ showCallToActionForTopSelling: false });
-            this.personalizedCategory = isPersonalizedAttempt && courses[0]?.category ? courses[0].category : null;
-          } else {
-            this.updateState({ showCallToActionForTopSelling: true });
-            this.personalizedCategory = null;
-          }
-        })
-    );
+    // this.topSellingCourses = []; // KALDIRILDI
+    return of([]);
   }
 
   private loadPurchasedCoursesObservable(): Observable<CourseResponse[]> {
     if (!this.isLoggedIn || !this.currentUserId) {
+      this.updateState({
+        errorMessage: null // Satın alınan kurs yoksa hata mesajı gösterme
+      });
+      this.allCourses = []; // Kullanıcı giriş yapmamışsa veya ID yoksa boş dizi
       return of([]);
     }
 
@@ -294,140 +202,35 @@ export class CourseListComponent implements OnInit, OnDestroy {
           this.updateState({
             errorMessage: this.translate.instant('PURCHASED_COURSES_LOAD_ERROR')
           });
+          this.allCourses = []; // Hata durumunda boş dizi
           return of([]);
+        }),
+        tap(courses => {
+          this.allCourses = courses; // Satın alınan kursları ata
         })
     );
   }
 
-  // ========== SLIDER METHODS ==========
-
-  private initializeSlider(): void {
-    if (this.topSellingCourses.length === 0) return;
-
-    this.calculateResponsiveSlides();
-    this.updateSliderDimensions();
-    this.startAutoSlide();
-  }
-
-  private calculateResponsiveSlides(): void {
-    // Only calculate in browser environment
-    if (!isPlatformBrowser(this.platformId)) {
-      this.updateSliderConfig({ slidesPerView: 1 });
-      return;
-    }
-
-    const screenWidth = window.innerWidth;
-    let slidesPerView = 1;
-
-    if (screenWidth >= this.BREAKPOINTS.large) {
-      slidesPerView = 4;
-    } else if (screenWidth >= this.BREAKPOINTS.desktop) {
-      slidesPerView = 3;
-    } else if (screenWidth >= this.BREAKPOINTS.tablet) {
-      slidesPerView = 2;
-    } else {
-      slidesPerView = 1;
-    }
-
-    this.updateSliderConfig({ slidesPerView });
-  }
-
-  private updateSliderDimensions(): void {
-    if (this.topSellingCourses.length === 0) return;
-
-    const { slidesPerView } = this.sliderConfig$.value;
-    const slideWidth = 100 / slidesPerView;
-    const maxSlide = Math.max(0, Math.ceil(this.topSellingCourses.length / slidesPerView) - 1);
-    const currentSlide = Math.min(this.currentSlide, maxSlide);
-
-    this.updateSliderConfig({
-      slideWidth,
-      maxSlide,
-      currentSlide
-    });
-  }
-
-  private startAutoSlide(): void {
-    // Only start auto slide in browser environment
-    if (!isPlatformBrowser(this.platformId)) {
-      return;
-    }
-
-    const config = this.sliderConfig$.value;
-
-    if (!config.autoSlideEnabled || this.topSellingCourses.length <= config.slidesPerView) {
-      return;
-    }
-
-    this.stopAutoSlide();
-
-    this.autoSlideSubscription = interval(config.autoSlideInterval)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe(() => {
-          this.nextSlide();
-        });
-  }
-
-  private stopAutoSlide(): void {
-    if (this.autoSlideSubscription) {
-      this.autoSlideSubscription.unsubscribe();
-      this.autoSlideSubscription = undefined;
-    }
-  }
-
-  nextSlide(): void {
-    const { currentSlide, maxSlide } = this.sliderConfig$.value;
-    const newSlide = currentSlide < maxSlide ? currentSlide + 1 : 0;
-
-    this.updateSliderConfig({ currentSlide: newSlide });
-    this.restartAutoSlide();
-    this.cdr.markForCheck();
-  }
-
-  previousSlide(): void {
-    const { currentSlide, maxSlide } = this.sliderConfig$.value;
-    const newSlide = currentSlide > 0 ? currentSlide - 1 : maxSlide;
-
-    this.updateSliderConfig({ currentSlide: newSlide });
-    this.restartAutoSlide();
-    this.cdr.markForCheck();
-  }
-
-  goToSlide(slideIndex: number): void {
-    const { maxSlide } = this.sliderConfig$.value;
-    const newSlide = Math.min(slideIndex, maxSlide);
-
-    this.updateSliderConfig({ currentSlide: newSlide });
-    this.restartAutoSlide();
-    this.cdr.markForCheck();
-  }
-
-  private restartAutoSlide(): void {
-    if (this.sliderConfig$.value.autoSlideEnabled) {
-      this.stopAutoSlide();
-      setTimeout(() => this.startAutoSlide(), 1000);
-    }
-  }
-
-  onSliderMouseEnter(): void {
-    this.stopAutoSlide();
-  }
-
-  onSliderMouseLeave(): void {
-    if (this.sliderConfig$.value.autoSlideEnabled) {
-      this.startAutoSlide();
-    }
-  }
+  // ========== SLIDER METHODS (Kaldırıldı) ==========
+  // private initializeSlider(): void { ... }
+  // private calculateResponsiveSlides(): void { ... }
+  // private updateSliderDimensions(): void { ... }
+  // private startAutoSlide(): void { ... }
+  // private stopAutoSlide(): void { ... }
+  // nextSlide(): void { ... }
+  // previousSlide(): void { ... }
+  // goToSlide(slideIndex: number): void { ... }
+  // private restartAutoSlide(): void { ... }
+  // onSliderMouseEnter(): void { ... }
+  // onSliderMouseLeave(): void { ... }
 
   // ========== UTILITY METHODS ==========
 
   goToExternalPurchaseSite(): void {
-    // Only open window in browser environment
     if (!isPlatformBrowser(this.platformId)) {
       console.warn('Cannot open external site in server-side environment');
       return;
     }
-
     try {
       window.open(this.EXTERNAL_PURCHASE_URL, '_blank', 'noopener,noreferrer');
     } catch (error) {
@@ -450,7 +253,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
     if (price === 0) {
       return this.translate.instant('FREE');
     }
-
     try {
       const lang = this.translate.currentLang || 'en';
       const currency = lang === 'tr' ? 'TRY' : lang === 'uk' ? 'UAH' : 'USD';
@@ -472,7 +274,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
     if (minutes <= 0) {
       return this.translate.instant('DURATION_NOT_SPECIFIED');
     }
-
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
 
@@ -492,7 +293,6 @@ export class CourseListComponent implements OnInit, OnDestroy {
     for (let i = 0; i < 5; i++) {
       stars.push(i < fullStars);
     }
-
     return stars;
   }
 
@@ -515,8 +315,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
 
   refreshPage(): void {
     this.updateState({ isLoading: true });
-
-    this.loadAllData().pipe(
+    // loadAllData yerine sadece satın alınan kursları yükle
+    this.loadPurchasedCoursesObservable().pipe(
         takeUntil(this.destroy$),
         finalize(() => {
           this.updateState({ isLoading: false });
@@ -541,14 +341,8 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.componentState$.next({ ...currentState, ...partialState });
   }
 
-  private updateSliderConfig(partialConfig: Partial<SliderConfig>): void {
-    const currentConfig = this.sliderConfig$.value;
-    this.sliderConfig$.next({ ...currentConfig, ...partialConfig });
-  }
-
   private handleError(message: string, error: any): void {
     console.error(message, error);
-
     let errorMessage = this.translate.instant('GENERIC_ERROR');
 
     if (error?.error?.message) {
@@ -580,50 +374,31 @@ export class CourseListComponent implements OnInit, OnDestroy {
   // ========== LIFECYCLE HOOKS ==========
 
   ngAfterViewInit(): void {
-    // Initialize slider after view is ready (browser only)
-    if (this.isBrowser()) {
-      setTimeout(() => {
-        this.calculateResponsiveSlides();
-        this.updateSliderDimensions();
-        this.cdr.markForCheck();
-      });
-    }
+    // Slider kaldırıldığı için bu metoda gerek kalmadı
+    // if (this.isBrowser()) {
+    //   setTimeout(() => {
+    //     this.calculateResponsiveSlides();
+    //     this.updateSliderDimensions();
+    //     this.cdr.markForCheck();
+    //   });
+    // }
   }
 
   private cleanup(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.stopAutoSlide();
+    // this.stopAutoSlide(); // Slider kaldırıldığı için kaldırıldı
 
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
     }
   }
 
-  // ========== PERFORMANCE OPTIMIZATION ==========
+  // ========== PERFORMANCE OPTIMIZATION (Kaldırıldı) ==========
+  // trackByCourseId(index: number, course: CourseResponse): number { ... }
+  // trackBySlideIndex(index: number): number { ... }
 
-  trackByCourseId(index: number, course: CourseResponse): number {
-    return course.id;
-  }
-
-  trackBySlideIndex(index: number): number {
-    return index;
-  }
-
-  // ========== ACCESSIBILITY ==========
-
-  getSlideAriaLabel(index: number): string {
-    return this.translate.instant('SLIDE_ARIA_LABEL', {
-      current: index + 1,
-      total: this.slideIndicators.length
-    });
-  }
-
-  getCourseAriaLabel(course: CourseResponse): string {
-    return this.translate.instant('COURSE_ARIA_LABEL', {
-      title: course.title,
-      instructor: course.instructorName,
-      price: this.formatPrice(course.price)
-    });
-  }
+  // ========== ACCESSIBILITY (Slider ile ilgili olanlar kaldırıldı) ==========
+  // getSlideAriaLabel(index: number): string { ... }
+  // getCourseAriaLabel(course: CourseResponse): string { ... }
 }

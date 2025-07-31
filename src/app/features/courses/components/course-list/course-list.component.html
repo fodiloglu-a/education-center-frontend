@@ -9,144 +9,23 @@
             (closed)="clearMessages()">
     </app-alert-dialog>
 
-    <section class="top-selling-section" *ngIf="!isLoading">
-        <div class="no-data-section" *ngIf="showCallToActionForTopSelling">
-            <div class="no-data-content">
-                <img src="assets/images/education-center-illustration.svg"
-                     alt="{{ 'EDUCATION_CENTER' | translate }}"
-                     class="no-data-image" />
+    <section class="top-selling-section">
+        <div class="no-data-content">
+            <img src="assets/images/education-center-illustration.svg"
+                 alt="{{ 'EDUCATION_CENTER' | translate }}"
+                 class="no-data-image" />
 
-                <h3 class="no-data-title">{{ 'EXPLORE_MORE_COURSES' | translate }}</h3>
-                <p class="no-data-description">
-                    <ng-container *ngIf="isLoggedIn">{{ 'EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_LOGGED_IN' | translate }}</ng-container>
-                    <ng-container *ngIf="!isLoggedIn">{{ 'EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_NOT_LOGGED_IN' | translate }}</ng-container>
-                </p>
+            <h3 class="no-data-title">{{ 'EXPLORE_MORE_COURSES' | translate }}</h3>
+            <p class="no-data-description">
+                <ng-container *ngIf="isLoggedIn">{{ 'EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_LOGGED_IN' | translate }}</ng-container>
+                <ng-container *ngIf="!isLoggedIn">{{ 'EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_NOT_LOGGED_IN' | translate }}</ng-container>
+            </p>
 
-                <button class="action-button primary-btn large" (click)="goToExternalPurchaseSite()">
-                    <i class="icon-external-link"></i>
-                    {{ 'GO_TO_EDUCATION_CENTER' | translate }}
-                </button>
-            </div>
+            <button class="action-button primary-btn large" (click)="goToExternalPurchaseSite()">
+                <i class="icon-external-link"></i>
+                {{ 'GO_TO_EDUCATION_CENTER' | translate }}
+            </button>
         </div>
-
-        <ng-container *ngIf="!showCallToActionForTopSelling && topSellingCourses.length > 0">
-            <h2 class="section-title">
-                <span class="highlight-text">
-                  <ng-container *ngIf="isLoggedIn">{{ 'RECOMMENDED_COURSES_TITLE' | translate }}</ng-container>
-                  <ng-container *ngIf="!isLoggedIn">{{ 'TOP_SELLING_COURSES' | translate }}</ng-container>
-                </span>
-
-            </h2>
-
-            <p class="section-subtitle" *ngIf="isLoggedIn">{{ 'PERSONALIZED_RECOMMENDATIONS_FOR_YOU' | translate }}</p>
-            <p class="section-subtitle" *ngIf="!isLoggedIn">{{ 'GENERAL_TOP_SELLING_COURSES_SUBTITLE' | translate }}</p>
-
-            <!-- Slider Container -->
-            <div class="slider-container"
-                 (mouseenter)="onSliderMouseEnter()"
-                 (mouseleave)="onSliderMouseLeave()">
-
-                <!-- Slider Controls -->
-                <div class="slider-controls" *ngIf="topSellingCourses.length > slidesPerView">
-                    <button class="control-btn prev-btn"
-                            (click)="previousSlide()"
-                            [disabled]="currentSlide === 0"
-                            aria-label="Previous">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <polyline points="15,18 9,12 15,6"></polyline>
-                        </svg>
-                    </button>
-
-                    <div class="slide-indicators">
-                        <span *ngFor="let indicator of slideIndicators; let i = index"
-                              class="indicator"
-                              [class.active]="i === currentSlide"
-                              (click)="goToSlide(i)"
-                              [attr.aria-label]="'Go to slide ' + (i + 1)"></span>
-                    </div>
-
-                    <button class="control-btn next-btn"
-                            (click)="nextSlide()"
-                            [disabled]="currentSlide === maxSlide"
-                            aria-label="Next">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <polyline points="9,18 15,12 9,6"></polyline>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="slider-wrapper"
-                     [style.transform]="'translateX(-' + (currentSlide * slideWidth) + '%)'">
-                    <div class="course-card featured slider-item"
-                         *ngFor="let course of topSellingCourses; let i = index"
-                         [routerLink]="['/courses', course.id]"
-                         (click)="onCourseClick(course.id)">
-
-                        <div class="course-image-wrapper">
-                            <img [src]="course.imageUrl"
-                                 [alt]="course.title"
-                                 class="course-image"
-                                 onerror="this.onerror=null;this.src='assets/images/course-placeholder.jpg';" />
-
-                            <span class="sales-badge" *ngIf="course.enrollmentCount > 100">
-                              <i class="icon-fire"></i>
-                                {{ course.enrollmentCount }}+ {{ 'STUDENTS' | translate }}
-                            </span>
-
-                            <span class="level-badge" [class]="'level-' + course.level.toLowerCase()">
-                              {{ getLevelTranslation(course.level) }}
-                            </span>
-                        </div>
-
-                        <div class="card-content">
-                            <h3 class="course-title">{{ course.title }}</h3>
-
-                            <p class="course-description">{{ course.description }}</p>
-
-                            <div class="course-meta">
-                                <div class="instructor-info">
-                                    <i class="icon-user"></i>
-                                    <span class="instructor-name">{{ course.instructorName }}</span>
-                                </div>
-
-                                <div class="rating-info" *ngIf="course.averageRating > 0">
-                                    <div class="stars">
-                                        <i class="star"
-                                           *ngFor="let star of getStarArray(course.averageRating)"
-                                           [class.filled]="star"></i>
-                                    </div>
-                                    <span class="rating-text">
-                                      {{ course.averageRating | number:'1.1-1' }}
-                                        ({{ course.totalReviews }})
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="course-footer">
-                                <div class="course-info">
-                                  <span class="duration">
-                                    <i class="icon-clock"></i>
-                                      {{ formatDuration(course.duration) }}
-                                  </span>
-                                    <span class="language">
-                                    <i class="icon-globe"></i>
-                                        {{ 'LANGUAGE.' + course.language.toUpperCase() | translate }}
-                                  </span>
-                                </div>
-
-                                <div class="price-section">
-                                    <span class="course-price">{{ formatPrice(course.price) }}</span>
-                                </div>
-                            </div>
-
-                            <button class="view-details-button primary-btn">
-                                {{ 'VIEW_DETAILS' | translate }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </ng-container>
     </section>
 
     <section class="all-courses-section" *ngIf="!isLoading && allCourses.length > 0">
@@ -200,7 +79,7 @@
     <div *ngIf="!isLoading && allCourses.length === 0 && !errorMessage" class="empty-state">
         <i class="icon-book-open empty-icon"></i>
         <h3>{{ 'NO_PURCHASED_COURSES_FOUND' | translate }}</h3>
-        <p>{{ 'NO_PURCHASED_COURSES_MESSAGE' | translate }}</p>
+        <p>{{ 'NO_PURCHASED_COURSES_FOUND' | translate }}</p>
         <button class="action-button secondary-btn" (click)="refreshPage()">
             <i class="icon-refresh"></i>
             {{ 'REFRESH' | translate }}

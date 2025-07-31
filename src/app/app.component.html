@@ -1,127 +1,112 @@
-<!-- app.component.html -->
-
 <div class="app-container">
-  <!-- Üst Navigasyon Çubuğu (Header) -->
-  <header class="app-header">
-    <div class="header-content">
-      <!-- Logo -->
-      <a routerLink="/" class="app-logo" (click)="closeMobileMenu()">
-        <img *ngIf="isDarkMode" src="assets/logo/Logo.png" alt="Koyu Mod Logo" class="app-logo-img">
-        <img *ngIf="!isDarkMode" src="assets/logo/Logo.png" alt="Açık Mod Logo" class="app-logo-img">
-      </a>
+    <header class="app-header">
+        <div class="header-content">
+            <a routerLink="/" class="app-logo" (click)="closeMobileMenu()">
+                <img *ngIf="isDarkMode" src="assets/logo/Logo.png" alt="Koyu Mod Logo" class="app-logo-img">
+                <img *ngIf="!isDarkMode" src="assets/logo/Logo.png" alt="Açık Mod Logo" class="app-logo-img">
+            </a>
 
-      <!-- Masaüstü Navigasyon Menüsü -->
-      <nav class="desktop-nav">
+            <nav class="desktop-nav">
+                <ul class="nav-links">
+                    <li><a routerLink="/courses" routerLinkActive="active">{{ 'COURSES' | translate }}</a></li>
+                    <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a></li>
+                    <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active">{{ 'CERTIFICATES' | translate }}</a></li>
+                    <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active">{{ 'REVIEWS' | translate }}</a></li>
+                    <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active">{{ 'ADMIN_PANEL' | translate }}</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <div class="lang-switcher desktop-only">
+                    <button class="lang-toggle-button" (click)="toggleLanguageDropdown()">
+                        <span class="material-icons">language</span> </button>
+                    <div class="lang-dropdown" [class.open]="isLanguageDropdownOpen">
+                        <button class="lang-option-button" (click)="switchLanguage('uk'); closeMobileMenu()">
+                            <span class="flag-emoji">🇺🇦</span> Українська
+                        </button>
+                        <button class="lang-option-button" (click)="switchLanguage('tr'); closeMobileMenu()">
+                            <span class="flag-emoji">🇹🇷</span> Türkçe
+                        </button>
+                    </div>
+                </div>
+
+                <button class="theme-toggle desktop-only" (click)="toggleTheme()">
+                    <ng-container *ngIf="isDarkMode">
+                        <span class="material-icons">light_mode</span>
+                    </ng-container>
+                    <ng-container *ngIf="!isDarkMode">
+                        <span class="material-icons">dark_mode</span>
+                    </ng-container>
+                </button>
+
+                <ng-container *ngIf="!(isLoggedIn$ | async); else loggedInActions">
+                    <button class="auth-button primary-btn" routerLink="/auth/login">{{ 'LOGIN' | translate }}</button>
+                    <button class="auth-button secondary-btn" routerLink="/auth/register">{{ 'REGISTER' | translate }}</button>
+                </ng-container>
+                <ng-template #loggedInActions>
+                    <button class="auth-button primary-btn" (click)="logout()">{{ 'LOGOUT' | translate }}</button>
+                </ng-template>
+            </div>
+
+            <button class="menu-toggle" (click)="toggleMobileMenu()">
+                <span class="material-icons" *ngIf="!(isMenuOpen$ | async)">menu</span>
+                <span class="material-icons" *ngIf="isMenuOpen$ | async">close</span>
+            </button>
+        </div>
+    </header>
+
+    <nav class="mobile-nav" [class.open]="isMenuOpen$ | async">
         <ul class="nav-links">
-          <li><a routerLink="/courses" routerLinkActive="active">{{ 'COURSES' | translate }}</a></li>
-          <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a></li>
-          <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active">{{ 'CERTIFICATES' | translate }}</a></li>
-          <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active">{{ 'REVIEWS' | translate }}</a></li>
-            <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active">{{ 'ADMIN_PANEL' | translate }}</a></li>
+            <li><a routerLink="/courses" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'COURSES' | translate }}</a></li>
+            <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'PROFILE' | translate }}</a></li>
+            <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'CERTIFICATES' | translate }}</a></li>
+            <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'REVIEWS' | translate }}</a></li>
+            <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'ADMIN_PANEL' | translate }}</a></li>
+
+            <li class="mobile-menu-item">
+                <button class="mobile-menu-action-button" (click)="toggleLanguageDropdown()">
+                    <span class="material-icons">language</span> {{ 'LANGUAGE' | translate }}
+                </button>
+                <div class="lang-dropdown mobile-dropdown" [class.open]="isLanguageDropdownOpen">
+                    <button class="lang-option-button" (click)="switchLanguage('uk'); closeMobileMenu()">
+                        <span class="flag-emoji">🇺🇦</span> Українська
+                    </button>
+                    <button class="lang-option-button" (click)="switchLanguage('tr'); closeMobileMenu()">
+                        <span class="flag-emoji">🇹🇷</span> Türkçe
+                    </button>
+                </div>
+            </li>
+
+            <li class="mobile-menu-item">
+                <button class="mobile-menu-action-button" (click)="toggleTheme(); closeMobileMenu()">
+                    <ng-container *ngIf="isDarkMode">
+                        <span class="material-icons">light_mode</span> {{ 'LIGHT_MODE' | translate }}
+                    </ng-container>
+                    <ng-container *ngIf="!isDarkMode">
+                        <span class="material-icons">dark_mode</span> {{ 'DARK_MODE' | translate }}
+                    </ng-container>
+                </button>
+            </li>
+
+            <li *ngIf="!(isLoggedIn$ | async)" class="mobile-menu-item">
+                <a routerLink="/auth/login" (click)="closeMobileMenu()">{{ 'LOGIN' | translate }}</a>
+            </li>
+            <li *ngIf="!(isLoggedIn$ | async)" class="mobile-menu-item">
+                <a routerLink="/auth/register" (click)="closeMobileMenu()">{{ 'REGISTER' | translate }}</a>
+            </li>
+            <li *ngIf="isLoggedIn$ | async" class="mobile-menu-item">
+                <a (click)="logout()">{{ 'LOGOUT' | translate }}</a>
+            </li>
         </ul>
-      </nav>
+    </nav>
 
-      <!-- Sağ Üst Köşe Ayarları (Dil, Tema, Giriş/Çıkış) -->
-      <div class="header-actions">
-        <!-- Dil Seçimi (Masaüstü) -->
-        <div class="lang-switcher desktop-only">
-          <button class="lang-toggle-button" (click)="toggleLanguageDropdown()">
-            <span class="material-icons">language</span> <!-- Dünya ikonu -->
-          </button>
-          <div class="lang-dropdown" [class.open]="isLanguageDropdownOpen">
-            <button class="lang-option-button" (click)="switchLanguage('uk')">
-              <span class="flag-emoji">🇺🇦</span> Українська
-            </button>
-            <button class="lang-option-button" (click)="switchLanguage('tr')">
-              <span class="flag-emoji">🇹🇷</span> Türkçe
-            </button>
-          </div>
-        </div>
+    <div class="mobile-nav-overlay" [class.open]="isMenuOpen$ | async" (click)="closeMobileMenu()"></div>
 
-        <!-- Tema Değiştirme (Masaüstü) -->
-        <button class="theme-toggle desktop-only" (click)="toggleTheme()">
-          <ng-container *ngIf="isDarkMode">
-            <span class="material-icons">light_mode</span>
-          </ng-container>
-          <ng-container *ngIf="!isDarkMode">
-            <span class="material-icons">dark_mode</span>
-          </ng-container>
-        </button>
+    <main class="app-main">
+        <router-outlet></router-outlet>
+    </main>
 
-        <!-- Giriş/Çıkış Butonları (Masaüstü) -->
-        <ng-container *ngIf="!(isLoggedIn$ | async); else loggedInActions">
-          <button class="auth-button primary-btn" routerLink="/auth/login">{{ 'LOGIN' | translate }}</button>
-          <button class="auth-button secondary-btn" routerLink="/auth/register">{{ 'REGISTER' | translate }}</button>
-        </ng-container>
-        <ng-template #loggedInActions>
-          <button class="auth-button primary-btn" (click)="logout()">{{ 'LOGOUT' | translate }}</button>
-        </ng-template>
-      </div>
-
-      <!-- Mobil Menü Butonu (Hamburger) -->
-      <button class="menu-toggle" (click)="toggleMobileMenu()">
-        <span class="material-icons" *ngIf="!(isMenuOpen$ | async)">menu</span>
-        <span class="material-icons" *ngIf="isMenuOpen$ | async">close</span>
-      </button>
-    </div>
-  </header>
-
-  <!-- Mobil Navigasyon Menüsü (Açılır/Kapanır) -->
-  <nav class="mobile-nav" [class.open]="isMenuOpen$ | async">
-    <ul class="nav-links">
-      <li><a routerLink="/courses" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'COURSES' | translate }}</a></li>
-      <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'PROFILE' | translate }}</a></li>
-      <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'CERTIFICATES' | translate }}</a></li>
-      <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'REVIEWS' | translate }}</a></li>
-      <li *ngIf="hasRole('ROLE_ADMIN') | async"><a routerLink="/admin" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'ADMIN_PANEL' | translate }}</a></li>
-
-      <!-- Mobil Menü İçinde Dil Seçimi -->
-      <li class="mobile-menu-item">
-        <button class="mobile-menu-action-button" (click)="toggleLanguageDropdown()">
-          <span class="material-icons">language</span> {{ 'LANGUAGE' | translate }}
-        </button>
-        <div class="lang-dropdown mobile-dropdown" [class.open]="isLanguageDropdownOpen">
-          <button class="lang-option-button" (click)="switchLanguage('uk'); closeMobileMenu()">
-            <span class="flag-emoji">🇺🇦</span> Українська
-          </button>
-          <button class="lang-option-button" (click)="switchLanguage('tr'); closeMobileMenu()">
-            <span class="flag-emoji">🇹🇷</span> Türkçe
-          </button>
-        </div>
-      </li>
-
-      <!-- Mobil Menü İçinde Tema Değiştirme -->
-      <li class="mobile-menu-item">
-        <button class="mobile-menu-action-button" (click)="toggleTheme(); closeMobileMenu()">
-          <ng-container *ngIf="isDarkMode">
-            <span class="material-icons">light_mode</span> {{ 'LIGHT_MODE' | translate }}
-          </ng-container>
-          <ng-container *ngIf="!isDarkMode">
-            <span class="material-icons">dark_mode</span> {{ 'DARK_MODE' | translate }}
-          </ng-container>
-        </button>
-      </li>
-
-      <!-- Mobil Menü İçinde Giriş/Çıkış -->
-      <li *ngIf="!(isLoggedIn$ | async)" class="mobile-menu-item">
-        <a routerLink="/auth/login" (click)="closeMobileMenu()">{{ 'LOGIN' | translate }}</a>
-      </li>
-      <li *ngIf="!(isLoggedIn$ | async)" class="mobile-menu-item">
-        <a routerLink="/auth/register" (click)="closeMobileMenu()">{{ 'REGISTER' | translate }}</a>
-      </li>
-      <li *ngIf="isLoggedIn$ | async" class="mobile-menu-item">
-        <a (click)="logout()">{{ 'LOGOUT' | translate }}</a>
-      </li>
-    </ul>
-  </nav>
-
-  <!-- Ana İçerik Alanı -->
-  <main class="app-main">
-    <router-outlet></router-outlet>
-  </main>
-
-  <!-- Alt Bilgi Çubuğu (Footer) -->
-  <footer class="app-footer">
-    <p>&copy; 2025 {{ 'APP_TITLE' | translate }}</p>
-  </footer>
+    <footer class="app-footer">
+        <p>&copy; 2025 {{ 'APP_TITLE' | translate }}</p>
+    </footer>
 </div>
