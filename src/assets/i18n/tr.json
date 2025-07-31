@@ -407,6 +407,8 @@
 
   "DURATION_HOURS_MINUTES": "{{hours}} saat {{minutes}} dakika",
   "DURATION_HOURS": "{{hours}} saat",
-  "DURATION_MINUTES": "{{minutes}} dakika"
+  "DURATION_MINUTES": "{{minutes}} dakika",
+  "ADD_MATERIAL": "DERS MATERYALİ EKLE"
+
 
 }

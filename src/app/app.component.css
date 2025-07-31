@@ -93,7 +93,12 @@ html, body {
   padding: 0;
   font-family: 'Roboto', sans-serif;
   height: 100%;
-  box-sizing: border-box; /* Tüm elemanlar için */
+  box-sizing: border-box;
+}
+
+/* Body class for preventing scroll when mobile menu is open */
+body.mobile-menu-open {
+  overflow: hidden;
 }
 
 .app-container {
@@ -109,14 +114,14 @@ html, body {
   background-color: var(--nav-bg);
   backdrop-filter: blur(8px);
   padding: var(--spacing-md) var(--spacing-lg);
-  box-shadow: var(--shadow-md); /* Daha belirgin gölge */
+  box-shadow: var(--shadow-md);
   position: sticky;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 1000;
   box-sizing: border-box;
-  border-bottom: 1px solid var(--divider-color); /* Alt çizgi ekle */
+  border-bottom: 1px solid var(--divider-color);
 }
 
 .header-content {
@@ -134,7 +139,7 @@ html, body {
   font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--primary-color);
-  z-index: 1001; /* Mobil menü açıldığında logonun üstte kalması için */
+  z-index: 1001; /* Ensure logo is above mobile menu when open */
 }
 
 .app-logo-img {
@@ -202,7 +207,7 @@ html, body {
 
 .lang-dropdown {
   position: absolute;
-  top: calc(100% + var(--spacing-xs)); /* Butonun hemen altına, küçük bir boşlukla */
+  top: calc(100% + var(--spacing-xs));
   right: 0;
   background-color: var(--card-bg);
   border-radius: var(--border-radius-md);
@@ -213,7 +218,7 @@ html, body {
   transform: translateY(10px);
   transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
   z-index: 1010;
-  min-width: 140px; /* Genişletildi */
+  min-width: 140px;
 }
 
 .lang-dropdown.open {
@@ -275,7 +280,7 @@ html, body {
   border-radius: var(--border-radius-md);
   cursor: pointer;
   transition: background-color var(--transition-fast), transform var(--transition-fast);
-  white-space: nowrap; /* Metni tek satırda tut */
+  white-space: nowrap;
 }
 
 .auth-button.primary-btn {
@@ -305,37 +310,37 @@ html, body {
   color: var(--text-color);
   cursor: pointer;
   font-size: var(--font-size-xxl);
-  display: none; /* Varsayılan olarak gizli */
-  z-index: 1001; /* Hamburger ikonunun üstte olması için */
+  display: none; /* Hidden by default for desktop */
+  z-index: 1001; /* Ensure hamburger is above menu when open */
 }
 
 /* Mobil Navigasyon Menüsü */
 .mobile-nav {
   position: fixed;
-  top: 0;
-  right: -100vw; /* Başlangıçta ekranın dışında, tüm viewport genişliği kadar */
-  width: 100vw; /* Tamamen ekranı kaplasın */
-  height: 100vh; /* Tam ekran yüksekliği */
+  top: 0; /* Align to the very top */
+  right: -75vw; /* Start off-screen to the right by its width */
+  width: 75vw; /* Set width to a percentage of viewport width */
+  max-width: 320px; /* Max width for larger mobile devices */
+  height: 100vh; /* Full viewport height */
   background-color: var(--card-bg);
   box-shadow: -8px 0 16px rgba(0, 0, 0, 0.2);
   transition: right var(--transition-normal) ease-in-out;
   z-index: 999;
-  padding-top: calc(var(--spacing-xl) + 40px); /* Header yüksekliğini hesaba kat */
-  padding-left: var(--spacing-lg);
-  padding-right: var(--spacing-lg);
+  padding: var(--spacing-xl) var(--spacing-lg); /* Padding top adjusted for content below header */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  overflow-y: auto; /* Enable scrolling for menu content */
 }
 
 .mobile-nav.open {
-  right: 0; /* Ekranın içine kaydır */
+  right: 0; /* Slide in */
 }
 
 .mobile-nav .nav-links {
   flex-direction: column;
   gap: var(--spacing-sm);
-  padding-top: var(--spacing-lg); /* İlk linkten önce boşluk */
+  padding-top: var(--spacing-lg);
 }
 
 .mobile-nav .nav-links li {
@@ -351,18 +356,18 @@ html, body {
   padding: var(--spacing-md);
   text-align: left;
   background: none;
-  border: none; /* Buton borderlarını kaldır */
-  border-bottom: 1px solid var(--divider-color); /* Ayrıcı çizgi */
+  border: none;
+  border-bottom: 1px solid var(--divider-color);
   font-size: var(--font-size-lg);
   color: var(--text-color);
-  border-radius: var(--border-radius-md); /* Hover efekti için */
+  border-radius: var(--border-radius-md);
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-.mobile-nav .nav-links li:last-child a, /* Son eleman için border-bottom olmasın */
+
+.mobile-nav .nav-links li:last-child a,
 .mobile-nav .nav-links li.mobile-menu-item:last-child .mobile-menu-action-button {
   border-bottom: none;
 }
-
 
 .mobile-nav .nav-links li a:hover,
 .mobile-nav .mobile-menu-action-button:hover {
@@ -392,6 +397,26 @@ html, body {
   font-size: var(--font-size-base);
   border-bottom: none;
 }
+
+/* Mobil Menü Açıkken Ana İçeriği Kapatan Overlay */
+.mobile-nav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  z-index: 998; /* Between content and mobile menu */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-normal);
+}
+
+.mobile-nav-overlay.open { /* Class added by app.component.ts */
+  opacity: 1;
+  visibility: visible;
+}
+
 
 /* Ana İçerik Alanı */
 .app-main {
@@ -428,38 +453,6 @@ html, body {
   }
   .app-logo-img {
     height: 35px;
-  }
-
-  /* Mobil menü açıldığında ana içeriğin üzerine koyu bir overlay */
-  /* Bu overlay'i HTML'e eklemeniz gerekebilir, şimdilik sadece content'i karartıyoruz */
-  body.mobile-menu-open { /* app.component.ts'den body'ye eklenecek bir class */
-    overflow: hidden; /* Sayfanın kaymasını engelle */
-  }
-
-  .mobile-nav.open + .app-main {
-    /* Bu kısım artık menü dışına taşıyor ve click hatasına neden olabilir */
-    /* Menü açıldığında ana içeriğin hareket etmesi yerine, sadece menü açılmalı */
-    /* transform: translateX(-70%); kaldırıldı */
-    /* filter: brightness(0.7); kaldırıldı */
-  }
-
-  /* Menü açıkken ana içeriği karartan ve etkileşimi engelleyen bir overlay */
-  .mobile-nav-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5); /* Yarı şeffaf siyah */
-    z-index: 998; /* Menü ile içerik arasında */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity var(--transition-normal);
-  }
-
-  .mobile-nav.open ~ .mobile-nav-overlay {
-    opacity: 1;
-    visibility: visible;
   }
 }
 

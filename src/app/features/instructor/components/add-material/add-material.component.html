@@ -1,0 +1,157 @@
+<!-- Error Alert -->
+<div *ngIf="error" class="error-alert">
+    <div class="error-content">
+        <span class="error-icon">⚠️</span>
+        <span class="error-message">{{ error }}</span>
+        <button class="error-close" (click)="clearError()">×</button>
+    </div>
+</div>
+
+<!-- Upload Section -->
+<div class="upload-container">
+    <div
+            class="upload-zone"
+            [class.drag-over]="dragOver"
+            [class.loading]="isLoading"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+    >
+        <div class="upload-content">
+            <div class="upload-icon">📤</div>
+            <h3>Dosyalarınızı Yükleyin</h3>
+            <p>Dosyaları buraya sürükleyip bırakın veya seçmek için tıklayın</p>
+
+            <label for="uploadInput" class="upload-button">
+                <span *ngIf="!isLoading">Dosya Seç</span>
+                <span *ngIf="isLoading">Yükleniyor...</span>
+            </label>
+
+            <input
+                    id="uploadInput"
+                    type="file"
+                    multiple
+                    accept="image/*,video/*"
+                    (change)="onFileSelected($event)"
+                    hidden
+            >
+
+            <div class="upload-info">
+                <small>Desteklenen formatlar: JPG, PNG, GIF, WebP, MP4, WebM</small>
+                <small>Maksimum dosya boyutu: 50MB</small>
+            </div>
+        </div>
+
+        <!-- Upload Progress -->
+        <div *ngIf="isLoading && uploadProgress > 0" class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+            <span class="progress-text">{{ uploadProgress.toFixed(0) }}%</span>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div *ngIf="isLoading && uploadProgress === 0" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Medya dosyaları yükleniyor...</p>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!isLoading && mediaList.length === 0" class="empty-state">
+    <div class="empty-icon">📁</div>
+    <h3>Henüz dosya yüklenmemiş</h3>
+    <p>İlk medya dosyanızı yükleyerek başlayın</p>
+</div>
+
+<!-- Media Grid -->
+<div *ngIf="mediaList.length > 0" class="media-container">
+    <div class="media-header">
+        <h2>Medya Dosyalarım</h2>
+        <span class="media-count">{{ mediaList.length }} dosya</span>
+    </div>
+
+    <div class="media-grid">
+        <div class="media-card" *ngFor="let url of mediaList; trackBy: trackByUrl">
+            <!-- Media Preview -->
+            <div class="media-preview">
+                <ng-container *ngIf="isVideo(url)">
+                    <video
+                            controls
+                            [src]="url"
+                            preload="metadata"
+                            class="media-element"
+                    ></video>
+                    <div class="media-overlay">
+                        <span class="media-type-badge video-badge">{{ getFileIcon(url) }} {{ getFileType(url) }}</span>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="isImage(url)">
+                    <img
+                            [src]="url"
+                            [alt]="extractFilename(url)"
+                            class="media-element"
+                            loading="lazy"
+                    >
+                    <div class="media-overlay">
+                        <span class="media-type-badge image-badge">{{ getFileIcon(url) }} {{ getFileType(url) }}</span>
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- Media Info -->
+            <div class="media-info">
+                <h4 class="media-filename" [title]="extractFilename(url)">
+                    {{ extractFilename(url) }}
+                </h4>
+            </div>
+
+            <!-- Media Actions -->
+            <div class="media-actions">
+                <div class="action-row">
+                    <button
+                            class="action-btn primary"
+                            (click)="copyUrl(url)"
+                            title="URL'yi kopyala"
+                    >
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">Kopyala</span>
+                    </button>
+
+                    <button
+                            class="action-btn secondary"
+                            (click)="downloadMedia(url)"
+                            title="İndir"
+                    >
+                        <span class="btn-icon">⬇️</span>
+                        <span class="btn-text">İndir</span>
+                    </button>
+                </div>
+
+                <div class="action-row">
+                    <label class="action-btn warning" title="Güncelle">
+                        <span class="btn-icon">🔁</span>
+                        <span class="btn-text">Güncelle</span>
+                        <input
+                                type="file"
+                                accept="image/*,video/*"
+                                (change)="updateMedia(url, $event)"
+                                hidden
+                        >
+                    </label>
+
+                    <button
+                            class="action-btn danger"
+                            (click)="deleteMedia(url)"
+                            title="Sil"
+                    >
+                        <span class="btn-icon">🗑️</span>
+                        <span class="btn-text">Sil</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
