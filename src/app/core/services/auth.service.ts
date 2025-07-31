@@ -94,9 +94,9 @@ export class AuthService {
       }));
     }
 
-    return this.http.post<JwtResponse>(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
         tap(response => {
-          console.log('Login successful, handling response');
+          console.log('Login successful, handling response', response);
           this.handleAuthResponse(response);
         }),
         catchError(error => this.handleAuthError(error)),
@@ -115,7 +115,7 @@ export class AuthService {
       }));
     }
 
-    return this.http.post<JwtResponse>(`${this.apiUrl}/register`, user).pipe(
+    return this.http.post<any>(`${this.apiUrl}/register`, user).pipe(
         tap(response => {
           console.log('Registration successful, handling response');
           this.handleAuthResponse(response);
@@ -199,12 +199,14 @@ export class AuthService {
 
     const request: RefreshTokenRequest = { refreshToken };
 
-    return this.http.post<JwtResponse>(`${this.apiUrl}/refresh`, request).pipe(
+    return this.http.post<any>(`${this.apiUrl}/refresh`, request).pipe(
         tap(response => {
           console.log('Token refresh successful');
           this.handleAuthResponse(response);
           this.isRefreshing = false;
-          this.refreshTokenSubject.next(response.accessToken);
+          // Backend'den gelen token field'ını kullan
+          const accessToken = response.token || response.accessToken;
+          this.refreshTokenSubject.next(accessToken);
         }),
         catchError(error => {
           console.error('Token refresh failed:', error);
@@ -280,45 +282,54 @@ export class AuthService {
   }
 
   /**
-   * Auth response'unu handle eder
+   * Auth response'unu handle eder - Backend response format'ına göre revize edildi
    */
-  private handleAuthResponse(response: JwtResponse): void {
+  private handleAuthResponse(response: any): void {
     try {
-      if (!response || !response.accessToken) {
-        throw new Error('Invalid auth response: missing access token');
+      console.log('🔍 Raw response:', response);
+      console.log('🔍 Response keys:', Object.keys(response));
+
+      // Backend'den gelen response format'ı:
+      // {token: 'jwt_token', type: 'Bearer', id: 2, email: '...', firstName: '...', ...}
+
+      const accessToken = response.token || response.accessToken;
+      const tokenType = response.type || response.token_type || 'Bearer';
+
+      if (!accessToken) {
+        console.error('❌ No token found in response:', response);
+        throw new Error('Invalid auth response: missing token');
       }
 
-      console.log('Handling auth response');
+      console.log('✅ Token found, processing authentication');
 
       // Token'ları sakla (rememberMe default true)
+      // refreshToken backend'den gelmiyorsa empty string kullan
       this.tokenService.saveTokens(
-          response.accessToken,
-          response.refreshToken || '',
+          accessToken,
+          response.refreshToken || response.refresh_token || '',
           true
       );
 
-      // Token'dan kullanıcı bilgilerini çıkar
-      const payload = this.tokenService.decodeToken(response.accessToken);
-      if (payload) {
-        const userProfile: UserProfile = {
-          id: payload.sub,
-          email: payload.email || '',
-          firstName: payload.firstName || '',
-          lastName: payload.lastName || '',
-          role: payload.role || 'USER',
-          isEmailVerified: payload.isEmailVerified || false,
-          createdAt: payload.createdAt || new Date().toISOString()
-        };
+      // Backend'den direkt gelen user bilgilerini kullan
+      const userProfile: UserProfile = {
+        id: response.id?.toString() || '',
+        email: response.email || '',
+        firstName: response.firstName || '',
+        lastName: response.lastName || '',
+        role: response.role || 'USER',
+        isEmailVerified: response.isEmailVerified || false,
+        createdAt: response.createdAt || new Date().toISOString()
+      };
 
-        console.log('Setting user profile:', userProfile);
-        this.currentUserSubject.next(userProfile);
-        this.isAuthenticatedSubject.next(true);
-      } else {
-        console.error('Failed to decode token payload');
-        throw new Error('Invalid token payload');
-      }
+      console.log('✅ Setting user profile:', userProfile);
+      this.currentUserSubject.next(userProfile);
+      this.isAuthenticatedSubject.next(true);
+
+      // User bilgilerini storage'da sakla
+      this.tokenService.updateStoredUser(userProfile);
+
     } catch (error) {
-      console.error('Error handling auth response:', error);
+      console.error('❌ Error handling auth response:', error);
       this.clearAuthState();
       throw error;
     }
@@ -470,4 +481,4 @@ export class AuthService {
       this.tokenService.updateStoredUser(updates);
     }
   }
-  }
+}

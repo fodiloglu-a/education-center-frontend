@@ -63,12 +63,8 @@ export class TokenService {
    */
   private setStorageItem(key: string, value: string, useSessionStorage: boolean = false): void {
     if (isPlatformBrowser(this.platformId)) {
-      try {
-        const storage = useSessionStorage ? window.sessionStorage : window.localStorage;
-        storage.setItem(key, value);
-      } catch (error) {
-        console.error('Storage write error:', error);
-      }
+      const storage = useSessionStorage ? window.sessionStorage : window.localStorage;
+      storage.setItem(key, value);
     }
   }
 
@@ -77,13 +73,8 @@ export class TokenService {
    */
   private getStorageItem(key: string): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      try {
-        // Önce localStorage'ı kontrol et, yoksa sessionStorage'a bak
-        return window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
-      } catch (error) {
-        console.error('Storage read error:', error);
-        return null;
-      }
+      // Önce localStorage'ı kontrol et, yoksa sessionStorage'a bak
+      return window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
     }
     return null;
   }
@@ -93,12 +84,8 @@ export class TokenService {
    */
   private removeStorageItem(key: string): void {
     if (isPlatformBrowser(this.platformId)) {
-      try {
-        window.localStorage.removeItem(key);
-        window.sessionStorage.removeItem(key);
-      } catch (error) {
-        console.error('Storage remove error:', error);
-      }
+      window.localStorage.removeItem(key);
+      window.sessionStorage.removeItem(key);
     }
   }
 
@@ -116,11 +103,7 @@ export class TokenService {
       const useSessionStorage = !rememberMe;
 
       this.setStorageItem(this.ACCESS_TOKEN_KEY, accessToken, useSessionStorage);
-
-      if (refreshToken) {
-        this.setStorageItem(this.REFRESH_TOKEN_KEY, refreshToken, useSessionStorage);
-      }
-
+      this.setStorageItem(this.REFRESH_TOKEN_KEY, refreshToken, useSessionStorage);
       this.setStorageItem(this.REMEMBER_ME_KEY, rememberMe.toString(), false);
 
       // Token'dan kullanıcı bilgilerini çıkar ve sakla
@@ -128,10 +111,10 @@ export class TokenService {
       if (payload) {
         const userProfile: UserProfile = {
           id: payload.sub,
-          email: payload.email || '',
-          firstName: payload.firstName || '',
-          lastName: payload.lastName || '',
-          role: payload.role || 'USER',
+          email: payload.email,
+          firstName: payload.firstName,
+          lastName: payload.lastName,
+          role: payload.role,
           isEmailVerified: payload.isEmailVerified || false,
           createdAt: payload.createdAt || new Date().toISOString()
         };
@@ -187,24 +170,11 @@ export class TokenService {
       console.warn('Attempted to decode a null or undefined token.');
       return null;
     }
-
     try {
-      // Token'ı parçalara ayır
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        console.error('Invalid JWT token format');
-        return null;
-      }
-
-      const base64Url = parts[1];
+      const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-
-      // Base64 padding ekle
-      const padLen = (4 - base64.length % 4) % 4;
-      const paddedBase64 = base64 + '='.repeat(padLen);
-
       const jsonPayload = decodeURIComponent(
-          atob(paddedBase64)
+          atob(base64)
               .split('')
               .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
               .join('')
@@ -357,8 +327,10 @@ export class TokenService {
    * saveTokenAndUser metodu - eski JwtResponse formatı ile uyumluluk için
    */
   public saveTokenAndUser(jwtResponse: any): void {
-    if (!jwtResponse || !jwtResponse.accessToken) {
-      console.error('TokenService: JWT Response or accessToken is null/undefined. Not saving.');
+    // DÜZELTME BAŞLANGICI: jwtResponse.token yerine jwtResponse.accessToken
+    // Bu metod hala jwtResponse.token'ı kullanıyordu, bu nedenle jwtResponse.accessToken yerine bu düzeltme yapıldı.
+    if (!jwtResponse || !jwtResponse.token) { // jwtResponse.accessToken yerine jwtResponse.token kontrolü
+      console.error('TokenService: JWT Response or token is null/undefined. Not saving.');
       return;
     }
 
@@ -366,18 +338,19 @@ export class TokenService {
       const rememberMe = this.isRememberMe();
       const useSessionStorage = !rememberMe;
 
-      this.setStorageItem(this.ACCESS_TOKEN_KEY, jwtResponse.accessToken, useSessionStorage);
+      // DÜZELTME: jwtResponse.accessToken yerine jwtResponse.token kullanıldı
+      this.setStorageItem(this.ACCESS_TOKEN_KEY, jwtResponse.token, useSessionStorage);
 
       if (jwtResponse.refreshToken) {
         this.setStorageItem(this.REFRESH_TOKEN_KEY, jwtResponse.refreshToken, useSessionStorage);
       }
 
       const userToStore = {
-        id: jwtResponse.id || 0,
-        email: jwtResponse.email || '',
-        firstName: jwtResponse.firstName || '',
-        lastName: jwtResponse.lastName || '',
-        role: jwtResponse.role || 'USER',
+        id: jwtResponse.id,
+        email: jwtResponse.email,
+        firstName: jwtResponse.firstName,
+        lastName: jwtResponse.lastName,
+        role: jwtResponse.role,
         isEmailVerified: jwtResponse.isEmailVerified || false,
         createdAt: jwtResponse.createdAt || new Date().toISOString()
       };
@@ -387,7 +360,8 @@ export class TokenService {
       this._isLoggedIn$.next(true);
       this._userRole$.next(userToStore.role);
 
-      const payload = this.decodeToken(jwtResponse.accessToken);
+      // DÜZELTME: jwtResponse.accessToken yerine jwtResponse.token kullanıldı
+      const payload = this.decodeToken(jwtResponse.token);
       if (payload?.exp) {
         this._tokenExpiry$.next(new Date(payload.exp * 1000));
       }
