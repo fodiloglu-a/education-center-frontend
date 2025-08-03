@@ -7,7 +7,6 @@ import {
   CourseResponse,
   CourseDetailsResponse,
   LessonDTO,
-  TopSellingCoursesResponse,
   CourseCategory,
   CourseLevel
 } from '../models/course.models';
@@ -58,6 +57,16 @@ export class CourseService {
    */
   getCourseDetailsById(courseId: number): Observable<CourseDetailsResponse> {
     return this.http.get<CourseDetailsResponse>(`${this.apiUrl}/${courseId}`);
+  }
+
+  /**
+   * Belirli bir ID'ye sahip eğitimin temel bilgilerini getirir. (Herkese açık)
+   * Liste görünümü için optimize edilmiş, daha hafif response.
+   * @param courseId Eğitimin ID'si.
+   * @returns Eğitimin temel bilgilerini içeren CourseResponse nesnesini içeren Observable.
+   */
+  getCourseResponseById(courseId: number): Observable<CourseResponse> {
+    return this.http.get<CourseResponse>(`${this.apiUrl}/response/${courseId}`);
   }
 
   /**
@@ -205,7 +214,6 @@ export class CourseService {
     return this.http.get<CourseResponse[]>(`${this.apiUrl}/recommended`, { params });
   }
 
-
   /**
    * Belirli bir kategorideki kursları getirir.
    * @param category Kurs kategorisi
@@ -265,5 +273,33 @@ export class CourseService {
   getPurchasedCoursesByUserId(userId: number): Observable<CourseResponse[]> {
     // Backend Controller'ınızdaki ilgili endpoint: @GetMapping("/purchased/user/{userId}")
     return this.http.get<CourseResponse[]>(`${this.apiUrl}/purchased/user/${userId}`);
+  }
+
+  /**
+   * Kullanıcının belirli bir kursa erişim yetkisi olup olmadığını kontrol eder.
+   * Backend'de authentication token'dan userId otomatik olarak alınır.
+   * @param userId Kullanıcının ID'si (opsiyonel - backend'de token'dan alınacak)
+   * @param courseId Kontrol edilecek kursun ID'si
+   * @returns Kullanıcının kursa erişim yetkisi olup olmadığını belirten boolean Observable
+   */
+  checkCourseForUser(userId: number | null, courseId: number): Observable<boolean> {
+    let params = new HttpParams().set('courseId', courseId.toString());
+
+    // userId parametresi opsiyonel - backend'de authentication token'dan alınacak
+    if (userId !== null && userId !== undefined) {
+      params = params.set('userId', userId.toString());
+    }
+
+    return this.http.get<boolean>(`${this.apiUrl}/check-course`, { params });
+  }
+
+  /**
+   * Mevcut kullanıcının belirli bir kursa erişim yetkisi olup olmadığını kontrol eder.
+   * Bu method authentication token'ı kullanarak backend'de otomatik user ID algılaması yapar.
+   * @param courseId Kontrol edilecek kursun ID'si
+   * @returns Kullanıcının kursa erişim yetkisi olup olmadığını belirten boolean Observable
+   */
+  checkCourseAccess(courseId: number): Observable<boolean> {
+    return this.checkCourseForUser(null, courseId);
   }
 }

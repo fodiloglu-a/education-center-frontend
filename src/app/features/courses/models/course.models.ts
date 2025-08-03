@@ -13,7 +13,6 @@ export interface CourseResponse {
   price: number;               // Eğitimin fiyatı
   published: boolean;          // Eğitimin yayınlanıp yayınlanmadığı
   createdAt: string;           // Eğitimin oluşturulma tarihi (ISO 8601 string formatında)
-
   // Yeni eklenen alanlar
   category: CourseCategory;    // Eğitimin kategorisi
   enrollmentCount: number;     // Toplam kayıt/satış sayısı
@@ -22,7 +21,8 @@ export interface CourseResponse {
   duration: number;            // Eğitimin toplam süresi (dakika cinsinden)
   level: CourseLevel;          // Eğitim seviyesi (Başlangıç, Orta, İleri)
   language: string;            // Eğitim dili (örn: "tr", "en")
-  externalPurchaseUrl?: string; // Harici satın alma linki (opsiyonel)
+  externalPurchaseUrl?: string;
+  lessons: LessonDTO[]; // Harici satın alma linki (opsiyonel)
 }
 
 // Backend'deki CourseDetailsResponse DTO'suna karşılık gelen arayüz.
