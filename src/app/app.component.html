@@ -8,9 +8,9 @@
 
             <nav class="desktop-nav">
                 <ul class="nav-links">
+                    <li><a routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'HOME' | translate }}</a></li>
                     <li><a routerLink="/courses" routerLinkActive="active">{{ 'COURSES' | translate }}</a></li>
                     <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a></li>
-                    <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active">{{ 'CERTIFICATES' | translate }}</a></li>
                     <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active">{{ 'REVIEWS' | translate }}</a></li>
                     <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active">{{ 'ADMIN_PANEL' | translate }}</a></li>
                 </ul>
@@ -57,9 +57,9 @@
 
     <nav class="mobile-nav" [class.open]="isMenuOpen$ | async">
         <ul class="nav-links">
+            <li><a routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'HOME' | translate }}</a></li>
             <li><a routerLink="/courses" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'COURSES' | translate }}</a></li>
             <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'PROFILE' | translate }}</a></li>
-            <li *ngIf="isLoggedIn$ | async"><a routerLink="/certificates" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'CERTIFICATES' | translate }}</a></li>
             <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'REVIEWS' | translate }}</a></li>
             <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'ADMIN_PANEL' | translate }}</a></li>
 

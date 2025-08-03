@@ -3,6 +3,7 @@ import {CourseResponse} from "../../../courses/models/course.models";
 import {CourseService} from "../../../courses/services/course.service";
 import {CurrencyPipe, DecimalPipe, NgForOf} from "@angular/common";
 import {TranslatePipe} from "@ngx-translate/core";
+import {RouterLink} from "@angular/router";
 
 
 
@@ -15,6 +16,7 @@ import {TranslatePipe} from "@ngx-translate/core";
     CurrencyPipe,
     NgForOf,
     TranslatePipe,
+    RouterLink,
 
   ],
   styleUrls: ['./home.component.css']

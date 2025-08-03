@@ -57,7 +57,7 @@
                             <span>({{ course.averageRating | number:'1.1-1' }})</span>
                         </div>
                         <div class="course-price">{{ course.price | currency:'USD':'symbol' }}</div>
-                        <a href="#" class="btn-secondary">{{ 'HOME_COURSE_BTN' | translate }}</a>
+                        <a [routerLink]="['/courses', course.id]" class="btn-secondary">{{ 'HOME_COURSE_BTN' | translate }}</a>
                     </div>
                 </div>
             </div>
