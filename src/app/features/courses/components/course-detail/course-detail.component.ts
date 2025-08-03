@@ -2,18 +2,22 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CourseService } from '../../services/course.service';
 import { CourseDetailsResponse, LessonDTO, CourseCategory, CourseLevel } from '../../models/course.models';
 import { ReviewService } from '../../../reviews/services/review.service';
-import { ReviewResponse } from '../../../reviews/models/review.models'; // ReviewResponse import edildi
-
+import { ReviewResponse } from '../../../reviews/models/review.models';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import { TokenService } from '../../../../core/services/token.service';
+import { PaymentService } from '../../../payment/payment.service';
+import { PaymentResponse } from '../../../payment/models/payment.models';
+
+// LiqPayCheckout objesinin global olarak var olduğunu belirtmek için
+declare const LiqPayCheckout: any;
 
 @Component({
   selector: 'app-course-detail',
@@ -37,6 +41,8 @@ export class CourseDetailComponent implements OnInit {
   isInstructorOrAdmin: boolean = false;
   currentUserId: number | null = null;
   hasUserReviewed: boolean = false;
+  isLoggedIn: boolean = false;
+  hasPurchasedCourse: boolean = false;
 
   constructor(
       private route: ActivatedRoute,
@@ -44,11 +50,13 @@ export class CourseDetailComponent implements OnInit {
       private translate: TranslateService,
       private tokenService: TokenService,
       private router: Router,
-      private reviewService: ReviewService
+      private reviewService: ReviewService,
+      private paymentService: PaymentService
   ) { }
 
   ngOnInit(): void {
     this.currentUserId = this.tokenService.getUser()?.id || null;
+    this.isLoggedIn = !!this.currentUserId;
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('courseId');
@@ -66,14 +74,11 @@ export class CourseDetailComponent implements OnInit {
     });
   }
 
-  /**
-   * Belirli bir eğitimin detaylarını backend'den yükler.
-   * @param id Eğitimin ID'si.
-   */
   loadCourseDetails(id: number): void {
     this.isLoading = true;
     this.errorMessage = null;
     this.successMessage = null;
+    this.hasPurchasedCourse = false;
 
     this.courseService.getCourseDetailsById(id).pipe(
         catchError(error => {
@@ -89,24 +94,68 @@ export class CourseDetailComponent implements OnInit {
         if (this.course.lessons) {
           this.course.lessons = [...this.course.lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
         }
-        // Yorumları işlerken kullanıcının kendi yorumu olup olmadığını kontrol et
         if (this.course.reviews && this.currentUserId) {
-          // Kullanıcının bu kursa yorum yapıp yapmadığını kontrol et
           this.hasUserReviewed = this.course.reviews.some(review => review.userId === this.currentUserId);
-          // Her yoruma kendi yorumu olup olmadığını belirten bir bayrak ekle
           this.course.reviews = this.course.reviews.map(review => ({
             ...review,
             isCurrentUserReview: review.userId === this.currentUserId
           }));
         }
+        // Satın alma durumunu kontrol eden placeholder.
+        // Gerçek uygulamada bu kontrolü yapan bir servis çağrısı yapılmalıdır.
+        this.checkIfUserHasPurchasedCourse(id);
       }
     });
   }
 
-  /**
-   * Mevcut kullanıcının bu kursa yaptığı yorumun ID'sini döndürür.
-   * Eğer yorum yapmamışsa null döner.
-   */
+  // Kullanıcının kursu satın alıp almadığını kontrol eden yardımcı metot
+  // NOT: Bu metot, backend'de bu kontrolü yapan bir servis metodu yazıldığında güncellenmelidir.
+  checkIfUserHasPurchasedCourse(courseId: number): void {
+    // Örneğin, bu kontrolü yapan bir servis metodu yazmalısınız:
+    // this.courseService.isCoursePurchasedByUser(courseId, this.currentUserId).subscribe(
+    //   isPurchased => this.hasPurchasedCourse = isPurchased
+    // );
+    this.hasPurchasedCourse = false;
+  }
+
+  // Ödeme işlemini başlatan metod
+  purchaseCourse(): void {
+    if (!this.courseId || !this.course) {
+      this.errorMessage = this.translate.instant('ERROR_NO_COURSE_SELECTED');
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.paymentService.initiatePayment(this.courseId).subscribe(
+        (response: PaymentResponse) => {
+          this.isLoading = false;
+          LiqPayCheckout.init({
+            data: response.data,
+            signature: response.signature,
+            embedTo: "#liqpay_checkout",
+            mode: "embed"
+          }).on("liqpay.callback", (data: any) => {
+            console.log("Ödeme durumu:", data.status);
+            if (data.status === 'success') {
+              this.successMessage = this.translate.instant('PAYMENT_SUCCESSFUL');
+              this.loadCourseDetails(this.courseId!);
+            } else {
+              this.errorMessage = this.translate.instant('PAYMENT_FAILED_WITH_STATUS', { status: data.status });
+            }
+          }).on("liqpay.close", () => {
+            this.loadCourseDetails(this.courseId!);
+          });
+        },
+        (error) => {
+          this.isLoading = false;
+          this.errorMessage = error.message || this.translate.instant('PAYMENT_INITIATE_FAILED');
+          console.error('Ödeme başlatılırken hata oluştu:', error);
+        }
+    );
+  }
+
   getUsersReviewId(): number | null {
     if (this.course && this.course.reviews && this.currentUserId) {
       const userReview = this.course.reviews.find(review => review.userId === this.currentUserId);
@@ -115,27 +164,15 @@ export class CourseDetailComponent implements OnInit {
     return null;
   }
 
-  /**
-   * Alert dialog kapatıldığında mesajları temizler.
-   */
   clearMessages(): void {
     this.errorMessage = null;
     this.successMessage = null;
   }
 
-  /**
-   * Bir dersin video URL'sini döndürür.
-   * @param lesson Ders nesnesi.
-   * @returns Dersin video URL'si.
-   */
   getLessonVideoUrl(lesson: LessonDTO): string {
     return lesson.videoUrl;
   }
 
-  /**
-   * Eğitime yapılan yorumların ortalama puanını hesaplar.
-   * @returns Ortalama puan veya 0 eğer yorum yoksa.
-   */
   getAverageRating(): number {
     if (!this.course || !this.course.reviews || this.course.reviews.length === 0) {
       return 0;
@@ -144,15 +181,7 @@ export class CourseDetailComponent implements OnInit {
     return totalRating / this.course.reviews.length;
   }
 
-  /**
-   * Eğitimi silme işlemini başlatır.
-   * @param courseId Silinecek eğitimin ID'si.
-   */
   deleteCourse(courseId: number): void {
-    // confirm yerine AlertDialogComponent kullanmalıyız
-    // const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_COURSE'));
-    // if (confirmation) { ... }
-    // Şimdilik confirm kullanmaya devam ediyorum, ancak gerçek uygulamada bu değiştirilmeli.
     const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_COURSE'));
     if (confirmation) {
       this.isLoading = true;
@@ -174,10 +203,6 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Eğitimin yayınlanma durumunu değiştirir (yayınla/yayından kaldır).
-   * @param courseId Durumu değiştirilecek eğitimin ID'si.
-   */
   toggleCoursePublishedStatus(courseId: number): void {
     const confirmation = confirm(this.translate.instant('CONFIRM_TOGGLE_PUBLISH'));
     if (confirmation) {
@@ -199,11 +224,6 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Bir dersi silme işlemini başlatır.
-   * @param courseId Dersin ait olduğu eğitimin ID'si.
-   * @param lessonId Silinecek dersin ID'si.
-   */
   deleteLesson(courseId: number, lessonId: number): void {
     const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_LESSON'));
     if (confirmation) {
@@ -226,10 +246,6 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Bir yorumu silme işlemini başlatır.
-   * @param reviewId Silinecek yorumun ID'si.
-   */
   deleteReview(reviewId: number): void {
     const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_REVIEW'));
     if (confirmation) {
@@ -252,18 +268,10 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  /**
-   * Bir yorumu düzenleme veya silme yetkisi olup olmadığını kontrol eder.
-   * Kullanıcı kendi yorumunu veya admin/eğitmen herhangi bir yorumu düzenleyebilir/silebilir.
-   * @param review Yorum nesnesi.
-   * @returns Yetki varsa true, aksi takdirde false.
-   */
   canModifyReview(review: ReviewResponse): boolean {
-    // isCurrentUserReview bayrağını kullanıyoruz
     return review.isCurrentUserReview || this.isInstructorOrAdmin;
   }
 
-  // Yeni eklenen alanlar için çeviri helper'ları
   getCategoryTranslation(category: CourseCategory): string {
     return this.translate.instant(`CATEGORY.${category}`);
   }

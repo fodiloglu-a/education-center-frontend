@@ -3,13 +3,18 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
+import {HomeComponent} from "./features/home/components/home/home.component";
+
 
 // Uygulamanın ana yönlendirme tanımları.
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'courses',
-    pathMatch: 'full'
+    component: HomeComponent, // Ana yolu Home Component'e yönlendiriyoruz
+  },
+  {
+    path: 'home', // 'home' yolunu da home component'e yönlendirebilirsiniz
+    component: HomeComponent,
   },
   {
     path: 'auth',
@@ -36,8 +41,8 @@ export const routes: Routes = [
   {
     path: 'instructor', // Yeni eğitmen rotası
     loadChildren: () => import('./features/instructor/instructor.routes').then(m => m.INSTRUCTOR_ROUTES),
-    canActivate: [AuthGuard, RoleGuard], // Oturum açmış ve belirli bir role sahip kullanıcılar erişebilir
-    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] }, // Sadece eğitmenler veya adminler erişebilir
+    canActivate: [AuthGuard, RoleGuard],
+    data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
     title: 'Eğitmen Paneli'
   },
   {
@@ -49,6 +54,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'courses'
+    redirectTo: '' // Tanımsız yollar için ana sayfaya yönlendirme
   }
 ];

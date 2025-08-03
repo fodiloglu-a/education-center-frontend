@@ -1,0 +1,66 @@
+<div class="home-container">
+    <!-- 1. Kampanyalar için Slider Alanı -->
+    <section class="slider-section">
+        <div class="slider-wrapper">
+            <div class="slide active">
+                <img src="https://media-videos.849d26839fb7b1d41361dfa0cfed6323.r2.cloudflarestorage.com/b9a5bf58-774d-4b80-93de-fc57d1c96fde_2025-07-01%2011.15.01.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250803T181506Z&X-Amz-SignedHeaders=host&X-Amz-Credential=7c05f7364ffbaf4a97a715c58157b3ec%2F20250803%2Fauto%2Fs3%2Faws4_request&X-Amz-Expires=3600&X-Amz-Signature=c27fced807969f44c00746952f3df20e45de9658a484fe8863c757534d883882
+
+" alt="Kampanya 1">
+                <div class="slide-content">
+                    <h2 class="slide-title">{{ 'HOME_SLIDER_TITLE' | translate }}</h2>
+                    <p class="slide-text">{{ 'HOME_SLIDER_TEXT' | translate }}</p>
+                    <a href="/courses" class="btn-primary">{{ 'HOME_SLIDER_BTN' | translate }}</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Güven ve Değer Şeridi -->
+    <section class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-item">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h3 class="feature-title">{{ 'HOME_FEATURE_TITLE_1' | translate }}</h3>
+                    <p class="feature-text">{{ 'HOME_FEATURE_TEXT_1' | translate }}</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-rocket feature-icon"></i>
+                    <h3 class="feature-title">{{ 'HOME_FEATURE_TITLE_2' | translate }}</h3>
+                    <p class="feature-text">{{ 'HOME_FEATURE_TEXT_2' | translate }}</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-award feature-icon"></i>
+                    <h3 class="feature-title">{{ 'HOME_FEATURE_TITLE_3' | translate }}</h3>
+                    <p class="feature-text">{{ 'HOME_FEATURE_TEXT_3' | translate }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. En Çok Satan Eğitimler Bölümü -->
+    <section class="best-sellers-section section">
+        <div class="container">
+            <h2 class="section-title">{{ 'HOME_BESTSELLERS_TITLE' | translate }}</h2>
+            <p class="section-subtitle">{{ 'HOME_BESTSELLERS_SUBTITLE' | translate }}</p>
+
+            <div class="courses-grid">
+                <div *ngFor="let course of bestSellers" class="course-card">
+                    <img [src]="course.imageUrl" [alt]="course.title" class="course-image">
+                    <div class="course-content">
+                        <h4 class="course-title">{{ course.title }}</h4>
+                        <p class="course-instructor">{{ course.instructorName }}</p>
+                        <div class="course-rating">
+                            <i *ngFor="let star of [1, 2, 3, 4, 5]"
+                               class="fas fa-star"
+                               [class.filled]="star <= course.averageRating"></i>
+                            <span>({{ course.averageRating | number:'1.1-1' }})</span>
+                        </div>
+                        <div class="course-price">{{ course.price | currency:'USD':'symbol' }}</div>
+                        <a href="#" class="btn-secondary">{{ 'HOME_COURSE_BTN' | translate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -231,10 +231,10 @@
   "INSTRUCTOR_DASHBOARD_SUBTITLE": "Kurslarınız ve öğrencileriniz hakkında genel bakış",
   "TOTAL_COURSES": "Toplam Kurs Sayısı",
   "TOTAL_STUDENTS": "Toplam Öğrenci Sayısı",
-  "AVERAGE_RATING": "Ortalama Puan",
+
   "TOTAL_REVIEWS": "Toplam Yorum Sayısı",
   "QUICK_ACTIONS": "Hızlı Eylemler",
-  "MY_COURSES": "Kurslarım",
+
   "MY_REVIEWS": "Yorumlarım",
   "INSTRUCTOR_ID_NOT_FOUND": "Eğitmen ID'si bulunamadı. Lütfen tekrar giriş yapın.",
   "DASHBOARD_STATS_LOAD_FAILED": "Gösterge panosu istatistikleri yüklenirken bir hata oluştu.",
@@ -246,7 +246,7 @@
   "NO_INSTRUCTOR_COURSES_FOUND": "Henüz kurs oluşturmadınız.",
   "INSTRUCTOR_COURSES_LOAD_FAILED": "Kurslarınız yüklenirken bir hata oluştu.",
   "REVIEWS_FOR_MY_COURSES_SUBTITLE": "Kurslarınıza yapılan tüm yorumları görüntüleyin",
-  "FOR_COURSE": "Kurs İçin",
+
   "NO_INSTRUCTOR_REVIEWS_FOUND": "Kurslarınıza henüz yorum yapılmadı.",
   "INSTRUCTOR_REVIEWS_LOAD_FAILED": "Kurs yorumlarınız yüklenirken bir hata oluştu.",
   "TOP_SELLING_COURSES": "En Çok Satan Kurslar",
@@ -258,7 +258,7 @@
   "ALL_COURSES": "Tüm Kurslar",
   "BROWSE_ALL_COURSES_SUBTITLE": "Çeşitli konularda geniş kurs yelpazemizi keşfedin.",
   "DETAILS": "Detaylar",
-  "NO_COURSES_FOUND": "Hiç Kurs Bulunamadı",
+
   "NO_COURSES_MESSAGE": "Gösterilecek kurs yok. Lütfen daha sonra tekrar deneyin veya farklı kriterlerle arama yapın.",
   "REFRESH": "Yenile",
   "LANGUAGE.TR": "Türkçe",
@@ -319,32 +319,17 @@
   "LAST_UPDATED": "Son Güncelleme",
   "CREATED_AT": "Oluşturulma Tarihi",
   "IS_PREVIEW_LESSON": "Önizleme Dersi mi?",
-  "DURATION_PLACEHOLDER": "Süre (dakika) girin",
-  "DURATION_REQUIRED": "Süre zorunludur.",
-  "DURATION_MIN_VALUE": "Süre en az {{min}} olmalıdır.",
-  "PROFILE": "Profil",
-  "PROFILE_SUBTITLE": "Kullanıcı profil bilgilerinizi görüntüleyin ve yönetin.",
-  "FIRST_NAME": "Ad",
-  "LAST_NAME": "Soyad",
-  "EMAIL": "E-posta",
-  "ROLE": "Rol",
-  "MEMBER_SINCE": "Üyelik Tarihi",
+
   "ACCOUNT_ACTIONS": "Hesap Eylemleri",
-  "EDIT_PROFILE": "Profili Düzenle",
-  "CHANGE_PASSWORD": "Şifre Değiştir",
+
   "MY_CERTIFICATES": "Sertifikalarım",
-  "MY_REVIEWS": "Yorumlarım",
-  "USER_ID_NOT_FOUND": "Kullanıcı ID bulunamadı. Lütfen tekrar giriş yapın.",
-  "PROFILE_LOAD_FAILED": "Profil bilgileri yüklenirken bir hata oluştu.",
-  "USER_NOT_LOADED": "Kullanıcı bilgileri yüklenemedi. Lütfen tekrar deneyin.",
-  "RETRY_LOAD_PROFILE": "Profili Yeniden Yükle",
-  "ROLE_LEARNER": "Öğrenci",
+
   "INSTRUCTOR": "Eğitmen",
   "ROLE_ADMIN": "Yönetici",
   "REVIEWS_AND_NOTES": "Yorumlar ve Notlar",
   "REVIEWS_AND_NOTES_BY_USER": "Kullanıcı Yorumları ve Notları",
   "ALL_REVIEWS_AND_NOTES_SUBTITLE": "Tüm Yorumları ve Notları Görüntüle",
-  "MY_REVIEWS": "Yorumlarım",
+
   "MY_NOTES": "Notlarım",
   "VIEW_COURSE": "Kursu Görüntüle",
   "VIEW_LESSON": "Dersi Görüntüle",
@@ -353,24 +338,22 @@
   "ERROR_COURSE_ID_MISSING_FOR_NOTE_NAVIGATION": "Not navigasyonu için kurs ID'si eksik.",
 
 
-  "EDUCATION_CENTER": "Eğitim Merkezi",
+
   "EXPLORE_MORE_COURSES": "Daha Fazla Kurs Keşfet",
   "EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_LOGGED_IN": "Size özel hazırlanmış kurs önerilerimizi keşfedin ve eğitim yolculuğunuza devam edin.",
   "EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_NOT_LOGGED_IN": "Binlerce kaliteli kursu keşfedin ve yeni beceriler öğrenmeye başlayın.",
-  "GO_TO_EDUCATION_CENTER": "Eğitim Merkezine Git",
+
   "RECOMMENDED_COURSES_TITLE": "Sizin İçin Önerilen Kurslar",
-  "TOP_SELLING_COURSES": "En Çok Satan Kurslar",
+
   "PERSONALIZED_RECOMMENDATIONS_FOR_YOU": "Size özel hazırlanmış kurs önerileri",
   "GENERAL_TOP_SELLING_COURSES_SUBTITLE": "En popüler ve beğenilen kurslarımızı keşfedin",
-  "STUDENTS": "Öğrenci",
-  "VIEW_DETAILS": "Detayları Görüntüle",
+
   "MY_PURCHASED_COURSES": "Satın Aldığım Kurslar",
   "BROWSE_MY_PURCHASED_COURSES_SUBTITLE": "Satın aldığınız kurslara erişin ve eğitiminize devam edin",
-  "DETAILS": "Detaylar",
+
   "NO_PURCHASED_COURSES_FOUND": "Satın Alınmış Kurs Bulunamadı",
   "NO_PURCHASED_COURSES_MESSAGE": "Henüz bir kurs satın almadınız. Eğitim merkezimizi ziyaret ederek size uygun kursları keşfedebilirsiniz.",
-  "REFRESH": "Yenile",
-  "COURSE_LOAD_ERROR": "Kurslar yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+
 
   "CATEGORY": {
     "PROGRAMMING": "Programlama",
@@ -408,7 +391,65 @@
   "DURATION_HOURS_MINUTES": "{{hours}} saat {{minutes}} dakika",
   "DURATION_HOURS": "{{hours}} saat",
   "DURATION_MINUTES": "{{minutes}} dakika",
-  "ADD_MATERIAL": "DERS MATERYALİ EKLE"
+  "ADD_MATERIAL": "DERS MATERYALİ EKLE",
+
+  "HOME_SLIDER_TITLE": "Hayalinizdeki Kariyer İçin Bugün Başlayın",
+  "HOME_SLIDER_TEXT": "Uzman eğitmenlerden, en güncel teknolojilerle hazırlanmış kapsamlı kurslarla kendinizi geliştirin. Binlerce öğrencinin tercihi olan platformumuzda siz de yerinizi alın.",
+  "HOME_SLIDER_BTN": "Kursları Keşfet",
+
+  "HOME_FEATURE_TITLE_1": "Güvenilir Platform",
+  "HOME_FEATURE_TEXT_1": "SSL sertifikalı güvenli ödeme sistemi ve 256-bit şifreleme ile verileriniz tamamen korunur.",
+
+  "HOME_FEATURE_TITLE_2": "Hızlı Başlangıç",
+  "HOME_FEATURE_TEXT_2": "Satın aldığınız kurslara anında erişim sağlayın, kaldığınız yerden devam edin.",
+
+  "HOME_FEATURE_TITLE_3": "Kaliteli İçerik",
+  "HOME_FEATURE_TEXT_3": "Sektör uzmanları tarafından hazırlanan, güncel ve uygulamalı eğitim içerikleri.",
+
+  "HOME_BESTSELLERS_TITLE": "En Çok Satan Eğitimler",
+  "HOME_BESTSELLERS_SUBTITLE": "Binlerce öğrencinin tercihi olan, en popüler ve başarı oranı yüksek kurslarımız",
+
+  "HOME_COURSE_BTN": "Kursa Katıl",
+
+  "HOME_COURSE_RATING": "puan",
+  "HOME_COURSE_STUDENTS": "öğrenci",
+  "HOME_COURSE_HOURS": "saat",
+  "HOME_COURSE_LESSONS": "ders",
+  "HOME_COURSE_INSTRUCTOR": "Eğitmen",
+  "HOME_VIEW_ALL_COURSES": "Tüm Kursları Görüntüle",
+  "HOME_LOADING": "Yükleniyor...",
+  "HOME_ERROR_TITLE": "Bir Hata Oluştu",
+  "HOME_ERROR_MESSAGE": "Kurslar yüklenirken bir sorun yaşandı. Lütfen sayfayı yenileyin.",
+  "HOME_RETRY_BTN": "Tekrar Dene",
+  "HOME_NO_COURSES": "Henüz kurs bulunamadı",
+  "HOME_CURRENCY": "₺",
+  "HOME_FREE": "Ücretsiz",
+  "HOME_DISCOUNT": "İndirim",
+  "HOME_NEW": "Yeni",
+  "HOME_BESTSELLER": "En Çok Satan",
+  "HOME_CERTIFICATE": "Sertifikalı",
+  "HOME_LIFETIME_ACCESS": "Sınırsız Erişim",
+  "HOME_MOBILE_ACCESS": "Mobil Erişim",
+  "HOME_DOWNLOAD": "İndirilebilir",
+  "HOME_LEVEL_BEGINNER": "Başlangıç",
+  "HOME_LEVEL_INTERMEDIATE": "Orta",
+  "HOME_LEVEL_ADVANCED": "İleri",
+  "HOME_LEVEL_ALL": "Tüm Seviyeler",
+  "HOME_LANGUAGE": "Türkçe",
+  "HOME_LAST_UPDATED": "Son Güncelleme",
+  "HOME_WHAT_YOU_LEARN": "Neler Öğreneceksiniz",
+  "HOME_REQUIREMENTS": "Gereksinimler",
+  "HOME_TARGET_AUDIENCE": "Kimler İçin Uygun",
+  "HOME_COURSE_INCLUDES": "Kurs İçeriği",
+  "HOME_PREVIEW": "Önizleme",
+  "HOME_BUY_NOW": "Hemen Satın Al",
+  "HOME_ADD_TO_CART": "Sepete Ekle",
+  "HOME_WISHLIST": "İstek Listesi",
+  "HOME_SHARE": "Paylaş",
+  "HOME_COURSE_CONTENT": "Kurs İçeriği",
+  "HOME_REVIEWS": "Değerlendirmeler",
+  "HOME_INSTRUCTOR_INFO": "Eğitmen Bilgileri"
+
 
 
 }
