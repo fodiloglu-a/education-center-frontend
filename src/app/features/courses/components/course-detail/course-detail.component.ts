@@ -1,23 +1,43 @@
 // course-detail.component.ts
 
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Subject, forkJoin, of } from 'rxjs';
+import { takeUntil, catchError, finalize, switchMap, tap } from 'rxjs/operators';
+
+// Services
 import { CourseService } from '../../services/course.service';
-import { CourseDetailsResponse, LessonDTO, CourseCategory, CourseLevel } from '../../models/course.models';
 import { ReviewService } from '../../../reviews/services/review.service';
-import { ReviewResponse } from '../../../reviews/models/review.models';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
-import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
-import { TokenService } from '../../../../core/services/token.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { PaymentService } from '../../../payment/payment.service';
+
+// Models
+import { CourseResponse, CourseDetailsResponse, CourseCategory, CourseLevel, LessonDTO } from '../../models/course.models';
+import { ReviewResponse, ReviewRequest } from '../../../reviews/models/review.models';
+import { UserProfile } from '../../../auth/models/auth.models';
 import { PaymentResponse } from '../../../payment/models/payment.models';
 
-// LiqPayCheckout objesinin global olarak var olduğunu belirtmek için
+// Components
+import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
+
+// LiqPayCheckout global declaration
 declare const LiqPayCheckout: any;
+
+interface ComponentState {
+  isLoading: boolean;
+  errorMessage: string | null;
+  successMessage: string | null;
+  isLoggedIn: boolean;
+  currentUser: UserProfile | null;
+  hasPurchasedCourse: boolean;
+  isInstructorOrAdmin: boolean;
+  showReviewForm: boolean;
+  isSubmittingReview: boolean;
+}
 
 @Component({
   selector: 'app-course-detail',
@@ -26,251 +46,435 @@ declare const LiqPayCheckout: any;
     CommonModule,
     RouterLink,
     TranslateModule,
+    ReactiveFormsModule,
     LoadingSpinnerComponent,
     AlertDialogComponent
   ],
   templateUrl: './course-detail.component.html',
-  styleUrl: './course-detail.component.css'
+  styleUrl: './course-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CourseDetailComponent implements OnInit {
-  course: CourseDetailsResponse | null = null;
-  isLoading: boolean = true;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
+export class CourseDetailComponent implements OnInit, OnDestroy {
+
+  // Data properties
+  course: CourseResponse | CourseDetailsResponse | null = null;
+  courseReviews: ReviewResponse[] = [];
+  userReview: ReviewResponse | null = null;
   courseId: number | null = null;
-  isInstructorOrAdmin: boolean = false;
-  currentUserId: number | null = null;
-  hasUserReviewed: boolean = false;
-  isLoggedIn: boolean = false;
-  hasPurchasedCourse: boolean = false;
+
+  // Form
+  reviewForm!: FormGroup;
+
+  // State management
+  private componentState$ = new Subject<ComponentState>();
+  private currentState: ComponentState = {
+    isLoading: true,
+    errorMessage: null,
+    successMessage: null,
+    isLoggedIn: false,
+    currentUser: null,
+    hasPurchasedCourse: false,
+    isInstructorOrAdmin: false,
+    showReviewForm: false,
+    isSubmittingReview: false
+  };
+  isInstructorCourses: boolean=false
+
+  // Lifecycle
+  private destroy$ = new Subject<void>();
+
+  // Public getters
+  get isLoading(): boolean { return this.currentState.isLoading; }
+  get errorMessage(): string | null { return this.currentState.errorMessage; }
+  get successMessage(): string | null { return this.currentState.successMessage; }
+  get isLoggedIn(): boolean { return this.currentState.isLoggedIn; }
+  get currentUser(): UserProfile | null { return this.currentState.currentUser; }
+  get hasPurchasedCourse(): boolean { return this.currentState.hasPurchasedCourse; }
+  get isInstructorOrAdmin(): boolean { return this.currentState.isInstructorOrAdmin; }
+  get showReviewForm(): boolean { return this.currentState.showReviewForm; }
+  get isSubmittingReview(): boolean { return this.currentState.isSubmittingReview; }
 
   constructor(
       private route: ActivatedRoute,
-      private courseService: CourseService,
-      private translate: TranslateService,
-      private tokenService: TokenService,
       private router: Router,
+      private courseService: CourseService,
       private reviewService: ReviewService,
-      private paymentService: PaymentService
-  ) { }
+      private authService: AuthService,
+      private paymentService: PaymentService,
+      private translate: TranslateService,
+      private cdr: ChangeDetectorRef,
+      @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.initializeReviewForm();
+  }
 
   ngOnInit(): void {
-    this.currentUserId = this.tokenService.getUser()?.id || null;
-    this.isLoggedIn = !!this.currentUserId;
-
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('courseId');
-      if (id) {
-        this.courseId = +id;
-        this.loadCourseDetails(this.courseId);
-      } else {
-        this.errorMessage = this.translate.instant('COURSE_ID_NOT_FOUND');
-        this.isLoading = false;
-      }
-    });
-
-    this.tokenService.userRole$.subscribe(role => {
-      this.isInstructorOrAdmin = role === 'ROLE_INSTRUCTOR' || role === 'ROLE_ADMIN';
-    });
+    this.initializeComponent();
   }
 
-  loadCourseDetails(id: number): void {
-    this.isLoading = true;
-    this.errorMessage = null;
-    this.successMessage = null;
-    this.hasPurchasedCourse = false;
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-    this.courseService.getCourseDetailsById(id).pipe(
-        catchError(error => {
-          this.errorMessage = error.message || this.translate.instant('COURSE_DETAIL_LOAD_FAILED_GENERIC');
-          return of(null);
-        }),
-        finalize(() => {
-          this.isLoading = false;
-        })
-    ).subscribe(course => {
-      if (course) {
-        this.course = course;
-        if (this.course.lessons) {
-          this.course.lessons = [...this.course.lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
-        }
-        if (this.course.reviews && this.currentUserId) {
-          this.hasUserReviewed = this.course.reviews.some(review => review.userId === this.currentUserId);
-          this.course.reviews = this.course.reviews.map(review => ({
-            ...review,
-            isCurrentUserReview: review.userId === this.currentUserId
-          }));
-        }
-        // Satın alma durumunu kontrol eden placeholder.
-        // Gerçek uygulamada bu kontrolü yapan bir servis çağrısı yapılmalıdır.
-        this.checkIfUserHasPurchasedCourse(id);
-      }
+  // ========== INITIALIZATION ==========
+
+  private initializeComponent(): void {
+    this.updateState({ isLoading: true });
+
+    // Setup authentication listener
+    this.authService.getCurrentUser()
+        .pipe(
+            takeUntil(this.destroy$),
+            tap(user => {
+              this.updateState({
+                isLoggedIn: !!user,
+                currentUser: user,
+              });
+            }),
+            switchMap(() => this.route.paramMap)
+        )
+
+        .subscribe(params => {
+          const id = params.get('courseId');
+          if (id) {
+            this.courseId = +id;
+            this.loadCourseData();
+          } else {
+            this.updateState({
+              errorMessage: this.translate.instant('COURSE_ID_NOT_FOUND'),
+              isLoading: false
+            });
+          }
+        });
+    this.checkInstructorCourse()
+  }
+
+  private initializeReviewForm(): void {
+    this.reviewForm = new FormGroup({
+      rating: new FormControl(5, [Validators.required, Validators.min(1), Validators.max(5)]),
+      comment: new FormControl('', [Validators.maxLength(500)])
     });
   }
 
-  // Kullanıcının kursu satın alıp almadığını kontrol eden yardımcı metot
-  // NOT: Bu metot, backend'de bu kontrolü yapan bir servis metodu yazıldığında güncellenmelidir.
-  checkIfUserHasPurchasedCourse(courseId: number): void {
-    // Örneğin, bu kontrolü yapan bir servis metodu yazmalısınız:
-    // this.courseService.isCoursePurchasedByUser(courseId, this.currentUserId).subscribe(
-    //   isPurchased => this.hasPurchasedCourse = isPurchased
-    // );
-    this.hasPurchasedCourse = false;
+  // ========== DATA LOADING ==========
+
+  private loadCourseData(): void {
+    if (!this.courseId) return;
+
+    this.updateState({ isLoading: true, errorMessage: null });
+
+    // First check if user has purchased the course
+    const checkAccess$ = this.isLoggedIn
+        ? this.courseService.checkCourseAccess(this.userReview?.id||0,this.courseId)
+        : of(false);
+
+    checkAccess$
+        .pipe(
+            takeUntil(this.destroy$),
+            switchMap(hasPurchased => {
+              this.updateState({ hasPurchasedCourse: hasPurchased });
+
+              // Load appropriate course data based on purchase status
+              const courseData$ = hasPurchased
+                  ? this.courseService.getCourseDetailsById(this.courseId!)
+                  : this.courseService.getCourseResponseById(this.courseId!);
+
+              // Load reviews
+              const reviews$ = this.reviewService.getReviewsByCourseId(this.courseId!);
+
+              return forkJoin({
+                course: courseData$,
+                reviews: reviews$
+              });
+            }),
+            catchError(error => {
+              console.error('Error loading course data:', error);
+              this.updateState({
+                errorMessage: this.translate.instant('COURSE_LOAD_ERROR'),
+                isLoading: false
+              });
+              return of(null);
+            }),
+            finalize(() => {
+              this.updateState({ isLoading: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe(data => {
+          if (data) {
+            this.course = data.course;
+            this.courseReviews = data.reviews || [];
+            this.processUserReview();
+            this.cdr.markForCheck();
+          }
+        });
   }
 
-  // Ödeme işlemini başlatan metod
+  private processUserReview(): void {
+    if (this.isLoggedIn && this.currentUser && this.courseReviews.length > 0) {
+      this.userReview = this.courseReviews.find(
+          review => review.userId === this.currentUser!.id
+      ) || null;
+    }
+
+  }
+
+  // ========== COURSE ACTIONS ==========
+
   purchaseCourse(): void {
-    if (!this.courseId || !this.course) {
-      this.errorMessage = this.translate.instant('ERROR_NO_COURSE_SELECTED');
+    if (!this.courseId || !this.course || !this.isLoggedIn) {
+      this.updateState({
+        errorMessage: this.translate.instant('PURCHASE_ERROR_REQUIREMENTS')
+      });
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = null;
+    this.updateState({ isLoading: true, errorMessage: null });
 
-    this.paymentService.initiatePayment(this.courseId).subscribe(
-        (response: PaymentResponse) => {
-          this.isLoading = false;
-          LiqPayCheckout.init({
-            data: response.data,
-            signature: response.signature,
-            embedTo: "#liqpay_checkout",
-            mode: "embed"
-          }).on("liqpay.callback", (data: any) => {
-            console.log("Ödeme durumu:", data.status);
-            if (data.status === 'success') {
-              this.successMessage = this.translate.instant('PAYMENT_SUCCESSFUL');
-              this.loadCourseDetails(this.courseId!);
-            } else {
-              this.errorMessage = this.translate.instant('PAYMENT_FAILED_WITH_STATUS', { status: data.status });
-            }
-          }).on("liqpay.close", () => {
-            this.loadCourseDetails(this.courseId!);
-          });
-        },
-        (error) => {
-          this.isLoading = false;
-          this.errorMessage = error.message || this.translate.instant('PAYMENT_INITIATE_FAILED');
-          console.error('Ödeme başlatılırken hata oluştu:', error);
-        }
-    );
+    this.paymentService.initiatePayment(this.courseId)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.updateState({ isLoading: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: (response: PaymentResponse) => {
+            this.initializeLiqPay(response);
+          },
+          error: (error) => {
+            this.updateState({
+              errorMessage: error.message || this.translate.instant('PAYMENT_INITIATE_FAILED')
+            });
+          }
+        });
   }
 
-  getUsersReviewId(): number | null {
-    if (this.course && this.course.reviews && this.currentUserId) {
-      const userReview = this.course.reviews.find(review => review.userId === this.currentUserId);
-      return userReview ? userReview.id : null;
-    }
-    return null;
-  }
+  private initializeLiqPay(response: PaymentResponse): void {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-  clearMessages(): void {
-    this.errorMessage = null;
-    this.successMessage = null;
-  }
-
-  getLessonVideoUrl(lesson: LessonDTO): string {
-    return lesson.videoUrl;
-  }
-
-  getAverageRating(): number {
-    if (!this.course || !this.course.reviews || this.course.reviews.length === 0) {
-      return 0;
-    }
-    const totalRating = this.course.reviews.reduce((sum, review) => sum + review.rating, 0);
-    return totalRating / this.course.reviews.length;
-  }
-
-  deleteCourse(courseId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_COURSE'));
-    if (confirmation) {
-      this.isLoading = true;
-      this.courseService.deleteCourse(courseId).pipe(
-          catchError(error => {
-            this.errorMessage = error.message || this.translate.instant('DELETE_COURSE_FAILED_GENERIC');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading = false;
-          })
-      ).subscribe(response => {
-        if (response === null) {
-          return;
-        }
-        this.successMessage = this.translate.instant('DELETE_COURSE_SUCCESS');
-        this.router.navigate(['/courses']);
+    try {
+      LiqPayCheckout.init({
+        data: response.data,
+        signature: response.signature,
+        embedTo: "#liqpay_checkout",
+        mode: "embed"
+      }).on("liqpay.callback", (data: any) => {
+        this.handlePaymentCallback(data);
+      }).on("liqpay.close", () => {
+        this.loadCourseData();
+      });
+    } catch (error) {
+      console.error('LiqPay initialization error:', error);
+      this.updateState({
+        errorMessage: this.translate.instant('PAYMENT_INIT_ERROR')
       });
     }
   }
 
-  toggleCoursePublishedStatus(courseId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_TOGGLE_PUBLISH'));
-    if (confirmation) {
-      this.isLoading = true;
-      this.courseService.toggleCoursePublishedStatus(courseId).pipe(
-          catchError(error => {
-            this.errorMessage = error.message || this.translate.instant('TOGGLE_PUBLISH_FAILED_GENERIC');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading = false;
-          })
-      ).subscribe(updatedCourse => {
-        if (updatedCourse) {
-          this.course!.published = updatedCourse.published;
-          this.successMessage = this.translate.instant('TOGGLE_PUBLISH_SUCCESS');
-        }
+  private handlePaymentCallback(data: any): void {
+    if (data.status === 'success') {
+      this.updateState({
+        successMessage: this.translate.instant('PAYMENT_SUCCESSFUL')
+      });
+      this.loadCourseData();
+    } else {
+      this.updateState({
+        errorMessage: this.translate.instant('PAYMENT_FAILED_WITH_STATUS', { status: data.status })
       });
     }
   }
 
-  deleteLesson(courseId: number, lessonId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_LESSON'));
-    if (confirmation) {
-      this.isLoading = true;
-      this.courseService.deleteLessonFromCourse(courseId, lessonId).pipe(
-          catchError(error => {
-            this.errorMessage = error.message || this.translate.instant('DELETE_LESSON_FAILED_GENERIC');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading = false;
-          })
-      ).subscribe(response => {
-        if (response === null) {
-          return;
-        }
-        this.successMessage = this.translate.instant('DELETE_LESSON_SUCCESS');
-        this.loadCourseDetails(courseId);
+  // ========== REVIEW ACTIONS ==========
+
+  toggleReviewForm(): void {
+    this.updateState({ showReviewForm: !this.showReviewForm });
+
+    if (this.showReviewForm && this.userReview) {
+      // Populate form with existing review
+      this.reviewForm.patchValue({
+        rating: this.userReview.rating,
+        comment: this.userReview.comment
       });
+    } else if (this.showReviewForm) {
+      // Reset form for new review
+      this.reviewForm.reset({ rating: 5, comment: '' });
     }
+  }
+
+  submitReview(): void {
+    if (this.reviewForm.invalid || !this.courseId || !this.isLoggedIn) {
+      this.reviewForm.markAllAsTouched();
+      return;
+    }
+
+    this.updateState({ isSubmittingReview: true, errorMessage: null });
+
+    const reviewData: ReviewRequest = {
+      courseId: this.courseId,
+      rating: this.reviewForm.get('rating')?.value,
+      comment: this.reviewForm.get('comment')?.value || ''
+    };
+
+    const operation$ = this.userReview
+        ? this.reviewService.updateReview(this.userReview.id, reviewData)
+        : this.reviewService.addReview(reviewData);
+
+    operation$
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.updateState({ isSubmittingReview: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: () => {
+            this.updateState({
+              successMessage: this.translate.instant(
+                  this.userReview ? 'REVIEW_UPDATED_SUCCESS' : 'REVIEW_ADDED_SUCCESS'
+              ),
+              showReviewForm: false
+            });
+            this.loadCourseData();
+          },
+          error: (error) => {
+            this.updateState({
+              errorMessage: error.message || this.translate.instant('REVIEW_SAVE_ERROR')
+            });
+          }
+        });
   }
 
   deleteReview(reviewId: number): void {
-    const confirmation = confirm(this.translate.instant('CONFIRM_DELETE_REVIEW'));
-    if (confirmation) {
-      this.isLoading = true;
-      this.reviewService.deleteReview(reviewId).pipe(
-          catchError(error => {
-            this.errorMessage = error.message || this.translate.instant('DELETE_REVIEW_FAILED_GENERIC');
-            return of(null);
-          }),
-          finalize(() => {
-            this.isLoading = false;
-          })
-      ).subscribe(response => {
-        if (response === null) {
-          return;
-        }
-        this.successMessage = this.translate.instant('DELETE_REVIEW_SUCCESS');
-        this.loadCourseDetails(this.courseId!);
-      });
+    if (!confirm(this.translate.instant('CONFIRM_DELETE_REVIEW'))) {
+      return;
     }
+
+    this.updateState({ isLoading: true, errorMessage: null });
+
+    this.reviewService.deleteReview(reviewId)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.updateState({ isLoading: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: () => {
+            this.updateState({
+              successMessage: this.translate.instant('REVIEW_DELETED_SUCCESS')
+            });
+            this.loadCourseData();
+          },
+          error: (error) => {
+            this.updateState({
+              errorMessage: error.message || this.translate.instant('REVIEW_DELETE_ERROR')
+            });
+          }
+        });
   }
 
-  canModifyReview(review: ReviewResponse): boolean {
-    return review.isCurrentUserReview || this.isInstructorOrAdmin;
+  // ========== ADMIN ACTIONS ==========
+
+  deleteCourse(): void {
+    if (!this.courseId || !confirm(this.translate.instant('CONFIRM_DELETE_COURSE'))) {
+      return;
+    }
+
+    this.updateState({ isLoading: true });
+
+    this.courseService.deleteCourse(this.courseId)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.updateState({ isLoading: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: () => {
+            this.updateState({
+              successMessage: this.translate.instant('COURSE_DELETED_SUCCESS')
+            });
+            this.router.navigate(['/courses']);
+          },
+          error: (error) => {
+            this.updateState({
+              errorMessage: error.message || this.translate.instant('COURSE_DELETE_ERROR')
+            });
+          }
+        });
   }
+
+  togglePublishStatus(): void {
+    if (!this.courseId || !this.course || !confirm(this.translate.instant('CONFIRM_TOGGLE_PUBLISH'))) {
+      return;
+    }
+
+    this.updateState({ isLoading: true });
+
+    this.courseService.toggleCoursePublishedStatus(this.courseId)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.updateState({ isLoading: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: (updatedCourse) => {
+            if (this.course) {
+              this.course.published = updatedCourse.published;
+            }
+            this.updateState({
+              successMessage: this.translate.instant('PUBLISH_STATUS_UPDATED')
+            });
+          },
+          error: (error) => {
+            this.updateState({
+              errorMessage: error.message || this.translate.instant('PUBLISH_STATUS_ERROR')
+            });
+          }
+        });
+  }
+
+  // ========== LESSON ACTIONS ==========
+
+  deleteLesson(lessonId: number): void {
+    if (!this.courseId || !confirm(this.translate.instant('CONFIRM_DELETE_LESSON'))) {
+      return;
+    }
+
+    this.updateState({ isLoading: true });
+
+    this.courseService.deleteLessonFromCourse(this.courseId, lessonId)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.updateState({ isLoading: false });
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: () => {
+            this.updateState({
+              successMessage: this.translate.instant('LESSON_DELETED_SUCCESS')
+            });
+            this.loadCourseData();
+          },
+          error: (error) => {
+            this.updateState({
+              errorMessage: error.message || this.translate.instant('LESSON_DELETE_ERROR')
+            });
+          }
+        });
+  }
+
+  // ========== UTILITY METHODS ==========
 
   getCategoryTranslation(category: CourseCategory): string {
     return this.translate.instant(`CATEGORY.${category}`);
@@ -280,7 +484,32 @@ export class CourseDetailComponent implements OnInit {
     return this.translate.instant(`LEVEL.${level}`);
   }
 
+  formatPrice(price: number): string {
+    if (price === 0) {
+      return this.translate.instant('FREE');
+    }
+
+    try {
+      const lang = this.translate.currentLang || 'en';
+      const currency = lang === 'tr' ? 'TRY' : lang === 'uk' ? 'UAH' : 'USD';
+      const locale = lang === 'tr' ? 'tr-TR' : lang === 'uk' ? 'uk-UA' : 'en-US';
+
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }).format(price);
+    } catch (error) {
+      return `$${price.toFixed(2)}`;
+    }
+  }
+
   formatDuration(minutes: number): string {
+    if (minutes <= 0) {
+      return this.translate.instant('DURATION_NOT_SPECIFIED');
+    }
+
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
 
@@ -293,16 +522,153 @@ export class CourseDetailComponent implements OnInit {
     }
   }
 
-  formatPrice(price: number): string {
-    const lang = this.translate.currentLang;
-    const currency = lang === 'tr' ? 'TRY' : 'UAH';
-    const locale = lang === 'tr' ? 'tr-TR' : 'uk-UA';
+  getStarArray(rating: number): Array<{filled: boolean, half: boolean}> {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
 
-    return new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(price);
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars.push({filled: true, half: false});
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push({filled: false, half: true});
+      } else {
+        stars.push({filled: false, half: false});
+      }
+    }
+
+    return stars;
+  }
+
+  getAverageRating(): number {
+    if (!this.courseReviews.length) return 0;
+    const total = this.courseReviews.reduce((sum, review) => sum + review.rating, 0);
+    return total / this.courseReviews.length;
+  }
+
+  canModifyReview(review: ReviewResponse): boolean {
+    return (this.isLoggedIn && this.currentUser?.id === review.userId) || this.isInstructorOrAdmin;
+  }
+
+  canAccessLessons(): boolean {
+    return this.hasPurchasedCourse || this.isInstructorOrAdmin;
+  }
+
+  // ========== TYPE GUARDS ==========
+
+  isCourseDetailsResponse(course: CourseResponse | CourseDetailsResponse): course is CourseDetailsResponse {
+    return 'lessons' in course && 'requirements' in course;
+  }
+
+  hasLessons(): boolean {
+    return this.isCourseDetailsResponse(this.course!) && this.course.lessons && this.course.lessons.length > 0;
+  }
+
+  hasRequirements(): boolean {
+    return this.isCourseDetailsResponse(this.course!) && this.course.requirements && this.course.requirements.length > 0;
+  }
+
+  hasWhatYouWillLearn(): boolean {
+    return this.isCourseDetailsResponse(this.course!) && this.course.whatYouWillLearn && this.course.whatYouWillLearn.length > 0;
+  }
+
+  hasTargetAudience(): boolean {
+    return this.isCourseDetailsResponse(this.course!) && this.course.targetAudience && this.course.targetAudience.length > 0;
+  }
+
+  getCourseRequirements(): string[] {
+    return this.isCourseDetailsResponse(this.course!) ? (this.course.requirements || []) : [];
+  }
+
+  getCourseWhatYouWillLearn(): string[] {
+    return this.isCourseDetailsResponse(this.course!) ? (this.course.whatYouWillLearn || []) : [];
+  }
+
+  getCourseTargetAudience(): string[] {
+    return this.isCourseDetailsResponse(this.course!) ? (this.course.targetAudience || []) : [];
+  }
+
+  getCourseLessons(): LessonDTO[] {
+    if (this.isCourseDetailsResponse(this.course!) && this.course.lessons) {
+      return [...this.course.lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
+    }
+    return  this.course?.lessons||[]
+
+  }
+
+  // ========== NAVIGATION HELPERS ==========
+
+  navigateToLessonEdit(lessonId: number): void {
+    if (this.courseId) {
+      this.router.navigate(['/courses', this.courseId, 'lessons', lessonId, 'edit']);
+    }
+  }
+
+  navigateToCourseEdit(): void {
+    if (this.courseId) {
+      this.router.navigate(['/courses', this.courseId, 'edit']);
+    }
+  }
+
+  navigateToAddLesson(): void {
+    if (this.courseId) {
+      this.router.navigate(['/courses', this.courseId, 'lessons', 'new']);
+    }
+  }
+
+  navigateToPlayLesson(lessonId: number): void {
+    if (this.courseId) {
+      this.router.navigate(['/courses', this.courseId, 'lessons', lessonId]);
+    }
+  }
+
+  // ========== FORM GETTERS ==========
+
+  get rating() { return this.reviewForm.get('rating'); }
+  get comment() { return this.reviewForm.get('comment'); }
+
+  // ========== MESSAGE HANDLING ==========
+
+  clearMessages(): void {
+    this.updateState({
+      errorMessage: null,
+      successMessage: null
+    });
+  }
+
+  // ========== STATE MANAGEMENT ==========
+
+  private updateState(partialState: Partial<ComponentState>): void {
+    this.currentState = { ...this.currentState, ...partialState };
+  }
+
+  // ========== TRACK BY FUNCTIONS ==========
+
+  trackByLessonId(index: number, lesson: LessonDTO): number {
+    return lesson.id;
+  }
+
+  trackByReviewId(index: number, review: ReviewResponse): number {
+    return review.id;
+  }
+
+  trackByRequirementIndex(index: number, requirement: string): number {
+    return index;
+  }
+  checkInstructorCourse(): void {
+    console.log('this.currentState');
+    console.log(this.currentState);
+    this.courseService.checkCourseForInstructor(this.currentState.currentUser?.id||0,this.courseId||0).subscribe(
+        result => {
+          if (result) {
+            console.log(result,'result')
+               this.currentState.isInstructorOrAdmin=result;
+          }else {
+              this.currentState.isInstructorOrAdmin=false;
+
+          }
+        }
+    )
+    console.log(this.currentState);
   }
 }

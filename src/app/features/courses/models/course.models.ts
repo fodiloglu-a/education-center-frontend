@@ -23,6 +23,11 @@ export interface CourseResponse {
   language: string;            // Eğitim dili (örn: "tr", "en")
   externalPurchaseUrl?: string;
   lessons: LessonDTO[]; // Harici satın alma linki (opsiyonel)
+  requirements: string[];      // Ön gereksinimler listesi
+  whatYouWillLearn: string[];  // Öğrenilecekler listesi
+  targetAudience: string[];    // Hedef kitle
+  certificateAvailable: boolean; // Sertifika verilip verilmediği
+  reviews: ReviewResponse[];   // Eğitime yapılan yorumların listesi
 }
 
 // Backend'deki CourseDetailsResponse DTO'suna karşılık gelen arayüz.

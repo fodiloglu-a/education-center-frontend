@@ -1,587 +1,936 @@
-/* course-detail.component.css */
+/* Course Detail Component Premium Styles */
 
 .course-detail-container {
-  padding: var(--spacing-lg);
-  background-color: var(--background-color);
-  min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px);
-  box-sizing: border-box;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-bg) 100%);
+  color: var(--text-primary);
 }
 
-.course-content-wrapper {
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: var(--spacing-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xxl); /* Bölümler arası boşluk */
-}
-
-/* Header Section */
-.course-header-section {
-  display: flex;
-  flex-direction: column; /* Mobil için dikey */
-  gap: var(--spacing-lg);
+/* ========== COURSE HEADER ========== */
+.course-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 3rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
   align-items: center;
-  text-align: center;
 }
 
-.course-detail-image {
+.course-image-container {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px var(--shadow-medium);
+}
+
+.course-hero-image {
   width: 100%;
-  max-width: 600px; /* Resim için maksimum genişlik */
-  height: auto;
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
+  height: 400px;
   object-fit: cover;
+  transition: transform var(--transition-normal);
 }
 
-.header-info {
-  flex-grow: 1;
+.course-hero-image:hover {
+  transform: scale(1.02);
+}
+
+.course-badges {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.category-badge,
+.level-badge,
+.certificate-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  backdrop-filter: blur(10px);
+  display: flex;
   align-items: center;
+  gap: 0.25rem;
+}
+
+.category-badge {
+  background: rgba(67, 97, 238, 0.9);
+}
+
+.level-badge {
+  background: rgba(195, 173, 144, 0.9);
+}
+
+.level-badge.level-beginner { background: rgba(76, 175, 80, 0.9); }
+.level-badge.level-intermediate { background: rgba(255, 183, 77, 0.9); }
+.level-badge.level-advanced { background: rgba(244, 67, 54, 0.9); }
+.level-badge.level-all_levels { background: rgba(156, 39, 176, 0.9); }
+
+.certificate-badge {
+  background: rgba(255, 183, 77, 0.9);
+}
+
+.course-info {
+  padding: 2rem 0;
 }
 
 .course-title {
-  color: var(--primary-color);
-  font-size: var(--font-size-xxxl);
-  margin-top: 0;
-  margin-bottom: var(--spacing-sm);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
   line-height: 1.2;
 }
 
-.course-description-short {
-  color: var(--text-color);
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
+.course-description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
 }
 
-.course-meta-info {
+.course-meta {
   display: flex;
-  flex-direction: column; /* Mobil için dikey */
-  gap: var(--spacing-xs);
-  font-size: var(--font-size-md);
-  color: var(--dark-color);
-  margin-bottom: var(--spacing-lg);
-  flex-wrap: wrap; /* Yeni eklenen metadataların sığması için */
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px var(--shadow-light);
 }
 
-/* Yeni eklenen metadata bilgileri için genel stil */
-.course-category-display,
-.course-level-display,
-.course-language-display,
-.course-duration-display,
-.course-certificate-display {
+.meta-item {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background-color: var(--light-accent);
-  color: var(--accent-color);
-  padding: 5px 10px;
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  margin-top: var(--spacing-xs); /* Metalar arasında dikey boşluk */
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }
 
-.course-certificate-display .material-icons {
-  font-size: var(--font-size-base);
+.meta-item i {
   color: var(--primary-color);
+  width: 20px;
 }
 
-
-.instructor-name {
-  font-weight: 600;
-  color: var(--accent-color);
-}
-
-.course-price {
-  font-weight: 700;
-  color: var(--highlight-color);
-  font-size: var(--font-size-xl);
-}
-
-.average-rating {
+.rating-display {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0.5rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.star {
+  color: var(--border-light);
+  font-size: 0.9rem;
+  transition: color var(--transition-normal);
+}
+
+.star.filled {
   color: var(--highlight-color);
+}
+
+.star.half {
+  background: linear-gradient(90deg, var(--highlight-color) 50%, var(--border-light) 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rating-text {
   font-weight: 600;
+  color: var(--text-primary);
 }
 
-.star-icon {
-  font-size: var(--font-size-lg);
-  color: var(--highlight-color); /* Dolu yıldız rengi */
+.review-count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
-.star-icon.filled {
-  color: var(--highlight-color);
+.course-price-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-/* Genel Buton Stilleri */
-.action-button {
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-base);
+.current-price {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-shadow: 0 2px 10px rgba(67, 97, 238, 0.2);
+}
+
+.free-badge {
+  padding: 0.5rem 1rem;
+  background: var(--success-color);
+  color: white;
+  border-radius: 25px;
   font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ========== ACTION BUTTONS ========== */
+.course-actions {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
-  box-shadow: var(--shadow-md);
-  text-decoration: none; /* RouterLink için */
-  display: inline-flex; /* İçeriği ortalamak için */
-  align-items: center;
-  justify-content: center;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
-.primary-btn {
-  background-color: var(--primary-color);
+.purchase-btn {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
   color: white;
+  font-size: 1.1rem;
+  padding: 1.25rem 2.5rem;
+  box-shadow: 0 8px 30px rgba(67, 97, 238, 0.4);
 }
 
-.primary-btn:hover {
-  background-color: var(--deep-blue);
-  transform: translateY(-1px);
+.purchase-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(67, 97, 238, 0.6);
+  color: white;
+  text-decoration: none;
 }
 
-.secondary-btn {
-  background-color: var(--light-accent);
+.external-btn {
+  background: var(--secondary-color);
+  color: var(--dark-color);
+}
+
+.external-btn:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.edit-btn {
+  background: var(--light-accent);
   color: var(--accent-color);
 }
 
-.secondary-btn:hover {
-  background-color: var(--secondary-color);
-  transform: translateY(-1px);
+.edit-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
 }
 
-.danger-btn {
-  background-color: var(--error-color);
+.publish-btn {
+  background: var(--info-color);
   color: white;
 }
 
-.danger-btn:hover {
-  background-color: #d32f2f; /* Kırmızının daha koyu tonu */
-  transform: translateY(-1px);
+.publish-btn:hover {
+  background: var(--primary-color);
+  transform: translateY(-2px);
 }
 
-.course-actions-main {
-  display: flex;
-  flex-direction: column; /* Mobil için dikey */
-  gap: var(--spacing-md);
-  width: 100%;
+.delete-btn {
+  background: var(--error-color);
+  color: white;
 }
 
-.course-actions,
-.general-course-actions {
-  display: flex;
-  flex-wrap: wrap; /* Butonların sarılmasını sağlar */
-  gap: var(--spacing-sm);
-  justify-content: center;
-  margin-top: var(--spacing-md);
+.delete-btn:hover {
+  background: #d32f2f;
+  transform: translateY(-2px);
 }
 
-.external-link-btn .material-icons {
-  margin-right: 5px; /* İkon ile metin arasına boşluk */
+/* ========== PAYMENT CONTAINER ========== */
+.payment-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 2rem;
 }
 
+/* ========== COURSE SECTIONS ========== */
+.course-sections {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
 
-/* Section Card (Detaylı Açıklama, Ön Gereksinimler, Neler Öğreneceksiniz, Hedef Kitle, Dersler, Yorumlar) */
-.section-card {
-  background-color: var(--surface-bg);
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-sm);
+.content-section {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px var(--shadow-light);
+  border: 1px solid var(--border-light);
 }
 
 .section-title {
-  color: var(--accent-color);
-  font-size: var(--font-size-xxl);
-  margin-top: 0;
-  margin-bottom: var(--spacing-lg);
-  text-align: center;
-  border-bottom: 2px solid var(--divider-color);
-  padding-bottom: var(--spacing-sm);
-}
-
-/* Detaylı Açıklama Bölümü */
-.long-description {
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  line-height: 1.6;
-}
-
-/* Bilgi Listeleri (Ön Gereksinimler, Neler Öğreneceksiniz, Hedef Kitle) */
-.info-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.info-list li {
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  margin-bottom: var(--spacing-xs);
-  padding-left: 20px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
   position: relative;
 }
 
-.info-list li::before {
-  content: '✓'; /* Kontrol işareti veya başka bir ikon */
-  color: var(--success-color);
+.section-title::after {
+  content: '';
   position: absolute;
+  bottom: -8px;
   left: 0;
-  top: 0;
-  font-weight: 700;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  border-radius: 2px;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
 
-/* Dersler Bölümü */
-.lesson-list {
+.review-action-btn {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.review-action-btn:hover {
+  background: var(--deep-blue);
+  transform: translateY(-2px);
+}
+
+/* ========== LISTS ========== */
+.requirements-list,
+.learning-list,
+.audience-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+}
+
+.requirements-list li,
+.learning-list li,
+.audience-list li {
+  position: relative;
+  padding: 0.75rem 0 0.75rem 2rem;
+  border-bottom: 1px solid var(--divider-color);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.requirements-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: bold;
+}
+
+.learning-list li::before {
+  content: '▶';
+  position: absolute;
+  left: 0;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.audience-list li::before {
+  content: '👤';
+  position: absolute;
+  left: 0;
+}
+
+/* ========== LESSONS SECTION ========== */
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .lesson-item {
   display: flex;
-  flex-direction: column; /* Mobil için dikey */
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  border-bottom: 1px solid var(--divider-color);
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background: var(--surface-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
 }
 
-.lesson-item:last-child {
-  border-bottom: none;
+.lesson-item:hover {
+  background: var(--hover-bg);
+  border-color: var(--primary-color);
+  transform: translateX(5px);
 }
 
 .lesson-info {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 1rem;
   flex-grow: 1;
 }
 
-.lesson-order {
-  font-weight: 700;
-  color: var(--primary-color);
-  font-size: var(--font-size-lg);
+.lesson-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.lesson-details {
+  flex-grow: 1;
 }
 
 .lesson-title {
-  font-size: var(--font-size-base);
-  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.lesson-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.lesson-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .lesson-duration {
-  font-size: var(--font-size-sm);
-  color: var(--dark-color);
-  font-weight: 500;
-  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.lesson-preview-badge {
-  background-color: var(--highlight-color);
+.preview-badge {
+  background: var(--highlight-color);
   color: white;
-  padding: 2px 8px;
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-xs);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
   font-weight: 600;
-  margin-left: 10px;
 }
 
 .lesson-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  justify-content: flex-end; /* Butonları sağa hizala */
-  width: 100%; /* Mobil için tam genişlik */
-}
-
-.play-lesson-button {
-  min-width: 120px;
-}
-.edit-lesson-button, .delete-lesson-button {
-  min-width: 80px;
-}
-
-/* Yorumlar Bölümü */
-.review-summary {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  gap: 0.5rem;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--divider-color);
 }
 
-.summary-text {
-  font-size: var(--font-size-base);
-  color: var(--accent-color);
+.play-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
   font-weight: 600;
+  transition: all var(--transition-normal);
+}
+
+.play-btn:hover {
+  background: var(--deep-blue);
+  transform: scale(1.05);
+  color: white;
+  text-decoration: none;
+}
+
+.admin-lesson-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.edit-lesson-btn,
+.delete-lesson-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.edit-lesson-btn:hover {
+  background: var(--info-color);
+  color: white;
+}
+
+.delete-lesson-btn:hover {
+  background: var(--error-color);
+  color: white;
+}
+
+.no-lessons {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* ========== REVIEWS SECTION ========== */
+.review-summary {
+  background: var(--surface-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-light);
 }
 
 .summary-rating {
-  font-size: var(--font-size-xl);
-  color: var(--highlight-color);
-  font-weight: 700;
-}
-
-.stars {
   display: flex;
-  gap: 2px;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.review-list {
+.average-score {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+.stars-large {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.stars-large .star {
+  font-size: 1.5rem;
+}
+
+.total-reviews {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* ========== REVIEW FORM ========== */
+.review-form-container {
+  background: var(--surface-bg);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-light);
+}
+
+.review-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.rating-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.rating-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+.comment-input {
+  padding: 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+.comment-input::placeholder {
+  color: var(--text-muted);
+}
+
+.char-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.submit-btn {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--deep-blue);
+  transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: var(--light-accent);
+  color: var(--accent-color);
+  padding: 0.75rem 2rem;
+  border: 1px solid var(--border-light);
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.cancel-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+/* ========== REVIEWS LIST ========== */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .review-item {
-  background-color: var(--input-bg); /* Yorum kartı arka planı */
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-sm);
+  background: var(--surface-bg);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
 }
 
-/* Kullanıcının kendi yorumu için özel stil */
-.review-item.my-review-item {
-  border: 2px solid var(--primary-color); /* Vurgulu kenarlık */
-  background-color: rgba(var(--primary-color-rgb), 0.05); /* Hafif arka plan vurgusu */
-  box-shadow: var(--shadow-md);
+.review-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 20px var(--shadow-light);
 }
 
+.review-item.user-review {
+  border-color: var(--secondary-color);
+  background: linear-gradient(135deg, var(--surface-bg) 0%, rgba(195, 173, 144, 0.1) 100%);
+}
 
 .review-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-xs);
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.reviewer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .reviewer-name {
   font-weight: 600;
-  color: var(--primary-color);
-  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.review-rating {
+  display: flex;
+  gap: 0.125rem;
+}
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .review-date {
-  font-size: var(--font-size-sm);
-  color: var(--dark-color);
-}
-
-.review-stars {
-  display: flex;
-  gap: 2px;
-  margin-left: auto; /* Sağa hizala */
-}
-
-.review-stars .star-icon {
-  font-size: var(--font-size-base);
-  color: var(--border-color); /* Boş yıldız rengi */
-}
-
-.review-stars .star-icon.filled {
-  color: var(--highlight-color); /* Dolu yıldız rengi */
-}
-
-.review-comment {
-  font-size: var(--font-size-base);
-  color: var(--text-color);
-  margin-top: var(--spacing-sm);
-  line-height: 1.5;
+  color: var(--text-muted);
+  font-size: 0.85rem;
 }
 
 .review-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-  justify-content: flex-end; /* Butonları sağa hizala */
-  margin-top: var(--spacing-md);
+  gap: 0.5rem;
 }
 
-
-.no-content-message {
-  text-align: center;
-  color: var(--text-color);
-  font-size: var(--font-size-md);
-  padding: var(--spacing-lg) 0;
+.edit-review-btn,
+.delete-review-btn {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
-.add-review-button {
-  margin-top: var(--spacing-lg);
-  width: 100%;
-  max-width: 200px;
-  margin-left: auto;
-  margin-right: auto;
-  display: block; /* Ortalamak için */
+.edit-review-btn:hover {
+  background: var(--info-color);
+  color: white;
 }
 
+.delete-review-btn:hover {
+  background: var(--error-color);
+  color: white;
+}
+
+.review-content {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.review-comment {
+  margin: 0;
+}
+
+/* ========== NO CONTENT STATES ========== */
+.no-reviews,
 .no-course-found {
   text-align: center;
-  padding: var(--spacing-xl);
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  color: var(--text-color);
-  max-width: 500px;
-  margin: var(--spacing-xxl) auto;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
 }
 
+.no-reviews i,
+.no-course-found i {
+  font-size: 4rem;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.no-reviews h3,
+.no-course-found h2 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.no-reviews p,
 .no-course-found p {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 2rem;
 }
 
-.no-course-found .action-button {
-  width: auto;
-  min-width: 180px;
-  margin-top: var(--spacing-md);
-}
-
-/* ========================================= */
-/* Duyarlı Tasarım (Responsive Design) */
-/* ========================================= */
-
-@media (min-width: 768px) {
-  .course-header-section {
-    flex-direction: row; /* Masaüstünde yatay */
-    text-align: left;
-    align-items: flex-start;
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 900px) {
+  .course-header {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1rem;
   }
 
-  .course-detail-image {
-    max-width: 300px; /* Masaüstünde resim boyutu */
-    margin-right: var(--spacing-lg);
-  }
-
-  .header-info {
-    align-items: flex-start;
-  }
-
-  .course-meta-info {
-    flex-direction: row; /* Masaüstünde yatay */
-    gap: var(--spacing-lg);
-    justify-content: flex-start;
-  }
-
-  /* Yeni metadata alanları yan yana */
-  .course-category-display,
-  .course-level-display,
-  .course-language-display,
-  .course-duration-display,
-  .course-certificate-display {
-    margin-top: 0;
-  }
-
-  .course-actions-main {
-    flex-direction: row; /* Masaüstünde yatay */
-    justify-content: space-between;
-  }
-
-  .course-actions,
-  .general-course-actions {
-    justify-content: flex-start; /* Butonları sola hizala */
-  }
-
-  .lesson-item {
-    flex-direction: row; /* Masaüstünde yatay */
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .lesson-actions {
-    width: auto; /* Genişliği içeriğe göre ayarla */
-  }
-
-  .review-header {
-    flex-wrap: nowrap;
-  }
-
-  .review-stars {
-    margin-left: var(--spacing-md); /* Yıldızları sağa hizala */
-  }
-}
-
-@media (max-width: 767px) {
-  .course-content-wrapper {
-    padding: var(--spacing-lg);
-  }
-
-  .course-detail-image {
-    height: 200px; /* Mobil için resim yüksekliği */
+  .course-hero-image {
+    height: 250px;
   }
 
   .course-title {
-    font-size: var(--font-size-xxl);
+    font-size: 2rem;
   }
 
-  .course-description-short {
-    font-size: var(--font-size-base);
-  }
-
-  .course-price {
-    font-size: var(--font-size-lg);
-  }
-
-  .section-title {
-    font-size: var(--font-size-xl);
-  }
-
-  .lesson-order {
-    font-size: var(--font-size-base);
-  }
-
-  .lesson-title {
-    font-size: var(--font-size-sm);
-  }
-
-  .play-lesson-button, .edit-lesson-button, .delete-lesson-button {
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-sm);
-  }
-
-  .review-summary {
+  .course-meta {
     flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
+    gap: 1rem;
+  }
+
+  .current-price {
+    font-size: 2rem;
+  }
+
+  .course-actions {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0 1rem 2rem;
+  }
+
+  .purchase-btn {
+    justify-content: center;
+    font-size: 1.2rem;
+    padding: 1.5rem 2rem;
+  }
+
+  .admin-actions {
+    justify-content: center;
+  }
+
+  .course-sections {
+    padding: 1rem;
+  }
+
+  .content-section {
+    padding: 1.5rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .lesson-item {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .lesson-actions {
+    justify-content: center;
+  }
+
+  .review-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .review-meta {
+    justify-content: space-between;
   }
 
   .summary-rating {
-    font-size: var(--font-size-lg);
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
   }
 
-  .review-comment {
-    font-size: var(--font-size-sm);
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .course-title {
+    font-size: 1.6rem;
   }
 
-  .add-review-button {
-    max-width: 100%;
+  .course-badges {
+    flex-direction: column;
   }
 
-  .course-meta-info {
-    flex-direction: column; /* Mobil için dikey */
-    align-items: center; /* Ortala */
+  .action-btn {
+    justify-content: center;
+    width: 100%;
   }
 
-  /* Yeni metadata alanları alt alta */
-  .course-category-display,
-  .course-level-display,
-  .course-language-display,
-  .course-duration-display,
-  .course-certificate-display {
-    width: 100%; /* Tam genişlik */
-    justify-content: center; /* Ortala */
-    margin-top: var(--spacing-sm);
+  .lesson-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
-  .review-actions {
-    justify-content: center; /* Mobil butonları ortala */
+  .lesson-number {
+    align-self: center;
+  }
+}
+
+/* ========== DARK MODE ENHANCEMENTS ========== */
+@media (prefers-color-scheme: dark) {
+  .course-detail-container {
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-muted: rgba(224, 224, 224, 0.7);
+    --card-bg: #242424;
+    --surface-bg: #1a1a1a;
+    --border-light: rgba(255, 255, 255, 0.15);
+    --shadow-light: rgba(0, 0, 0, 0.3);
+    --shadow-medium: rgba(0, 0, 0, 0.5);
+    --hover-bg: rgba(67, 97, 238, 0.1);
+  }
+
+  .course-title,
+  .reviewer-name,
+  .lesson-title {
+    color: #ffffff;
+  }
+
+  .current-price {
+    text-shadow: 0 0 20px rgba(67, 97, 238, 0.5);
+  }
+
+  .content-section,
+  .review-form-container,
+  .review-summary,
+  .review-item {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .rating-select,
+  .comment-input {
+    background: #2a2a2a;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .rating-select:focus,
+  .comment-input:focus {
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.4);
   }
 }

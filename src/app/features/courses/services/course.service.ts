@@ -289,8 +289,20 @@ export class CourseService {
     if (userId !== null && userId !== undefined) {
       params = params.set('userId', userId.toString());
     }
+    console.log(params)
 
     return this.http.get<boolean>(`${this.apiUrl}/check-course`, { params });
+  }
+  checkCourseForInstructor(userId: number | null, courseId: number): Observable<boolean> {
+    let params = new HttpParams().set('courseId', courseId.toString());
+
+    // userId parametresi opsiyonel - backend'de authentication token'dan alınacak
+    if (userId !== null && userId !== undefined) {
+      params = params.set('userId', userId.toString());
+    }
+    console.log(params)
+
+    return this.http.get<boolean>(`${this.apiUrl}/check-instructor`, { params });
   }
 
   /**
@@ -299,7 +311,7 @@ export class CourseService {
    * @param courseId Kontrol edilecek kursun ID'si
    * @returns Kullanıcının kursa erişim yetkisi olup olmadığını belirten boolean Observable
    */
-  checkCourseAccess(courseId: number): Observable<boolean> {
-    return this.checkCourseForUser(null, courseId);
+  checkCourseAccess(userId:number,courseId: number): Observable<boolean> {
+    return this.checkCourseForUser(userId, courseId);
   }
 }
