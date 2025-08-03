@@ -1,42 +1,43 @@
-import { Component, OnInit, OnDestroy, HostListener, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject, interval, Subscription, BehaviorSubject, combineLatest } from 'rxjs';
-import { takeUntil, catchError, finalize, debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
+import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
+import { takeUntil, catchError, finalize, distinctUntilChanged, tap, switchMap, debounceTime } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 // Services
 import { CourseService } from '../../services/course.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { TokenService } from '../../../../core/services/token.service';
 
 // Models
 import { CourseResponse, CourseCategory, CourseLevel } from '../../models/course.models';
-
+import { UserProfile } from '../../../auth/models/auth.models';
 
 // Components
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
-import {UserProfile} from "../../../auth/models/auth.models";
 
-// Interfaces (Slider ile ilgili olanlar kaldırıldı)
+// Interfaces
+interface FilterOptions {
+  category: CourseCategory | 'ALL';
+  sortBy: 'POPULARITY' | 'PRICE_ASC' | 'PRICE_DESC' | 'RATING' | 'NEWEST';
+  searchTerm: string;
+  minPrice?: number;
+  maxPrice?: number;
+  level?: CourseLevel | 'ALL';
+}
+
 interface ComponentState {
   isLoading: boolean;
   errorMessage: string | null;
   successMessage: string | null;
-  showCallToActionForTopSelling: boolean; // Her zaman true olacak
   isLoggedIn: boolean;
   currentUser: UserProfile | null;
+  viewMode: 'grid' | 'list';
+  showFilters: boolean;
 }
-
-// Responsive Breakpoints artık sadece CSS'te yönetiliyor veya burada kullanılmıyor.
-// interface ResponsiveBreakpoints {
-//   mobile: number;
-//   tablet: number;
-//   desktop: number;
-//   large: number;
-// }
 
 @Component({
   selector: 'app-course-list',
@@ -46,7 +47,8 @@ interface ComponentState {
     RouterLink,
     TranslateModule,
     LoadingSpinnerComponent,
-    AlertDialogComponent
+    AlertDialogComponent,
+    FormsModule
   ],
   templateUrl: './course-list.component.html',
   styleUrl: './course-list.component.css',
@@ -55,92 +57,73 @@ interface ComponentState {
 export class CourseListComponent implements OnInit, OnDestroy {
 
   // Data properties
-  // topSellingCourses: CourseResponse[] = []; // KALDIRILDI
   allCourses: CourseResponse[] = [];
-  personalizedCategory: CourseCategory | null = null; // Bu değişkenin kullanımı azalacak/değişecek
+  filteredCourses: CourseResponse[] = [];
+  categories = Object.values(CourseCategory);
+  levels = Object.values(CourseLevel);
+
+  // Filter and search
+  private filterSubject$ = new BehaviorSubject<FilterOptions>({
+    category: 'ALL',
+    sortBy: 'POPULARITY',
+    searchTerm: '',
+    level: 'ALL'
+  });
+
+  private searchSubject$ = new BehaviorSubject<string>('');
 
   // State management
   private componentState$ = new BehaviorSubject<ComponentState>({
     isLoading: true,
     errorMessage: null,
     successMessage: null,
-    showCallToActionForTopSelling: true, // Her zaman true olarak ayarlandı
     isLoggedIn: false,
-    currentUser: null
+    currentUser: null,
+    viewMode: 'grid',
+    showFilters: false
   });
 
   // Public state getters
   get isLoading(): boolean { return this.componentState$.value.isLoading; }
   get errorMessage(): string | null { return this.componentState$.value.errorMessage; }
   get successMessage(): string | null { return this.componentState$.value.successMessage; }
-  get showCallToActionForTopSelling(): boolean { return this.componentState$.value.showCallToActionForTopSelling; }
   get isLoggedIn(): boolean { return this.componentState$.value.isLoggedIn; }
   get currentUser(): UserProfile | null { return this.componentState$.value.currentUser; }
-  get currentUserId(): number | null { return this.currentUser?.id ? parseInt(String(this.currentUser.id)) : null; }
+  get viewMode(): 'grid' | 'list' { return this.componentState$.value.viewMode; }
+  get showFilters(): boolean { return this.componentState$.value.showFilters; }
 
-  // Slider configuration (Kaldırıldı)
-  // private sliderConfig$ = new BehaviorSubject<SliderConfig>(...);
-  // Public slider getters (Kaldırıldı)
-  // get currentSlide(): number { ... }
-  // get maxSlide(): number { ... }
-  // get slideWidth(): number { ... }
-  // get slidesPerView(): number { ... }
-  // get slideIndicators(): number[] { ... }
+  // Filter getters
+  get currentFilters(): FilterOptions { return this.filterSubject$.value; }
+  get searchTerm(): string { return this.searchSubject$.value; }
 
-  // Configuration constants (Breakpointler hala CSS için kullanılabilir)
-  private readonly BREAKPOINTS = { // Sadece TypeScript'te kullanılıyorsa tanımlı kalsın
-    mobile: 480,
-    tablet: 768,
-    desktop: 1024,
-    large: 1400
-  };
-
-  private readonly EXTERNAL_PURCHASE_URL = 'https://egitimmerkezi.com';
-  private readonly DEFAULT_PLACEHOLDER_IMAGE = 'assets/images/course-placeholder.jpg';
-
-  // Subscriptions (Slider ile ilgili olanlar kaldırıldı)
-  // private autoSlideSubscription?: Subscription;
-  private resizeSubscription?: Subscription; // Resize hala kullanılabilir
+  // Configuration
+  private readonly COURSES_PER_PAGE = 12;
   private destroy$ = new Subject<void>();
-
-  // Performance optimization (Kaldırıldı)
-  // private resizeSubject$ = new Subject<Event>();
 
   constructor(
       private courseService: CourseService,
       private authService: AuthService,
       private translate: TranslateService,
-      private tokenService: TokenService,
       private cdr: ChangeDetectorRef,
       @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    // this.setupResizeHandler(); // Slider kaldırıldığı için buna gerek kalmayabilir
-  }
+  ) {}
 
   ngOnInit(): void {
     this.initializeComponent();
+    this.setupFilterSubscription();
+    this.setupSearchSubscription();
   }
 
   ngOnDestroy(): void {
-    this.cleanup();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  // @HostListener('window:resize', ['$event']) (Kaldırıldı)
-  // onResize(event: Event): void { ... }
-
-  // ========== INITIALIZATION METHODS ==========
+  // ========== INITIALIZATION ==========
 
   private initializeComponent(): void {
-    this.updateState({ isLoading: true, showCallToActionForTopSelling: true }); // Her zaman CTA göster
-
+    this.updateState({ isLoading: true });
     this.setupAuthenticationListener();
-
-    // Slider kaldırıldığı için responsive slide hesaplamasına gerek kalmadı.
-    // if (isPlatformBrowser(this.platformId)) {
-    //   this.calculateResponsiveSlides();
-    // } else {
-    //   this.updateSliderConfig({ slidesPerView: 1 });
-    // }
   }
 
   private setupAuthenticationListener(): void {
@@ -154,8 +137,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
                 currentUser: user
               });
             }),
-            // Sadece satın alınan kursları yükle (TopSelling artık sadece CTA)
-            switchMap(() => this.loadPurchasedCoursesObservable())
+            switchMap(() => this.loadAllCoursesObservable())
         )
         .subscribe({
           next: () => {
@@ -163,90 +145,219 @@ export class CourseListComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
           },
           error: (error) => {
-            this.handleError('Failed to load user data or courses', error);
+            this.handleError('Failed to load courses', error);
           }
         });
   }
 
-  // private setupResizeHandler(): void { ... } // Slider kaldırıldığı için kaldırıldı
-
-  // ========== DATA LOADING METHODS ==========
-
-  // loadAllData kaldırıldı, çünkü artık sadece loadPurchasedCoursesObservable çağrılıyor
-  // private loadAllData(): Observable<void> { ... }
-
-  // loadTopSellingCoursesObservable metodunun kendisi basitleştirildi
-  private loadTopSellingCoursesObservable(): Observable<CourseResponse[]> {
-    // Top selling kursları çekme mantığı kaldırıldı, her zaman boş bir dizi dönecek
-    // Çünkü bu bölüm sadece CTA için kullanılacak.
-    this.updateState({
-      showCallToActionForTopSelling: true, // Her zaman CTA göster
-      errorMessage: null
-    });
-    // this.topSellingCourses = []; // KALDIRILDI
-    return of([]);
+  private setupFilterSubscription(): void {
+    this.filterSubject$
+        .pipe(
+            takeUntil(this.destroy$),
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        )
+        .subscribe(() => {
+          this.applyFiltersAndSort();
+          this.cdr.markForCheck();
+        });
   }
 
-  private loadPurchasedCoursesObservable(): Observable<CourseResponse[]> {
-    if (!this.isLoggedIn || !this.currentUserId) {
-      this.updateState({
-        errorMessage: null // Satın alınan kurs yoksa hata mesajı gösterme
-      });
-      this.allCourses = []; // Kullanıcı giriş yapmamışsa veya ID yoksa boş dizi
-      return of([]);
-    }
+  private setupSearchSubscription(): void {
+    this.searchSubject$
+        .pipe(
+            takeUntil(this.destroy$),
+            debounceTime(500),
+            distinctUntilChanged()
+        )
+        .subscribe(searchTerm => {
+          this.updateFilters({ searchTerm });
+        });
+  }
 
-    return this.courseService.getPurchasedCoursesByUserId(this.currentUserId).pipe(
+  // ========== DATA LOADING ==========
+
+  private loadAllCoursesObservable(): Observable<CourseResponse[]> {
+    return this.courseService.getAllPublishedCourses().pipe(
         catchError(error => {
-          console.error('Error loading purchased courses:', error);
+          console.error('Error loading courses:', error);
           this.updateState({
-            errorMessage: this.translate.instant('PURCHASED_COURSES_LOAD_ERROR')
+            errorMessage: this.translate.instant('COURSES_LOAD_ERROR')
           });
-          this.allCourses = []; // Hata durumunda boş dizi
           return of([]);
         }),
         tap(courses => {
-          this.allCourses = courses; // Satın alınan kursları ata
+          this.allCourses = courses;
+          this.applyFiltersAndSort();
         })
     );
   }
 
-  // ========== SLIDER METHODS (Kaldırıldı) ==========
-  // private initializeSlider(): void { ... }
-  // private calculateResponsiveSlides(): void { ... }
-  // private updateSliderDimensions(): void { ... }
-  // private startAutoSlide(): void { ... }
-  // private stopAutoSlide(): void { ... }
-  // nextSlide(): void { ... }
-  // previousSlide(): void { ... }
-  // goToSlide(slideIndex: number): void { ... }
-  // private restartAutoSlide(): void { ... }
-  // onSliderMouseEnter(): void { ... }
-  // onSliderMouseLeave(): void { ... }
+  // ========== FILTERING AND SORTING ==========
 
-  // ========== UTILITY METHODS ==========
+  private applyFiltersAndSort(): void {
+    let filtered = [...this.allCourses];
+    const filters = this.currentFilters;
 
-  goToExternalPurchaseSite(): void {
-    if (!isPlatformBrowser(this.platformId)) {
-      console.warn('Cannot open external site in server-side environment');
-      return;
+    // Search filter
+    if (filters.searchTerm.trim()) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(course =>
+          course.title.toLowerCase().includes(searchLower) ||
+          course.description.toLowerCase().includes(searchLower) ||
+          course.instructorName.toLowerCase().includes(searchLower)
+      );
     }
-    try {
-      window.open(this.EXTERNAL_PURCHASE_URL, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      console.error('Failed to open external purchase site:', error);
-      this.updateState({
-        errorMessage: this.translate.instant('EXTERNAL_SITE_ERROR')
-      });
+
+    // Category filter
+    if (filters.category !== 'ALL') {
+      filtered = filtered.filter(course => course.category === filters.category);
     }
+
+    // Level filter
+    if (filters.level !== 'ALL') {
+      filtered = filtered.filter(course => course.level === filters.level);
+    }
+
+    // Price filter
+    if (filters.minPrice !== undefined) {
+      filtered = filtered.filter(course => course.price >= filters.minPrice!);
+    }
+    if (filters.maxPrice !== undefined) {
+      filtered = filtered.filter(course => course.price <= filters.maxPrice!);
+    }
+
+    // Sort
+    filtered = this.sortCourses(filtered, filters.sortBy);
+
+    this.filteredCourses = filtered;
+  }
+
+  private sortCourses(courses: CourseResponse[], sortBy: FilterOptions['sortBy']): CourseResponse[] {
+    return courses.sort((a, b) => {
+      switch (sortBy) {
+        case 'POPULARITY':
+          return b.enrollmentCount - a.enrollmentCount;
+        case 'PRICE_ASC':
+          return a.price - b.price;
+        case 'PRICE_DESC':
+          return b.price - a.price;
+        case 'RATING':
+          return b.averageRating - a.averageRating;
+        case 'NEWEST':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        default:
+          return 0;
+      }
+    });
+  }
+
+  // ========== FILTER CONTROLS ==========
+
+  updateFilters(partialFilters: Partial<FilterOptions>): void {
+    const currentFilters = this.filterSubject$.value;
+    this.filterSubject$.next({ ...currentFilters, ...partialFilters });
+  }
+
+  updateSearch(searchTerm: string): void {
+    this.searchSubject$.next(searchTerm);
+  }
+
+  resetFilters(): void {
+    this.filterSubject$.next({
+      category: 'ALL',
+      sortBy: 'POPULARITY',
+      searchTerm: '',
+      level: 'ALL',
+      minPrice: undefined,
+      maxPrice: undefined
+    });
+    this.searchSubject$.next('');
+  }
+
+  toggleFilters(): void {
+    this.updateState({ showFilters: !this.showFilters });
+  }
+
+  toggleViewMode(): void {
+    const newMode = this.viewMode === 'grid' ? 'list' : 'grid';
+    this.updateState({ viewMode: newMode });
+  }
+
+  // ========== EVENT HANDLERS ==========
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.updateSearch(input?.value || '');
+  }
+
+  onSortChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.updateFilters({ sortBy: select?.value as FilterOptions['sortBy'] });
+  }
+
+  onCategoryChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.updateFilters({ category: select?.value as CourseCategory | 'ALL' });
+  }
+
+  onLevelChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.updateFilters({ level: select?.value as CourseLevel | 'ALL' });
+  }
+
+  onMinPriceInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input?.value;
+    this.updateFilters({
+      minPrice: value && value.trim() !== '' ? +value : undefined
+    });
+  }
+
+  onMaxPriceInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const value = input?.value;
+    this.updateFilters({
+      maxPrice: value && value.trim() !== '' ? +value : undefined
+    });
   }
 
   getCategoryTranslation(category: CourseCategory): string {
-    return this.translate.instant(`CATEGORY.${category.toUpperCase()}`);
+    return this.translate.instant(`CATEGORY.${category}`);
   }
 
-  getLevelTranslation(level: string): string {
-    return this.translate.instant(`LEVEL.${level.toUpperCase()}`);
+  getCategoryOptions(): Array<{value: CourseCategory | 'ALL', label: string}> {
+    return [
+      { value: 'ALL', label: this.translate.instant('ALL_CATEGORIES') },
+      ...this.categories.map(cat => ({
+        value: cat,
+        label: this.getCategoryTranslation(cat)
+      }))
+    ];
+  }
+
+  getLevelTranslation(level: CourseLevel): string {
+    return this.translate.instant(`LEVEL.${level}`);
+  }
+
+  getLevelOptions(): Array<{value: CourseLevel | 'ALL', label: string}> {
+    return [
+      { value: 'ALL', label: this.translate.instant('ALL_LEVELS') },
+      ...this.levels.map(level => ({
+        value: level,
+        label: this.getLevelTranslation(level)
+      }))
+    ];
+  }
+
+  getSortOptions(): Array<{value: FilterOptions['sortBy'], label: string}> {
+    return [
+      { value: 'POPULARITY', label: this.translate.instant('SORT_BY_POPULARITY') },
+      { value: 'PRICE_ASC', label: this.translate.instant('SORT_BY_PRICE_LOW') },
+      { value: 'PRICE_DESC', label: this.translate.instant('SORT_BY_PRICE_HIGH') },
+      { value: 'RATING', label: this.translate.instant('SORT_BY_RATING') },
+      { value: 'NEWEST', label: this.translate.instant('SORT_BY_NEWEST') }
+    ];
   }
 
   formatPrice(price: number): string {
@@ -278,29 +389,34 @@ export class CourseListComponent implements OnInit, OnDestroy {
     const mins = minutes % 60;
 
     if (hours > 0 && mins > 0) {
-      return this.translate.instant('DURATION_HOURS_MINUTES', { hours, minutes: mins });
+      return `${hours}s ${mins}dk`;
     } else if (hours > 0) {
-      return this.translate.instant('DURATION_HOURS', { hours });
+      return `${hours} saat`;
     } else {
-      return this.translate.instant('DURATION_MINUTES', { minutes: mins });
+      return `${mins} dakika`;
     }
   }
 
-  getStarArray(rating: number): boolean[] {
-    const stars: boolean[] = [];
-    const fullStars = Math.floor(Math.max(0, Math.min(5, rating)));
+  getStarArray(rating: number): Array<{filled: boolean, half: boolean}> {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
 
-    for (let i = 0; i < 5; i++) {
-      stars.push(i < fullStars);
+    for (let i = 1; i <= 5; i++) {
+      if (i <= fullStars) {
+        stars.push({filled: true, half: false});
+      } else if (i === fullStars + 1 && hasHalfStar) {
+        stars.push({filled: false, half: true});
+      } else {
+        stars.push({filled: false, half: false});
+      }
     }
+
     return stars;
   }
 
   onCourseClick(courseId: number): void {
     console.log('Course clicked:', courseId);
-
-    // Analytics tracking could be added here
-    // this.analytics.trackEvent('course_click', { courseId });
   }
 
   // ========== MESSAGE HANDLING ==========
@@ -310,13 +426,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
       errorMessage: null,
       successMessage: null
     });
-    this.cdr.markForCheck();
   }
 
-  refreshPage(): void {
+  refreshCourses(): void {
     this.updateState({ isLoading: true });
-    // loadAllData yerine sadece satın alınan kursları yükle
-    this.loadPurchasedCoursesObservable().pipe(
+    this.loadAllCoursesObservable().pipe(
         takeUntil(this.destroy$),
         finalize(() => {
           this.updateState({ isLoading: false });
@@ -329,7 +443,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
         });
       },
       error: (error) => {
-        this.handleError('Failed to refresh data', error);
+        this.handleError('Failed to refresh courses', error);
       }
     });
   }
@@ -358,47 +472,9 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  // ========== BROWSER DETECTION UTILITY ==========
+  // ========== TRACK BY FUNCTIONS ==========
 
-  private isBrowser(): boolean {
-    return isPlatformBrowser(this.platformId);
+  trackByCourseId(index: number, course: CourseResponse): number {
+    return course.id;
   }
-
-  private getScreenWidth(): number {
-    if (!this.isBrowser()) {
-      return this.BREAKPOINTS.desktop; // Default fallback for SSR
-    }
-    return window.innerWidth;
-  }
-
-  // ========== LIFECYCLE HOOKS ==========
-
-  ngAfterViewInit(): void {
-    // Slider kaldırıldığı için bu metoda gerek kalmadı
-    // if (this.isBrowser()) {
-    //   setTimeout(() => {
-    //     this.calculateResponsiveSlides();
-    //     this.updateSliderDimensions();
-    //     this.cdr.markForCheck();
-    //   });
-    // }
-  }
-
-  private cleanup(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    // this.stopAutoSlide(); // Slider kaldırıldığı için kaldırıldı
-
-    if (this.resizeSubscription) {
-      this.resizeSubscription.unsubscribe();
-    }
-  }
-
-  // ========== PERFORMANCE OPTIMIZATION (Kaldırıldı) ==========
-  // trackByCourseId(index: number, course: CourseResponse): number { ... }
-  // trackBySlideIndex(index: number): number { ... }
-
-  // ========== ACCESSIBILITY (Slider ile ilgili olanlar kaldırıldı) ==========
-  // getSlideAriaLabel(index: number): string { ... }
-  // getCourseAriaLabel(course: CourseResponse): string { ... }
 }

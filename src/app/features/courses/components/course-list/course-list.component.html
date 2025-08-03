@@ -1,6 +1,8 @@
 <div class="course-list-container">
+    <!-- Loading Spinner -->
     <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
+    <!-- Error Messages -->
     <app-alert-dialog
             *ngIf="errorMessage"
             [message]="errorMessage"
@@ -9,80 +11,267 @@
             (closed)="clearMessages()">
     </app-alert-dialog>
 
-    <section class="top-selling-section">
-        <div class="no-data-content">
-            <img src="assets/logo/Logo.png"
-                 alt="{{ 'EDUCATION_CENTER' | translate }}"
-                 class="no-data-image" />
+    <!-- Success Messages -->
+    <app-alert-dialog
+            *ngIf="successMessage"
+            [message]="successMessage"
+            type="success"
+            [autoClose]="true"
+            (closed)="clearMessages()">
+    </app-alert-dialog>
 
-            <h3 class="no-data-title">{{ 'EXPLORE_MORE_COURSES' | translate }}</h3>
-            <p class="no-data-description">
-                <ng-container *ngIf="isLoggedIn">{{ 'EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_LOGGED_IN' | translate }}</ng-container>
-                <ng-container *ngIf="!isLoggedIn">{{ 'EXPLORE_PERSONALIZED_RECOMMENDATIONS_MESSAGE_NOT_LOGGED_IN' | translate }}</ng-container>
-            </p>
-
-            <button class="action-button primary-btn large" (click)="goToExternalPurchaseSite()">
-                <i class="icon-external-link"></i>
-                {{ 'GO_TO_EDUCATION_CENTER' | translate }}
-            </button>
+    <!-- Header Section -->
+    <div class="header-section" *ngIf="!isLoading">
+        <div class="page-title-area">
+            <h1 class="page-title">{{ 'ALL_COURSES' | translate }}</h1>
+            <p class="page-subtitle">{{ 'DISCOVER_LEARN_GROW' | translate }}</p>
         </div>
-    </section>
 
-    <section class="all-courses-section" *ngIf="!isLoading && allCourses.length > 0">
-        <h2 class="section-title">{{ 'MY_PURCHASED_COURSES' | translate }}</h2>
-        <p class="section-subtitle">{{ 'BROWSE_MY_PURCHASED_COURSES_SUBTITLE' | translate }}</p>
+        <!-- Search Bar -->
+        <!-- <div class="search-section">
+           <div class="search-input-wrapper">
+               <i class="fas fa-search search-icon"></i>
+               <input
+                       type="text"
+                       class="search-input"
+                       [placeholder]="'SEARCH_COURSES' | translate"
+                       [value]="searchTerm"
+                       (input)="onSearchInput($event)"
+                       autocomplete="off">
+               <button
+                       *ngIf="searchTerm"
+                       class="clear-search-btn"
+                       (click)="updateSearch('')"
+                       [title]="'CLEAR_SEARCH' | translate">
+                   <i class="fas fa-times"></i>
+               </button>
+           </div>
+       </div> -->
 
-        <div class="course-cards-grid">
-            <div class="course-card"
-                 *ngFor="let course of allCourses"
-                 [routerLink]="['/courses', course.id]"
-                 (click)="onCourseClick(course.id)">
+        <!-- Filter and View Controls -->
+        <div class="controls-section">
+            <div class="filter-controls">
+                <button
+                        class="filter-toggle-btn"
+                        (click)="toggleFilters()"
+                        [class.active]="showFilters">
+                    <i class="fas fa-filter"></i>
+                    {{ 'FILTERS' | translate }}
+                    <span class="filter-count" *ngIf="currentFilters.category !== 'ALL' || currentFilters.level !== 'ALL'">
+            {{ (currentFilters.category !== 'ALL' ? 1 : 0) + (currentFilters.level !== 'ALL' ? 1 : 0) }}
+          </span>
+                </button>
 
-                <div class="course-image-wrapper">
-                    <img [src]="course.imageUrl"
-                         [alt]="course.title"
-                         class="course-image"
-                         onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
+                <div class="sort-controls">
+                    <label for="sortSelect" class="sort-label">{{ 'SORT_BY' | translate }}:</label>
+                    <select
+                            id="sortSelect"
+                            class="sort-select"
+                            [value]="currentFilters.sortBy"
+                            (change)="onSortChange($event)">>
+                        <option
+                                *ngFor="let option of getSortOptions()"
+                                [value]="option.value">
+                            {{ option.label }}
+                        </option>
+                    </select>
+                </div>
+            </div>
 
-                    <span class="category-badge">
-                      {{ getCategoryTranslation(course.category) }}
-                    </span>
+            <div class="view-controls">
+                <button
+                        class="view-mode-btn"
+                        [class.active]="viewMode === 'grid'"
+                        (click)="toggleViewMode()"
+                        [title]="'GRID_VIEW' | translate">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button
+                        class="view-mode-btn"
+                        [class.active]="viewMode === 'list'"
+                        (click)="toggleViewMode()"
+                        [title]="'LIST_VIEW' | translate">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Advanced Filters Panel -->
+        <div class="advanced-filters" *ngIf="showFilters" [@slideDown]>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="categorySelect" class="filter-label">{{ 'CATEGORY' | translate }}</label>
+                    <select
+                            id="categorySelect"
+                            class="filter-select"
+                            [value]="currentFilters.category"
+                            (change)="onCategoryChange($event)">>
+                        <option
+                                *ngFor="let option of getCategoryOptions()"
+                                [value]="option.value">
+                            {{ option.label }}
+                        </option>
+                    </select>
                 </div>
 
-                <div class="card-content">
-                    <h3 class="course-title">{{ course.title }}</h3>
+                <div class="filter-group">
+                    <label for="levelSelect" class="filter-label">{{ 'LEVEL' | translate }}</label>
+                    <select
+                            id="levelSelect"
+                            class="filter-select"
+                            [value]="currentFilters.level"
+                            (change)="onLevelChange($event)">>
+                        <option
+                                *ngFor="let option of getLevelOptions()"
+                                [value]="option.value">
+                            {{ option.label }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">{{ 'PRICE_RANGE' | translate }}</label>
+                    <div class="price-inputs">
+                        <input
+                                type="number"
+                                class="price-input"
+                                [placeholder]="'MIN_PRICE' | translate"
+                                [value]="currentFilters.minPrice || ''"
+                                (input)="onMinPriceInput($event)">
+                        <span class="price-separator">-</span>
+                        <input
+                                type="number"
+                                class="price-input"
+                                [placeholder]="'MAX_PRICE' | translate"
+                                [value]="currentFilters.maxPrice || ''"
+                                (input)="onMaxPriceInput($event)">>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button class="reset-filters-btn" (click)="resetFilters()">
+                        <i class="fas fa-undo"></i>
+                        {{ 'RESET_FILTERS' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="results-info">
+      <span class="results-count">
+        {{ 'SHOWING_RESULTS' | translate: { count: filteredCourses.length, total: allCourses.length } }}
+      </span>
+            <button class="refresh-btn" (click)="refreshCourses()" [disabled]="isLoading">
+                <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+                {{ 'REFRESH' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Courses Section -->
+    <div class="courses-section" *ngIf="!isLoading">
+        <!-- Courses Grid/List -->
+        <div
+                class="courses-container"
+                [class.grid-view]="viewMode === 'grid'"
+                [class.list-view]="viewMode === 'list'">
+
+            <div
+                    class="course-card"
+                    *ngFor="let course of filteredCourses; trackBy: trackByCourseId"
+                    [routerLink]="['/courses', course.id]"
+                    (click)="onCourseClick(course.id)">
+
+                <div class="course-image-wrapper">
+                    <img
+                            [src]="course.imageUrl"
+                            [alt]="course.title"
+                            class="course-image"
+                            onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
+
+                    <!-- Badges -->
+                    <div class="course-badges">
+            <span class="category-badge">
+              {{ getCategoryTranslation(course.category) }}
+            </span>
+                        <span class="level-badge" [class]="'level-' + course.level.toLowerCase()">
+              {{ getLevelTranslation(course.level) }}
+            </span>
+                    </div>
+
+                    <!-- Hover Overlay -->
+                    <div class="course-overlay">
+                        <button class="preview-btn">
+                            <i class="fas fa-play"></i>
+                            {{ 'PREVIEW' | translate }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="course-content">
+                    <div class="course-header">
+                        <h3 class="course-title">{{ course.title }}</h3>
+                        <div class="course-rating" *ngIf="course.averageRating > 0">
+                            <div class="stars">
+                <span
+                        *ngFor="let star of getStarArray(course.averageRating)"
+                        class="star"
+                        [class.filled]="star.filled"
+                        [class.half]="star.half">
+                  <i class="fas fa-star"></i>
+                </span>
+                            </div>
+                            <span class="rating-text">{{ course.averageRating | number:'1.1-1' }}</span>
+                            <span class="review-count">({{ course.totalReviews }})</span>
+                        </div>
+                    </div>
+
                     <p class="course-description">{{ course.description }}</p>
 
                     <div class="course-meta">
-                      <span class="instructor-name">
-                        <i class="icon-user"></i>
-                          {{ course.instructorName }}
-                      </span>
+                        <div class="instructor-info">
+                            <i class="fas fa-user-tie"></i>
+                            <span class="instructor-name">{{ course.instructorName }}</span>
+                        </div>
 
-                        <div class="rating-info compact" *ngIf="course.averageRating > 0">
-                            <i class="star filled"></i>
-                            <span>{{ course.averageRating | number:'1.1-1' }}</span>
+                        <div class="course-stats">
+              <span class="duration">
+                <i class="fas fa-clock"></i>
+                  {{ formatDuration(course.duration) }}
+              </span>
+                            <span class="students">
+                <i class="fas fa-users"></i>
+                                {{ course.enrollmentCount }} {{ 'STUDENTS' | translate }}
+              </span>
                         </div>
                     </div>
 
                     <div class="course-footer">
-                        <span class="course-price">{{ formatPrice(course.price) }}</span>
-                        <button class="view-details-button secondary-btn">
-                            {{ 'DETAILS' | translate }}
+                        <div class="price-section">
+                            <span class="current-price">{{ formatPrice(course.price) }}</span>
+                        </div>
+
+                        <button class="enroll-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            {{ 'ENROLL_NOW' | translate }}
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
 
-    <div *ngIf="!isLoading && allCourses.length === 0 && !errorMessage" class="empty-state">
-        <i class="icon-book-open empty-icon"></i>
-        <h3>{{ 'NO_PURCHASED_COURSES_FOUND' | translate }}</h3>
-        <p>{{ 'NO_PURCHASED_COURSES_FOUND' | translate }}</p>
-        <button class="action-button secondary-btn" (click)="refreshPage()">
-            <i class="icon-refresh"></i>
-            {{ 'REFRESH' | translate }}
-        </button>
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="filteredCourses.length === 0 && !isLoading">
+            <div class="empty-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>{{ 'NO_COURSES_FOUND' | translate }}</h3>
+            <p>{{ 'NO_COURSES_FOUND_MESSAGE' | translate }}</p>
+            <button class="reset-filters-btn" (click)="resetFilters()">
+                <i class="fas fa-undo"></i>
+                {{ 'CLEAR_ALL_FILTERS' | translate }}
+            </button>
+        </div>
     </div>
 </div>

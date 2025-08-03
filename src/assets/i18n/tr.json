@@ -449,7 +449,31 @@
   "HOME_SHARE": "Paylaş",
   "HOME_COURSE_CONTENT": "Kurs İçeriği",
   "HOME_REVIEWS": "Değerlendirmeler",
-  "HOME_INSTRUCTOR_INFO": "Eğitmen Bilgileri"
+  "HOME_INSTRUCTOR_INFO": "Eğitmen Bilgileri",
+
+
+
+  "ALL_COURSES": "Tüm Kurslar",
+  "DISCOVER_LEARN_GROW": "Keşfet, Öğren, Geliş",
+  "SEARCH_COURSES": "Kurs ara...",
+  "FILTERS": "Filtreler",
+  "SORT_BY": "Sırala",
+  "SORT_BY_POPULARITY": "Popülerlik",
+  "SORT_BY_PRICE_LOW": "Fiyat (Düşük-Yüksek)",
+  "SORT_BY_PRICE_HIGH": "Fiyat (Yüksek-Düşük)",
+  "SORT_BY_RATING": "Puan",
+  "SORT_BY_NEWEST": "En Yeni",
+  "ALL_CATEGORIES": "Tüm Kategoriler",
+  "ALL_LEVELS": "Tüm Seviyeler",
+  "PRICE_RANGE": "Fiyat Aralığı",
+  "MIN_PRICE": "Min fiyat",
+  "MAX_PRICE": "Max fiyat",
+  "RESET_FILTERS": "Filtreleri Temizle",
+  "SHOWING_RESULTS": "{{count}}/{{total}} kurs gösteriliyor",
+  "NO_COURSES_FOUND": "Kurs bulunamadı",
+  "ENROLL_NOW": "Hemen Kaydol",
+  "PREVIEW": "Önizle",
+  "STUDENTS": "öğrenci"
 
 
 
