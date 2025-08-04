@@ -10,6 +10,7 @@ export interface CourseResponse {
   description: string;         // Eğitimin kısa açıklaması
   imageUrl:'assets/logo/Logo.png';
   instructorName: string;      // Eğitmenin adı ve soyadı
+  instructorId: number;
   price: number;               // Eğitimin fiyatı
   published: boolean;          // Eğitimin yayınlanıp yayınlanmadığı
   createdAt: string;           // Eğitimin oluşturulma tarihi (ISO 8601 string formatında)
@@ -39,6 +40,7 @@ export interface CourseDetailsResponse {
   description: string;         // Eğitimin detaylı açıklaması
   imageUrl: string;            // Eğitimin kapak görselinin URL'si
   instructorName: string;      // Eğitmenin adı ve soyadı
+  instructorId: number;
   price: number;               // Eğitimin fiyatı
   published: boolean;          // Eğitimin yayınlanıp yayınlanmadığı
   createdAt: string;           // Eğitimin oluşturulma tarihi (ISO 8601 string formatında)

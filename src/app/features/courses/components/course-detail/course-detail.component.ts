@@ -220,6 +220,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
           }
         });
+
   }
 
   private processUserReview(): void {
@@ -753,6 +754,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   goToInsProfile() {
-
+   this.router.navigate(['/instructor', this.course?.instructorId]);
   }
 }

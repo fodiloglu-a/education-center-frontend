@@ -1,0 +1,153 @@
+<div class="instructor-profile-container">
+    <!-- Yükleme Spinner -->
+    <div *ngIf="loading" class="loading-container">
+        <!-- Özel spinner component'iniz buraya gelecek -->
+        <p>{{ 'INSTRUCTOR_PROFILE.LOADING' | translate }}</p>
+    </div>
+
+    <!-- Hata Durumu -->
+    <div *ngIf="error && !loading" class="error-container">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>{{ 'INSTRUCTOR_PROFILE.ERROR_TITLE' | translate }}</h3>
+        <p>{{ 'INSTRUCTOR_PROFILE.ERROR_MESSAGE' | translate }}</p>
+        <button class="action-button primary-btn" (click)="loadInstructorProfile()">
+            <i class="fas fa-redo"></i>
+            {{ 'INSTRUCTOR_PROFILE.RETRY_BUTTON' | translate }}
+        </button>
+    </div>
+
+    <!-- Profil İçeriği -->
+    <div *ngIf="instructorProfile && !loading && !error" class="profile-content">
+        <section class="profile-header-section">
+            <div class="profile-image-wrapper">
+                <img [src]="instructorProfile.profileImageUrl || 'https://placehold.co/150x150/C3AD90/3D2010?text=Avatar'"
+                     [alt]="instructorProfile.firstName + ' ' + instructorProfile.lastName"
+                     class="profile-image"/>
+                <div class="verification-badge" *ngIf="instructorProfile.isVerified">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+
+            <div class="profile-info-content">
+                <div class="name-area">
+                    <h1>{{ instructorProfile.firstName }} {{ instructorProfile.lastName }}</h1>
+                    <span class="featured-badge" *ngIf="instructorProfile.isFeatured">
+                        <i class="fas fa-star"></i>
+                        {{ 'INSTRUCTOR_PROFILE.FEATURED_INSTRUCTOR' | translate }}
+                    </span>
+                </div>
+
+                <div class="job-info" *ngIf="instructorProfile.jobTitle">
+                    <h3>{{ instructorProfile.jobTitle }} <span *ngIf="instructorProfile.company"> {{ instructorProfile.company }}</span></h3>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item" *ngIf="instructorProfile.totalStudents">
+                        <i class="fas fa-users"></i>
+                        <span>{{ instructorProfile.totalStudents }} {{ 'INSTRUCTOR_PROFILE.STUDENTS' | translate }}</span>
+                    </div>
+                    <div class="stat-item" *ngIf="instructorProfile.totalCourses">
+                        <i class="fas fa-book-open"></i>
+                        <span>{{ instructorProfile.totalCourses }} {{ 'INSTRUCTOR_PROFILE.COURSES' | translate }}</span>
+                    </div>
+                    <div class="stat-item" *ngIf="instructorProfile.averageRating">
+                        <i class="fas fa-star"></i>
+                        <span>{{ instructorProfile.averageRating | number:'1.1-1' }}/5 ({{ instructorProfile.totalReviews }} {{ 'INSTRUCTOR_PROFILE.REVIEWS' | translate }})</span>
+                    </div>
+                    <div class="stat-item" *ngIf="instructorProfile.yearsOfExperience">
+                        <i class="fas fa-award"></i>
+                        <span>{{ instructorProfile.yearsOfExperience }} {{ 'INSTRUCTOR_PROFILE.YEARS_EXPERIENCE' | translate }}</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons-row">
+                    <button class="action-button primary-btn" (click)="sendEmail()">
+                        <i class="fas fa-envelope"></i>
+                        {{ 'INSTRUCTOR_PROFILE.CONTACT' | translate }}
+                    </button>
+                    <button class="action-button secondary-btn" (click)="goBack()">
+                        <i class="fas fa-arrow-left"></i>
+                        {{ 'INSTRUCTOR_PROFILE.BACK' | translate }}
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profil Detayları -->
+        <div class="profile-details-sections">
+            <section class="section-card" *ngIf="instructorProfile.bio">
+                <h2 class="section-title">{{ 'INSTRUCTOR_PROFILE.ABOUT' | translate }}</h2>
+                <div class="section-content">
+                    <p class="bio-text">{{ instructorProfile.bio }}</p>
+                </div>
+            </section>
+
+            <section class="section-card" *ngIf="instructorProfile.specializations && instructorProfile.specializations.length > 0">
+                <h2 class="section-title">{{ 'INSTRUCTOR_PROFILE.SPECIALIZATIONS' | translate }}</h2>
+                <div class="section-content tags-list">
+                    <span class="tag-item" *ngFor="let specialization of instructorProfile.specializations">
+                        {{ specialization }}
+                    </span>
+                </div>
+            </section>
+
+            <section class="section-card" *ngIf="instructorProfile.certifications && instructorProfile.certifications.length > 0">
+                <h2 class="section-title">{{ 'INSTRUCTOR_PROFILE.CERTIFICATIONS' | translate }}</h2>
+                <div class="section-content tags-list">
+                    <span class="tag-item" *ngFor="let certification of instructorProfile.certifications">
+                        <i class="fas fa-certificate"></i>
+                        {{ certification }}
+                    </span>
+                </div>
+            </section>
+
+            <section class="section-card contact-section">
+                <h2 class="section-title">{{ 'INSTRUCTOR_PROFILE.CONTACT_INFO' | translate }}</h2>
+                <div class="contact-grid">
+                    <div class="contact-item" *ngIf="instructorProfile.email">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ instructorProfile.email }}</span>
+                    </div>
+                    <div class="contact-item" *ngIf="instructorProfile.phoneNumber">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ instructorProfile.phoneNumber }}</span>
+                    </div>
+                    <div class="contact-item" *ngIf="instructorProfile.linkedinUrl">
+                        <i class="fab fa-linkedin"></i>
+                        <a [href]="instructorProfile.linkedinUrl" target="_blank">{{ 'INSTRUCTOR_PROFILE.LINKEDIN' | translate }}</a>
+                    </div>
+                    <div class="contact-item" *ngIf="instructorProfile.websiteUrl">
+                        <i class="fas fa-globe"></i>
+                        <a [href]="instructorProfile.websiteUrl" target="_blank">{{ 'INSTRUCTOR_PROFILE.WEBSITE' | translate }}</a>
+                    </div>
+                    <div class="social-links-wrapper" *ngIf="instructorProfile.socialLinks && instructorProfile.socialLinks.length > 0">
+                        <a *ngFor="let link of instructorProfile.socialLinks" [href]="link" target="_blank" rel="noopener noreferrer" class="social-link">
+                            <i class="fas fa-link"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card" *ngIf="instructorProfile.taughtCourses && instructorProfile.taughtCourses.length > 0">
+                <h2 class="section-title">{{ 'INSTRUCTOR_PROFILE.TAUGHT_COURSES' | translate }}</h2>
+                <div class="courses-grid">
+                    <div class="course-card" *ngFor="let course of taughtCourses" [routerLink]="['/courses', course.id]">
+                        <img [src]="course.imageUrl" [alt]="course.title" class="course-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/C3AD90/3D2010?text=Course+Image';" />
+                        <div class="card-content">
+                            <h4 class="course-title">{{ course.title }}</h4>
+                            <div class="course-meta">
+                                <div class="rating-info">
+                                    <div class="star-rating">
+                                        <i *ngFor="let star of getStarArray(course.averageRating)" class="fas fa-star" [class.filled]="star"></i>
+                                    </div>
+                                    <span class="rating-text">{{ course.averageRating | number:'1.1-1' }}</span>
+                                </div>
+                                <span class="course-price">{{ formatPrice(course.price) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

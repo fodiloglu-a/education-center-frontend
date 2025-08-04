@@ -1,30 +1,61 @@
 // instructor.models.ts
 
-import { CourseResponse } from '../../courses/models/course.models'; // CourseResponse modelini import ediyoruz
-import { ReviewResponse } from '../../reviews/models/review.models'; // ReviewResponse modelini import ediyoruz
+import { CourseResponse } from '../../courses/models/course.models';
+import { ReviewResponse } from '../../reviews/models/review.models';
 
-// Eğitmen paneli için genel istatistikleri içeren arayüz.
-// Bu, eğitmen gösterge panosunda özet bilgiler göstermek için kullanılabilir.
+// API'den dönen eğitmen profil verilerine karşılık gelen DTO
+export interface InstructorProfileDTO {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  bio: string | null;
+  profileImageUrl: string | null;
+  phoneNumber: string | null;
+  linkedinUrl: string | null;
+  websiteUrl: string | null;
+  jobTitle: string | null;
+  company: string | null;
+  yearsOfExperience: number | null;
+  specializations: string[];
+  certifications: string[];
+  educationLevel: string | null;
+  university: string | null;
+  graduationYear: number | null;
+  totalStudents: number;
+  averageRating: number;
+  totalCourses: number;
+  totalReviews: number;
+  socialLinks: string[];
+  taughtCourses: CourseResponse[]; // Eğitmen tarafından verilen kursların listesi
+  isFeatured: boolean;
+  isVerified: boolean;
+  hourlyRate: number | null;
+  teachingLanguage: string | null;
+  responseTimeHours: number | null;
+  studentCompletionRate: number | null;
+  lastActiveDate: string | null;
+  mediaFiles: string[];
+}
+
+// Eğitmen paneli için diğer modeller
 export interface InstructorDashboardStats {
-  totalCourses: number;         // Eğitmenin toplam kurs sayısı
-  totalStudents: number;        // Eğitmenin kurslarına kayıtlı toplam öğrenci sayısı
-  averageRating: number;        // Eğitmenin kurslarının ortalama puanı
-  totalReviews: number;         // Eğitmenin kurslarına yapılan toplam yorum sayısı
-  // İleride eklenebilecek diğer istatistikler (örn. toplam kazanç, tamamlanma oranları)
+  totalCourses: number;
+  totalStudents: number;
+  averageRating: number;
+  totalReviews: number;
 }
 
-// Eğitmenin kendi kurslarını yönetirken kullanacağı detaylı kurs bilgileri arayüzü.
-// CourseResponse'a ek olarak, eğitmene özel ek bilgiler içerebilir.
 export interface InstructorCourseResponse extends CourseResponse {
-  totalLessons: number;         // Kurstaki toplam ders sayısı
-  totalEnrollments: number;     // Kursa kayıtlı öğrenci sayısı
-  courseAverageRating: number;  // Kursun ortalama puanı
-  // İleride eklenebilecek diğer kursa özel istatistikler
+  totalLessons: number;
+  totalEnrollments: number;
+  courseAverageRating: number;
 }
 
-// Eğitmenin kendi kurslarına yapılan yorumları görüntülerken kullanacağı arayüz.
-// ReviewResponse'a ek olarak, yoruma ait kurs bilgisi gibi ek bilgiler içerebilir.
 export interface InstructorReviewResponse extends ReviewResponse {
-  // ReviewResponse zaten courseId ve courseTitle içeriyor, bu yeterli olabilir.
-  // Eğer yoruma özel ek eğitmen bilgisi gerekiyorsa buraya eklenebilir.
+  // ReviewResponse yeterli olduğu için ek alan yok
 }

@@ -3,6 +3,8 @@
 // Backend'deki UserResponse DTO'suna karşılık gelen arayüz.
 // Kullanıcının profil bilgilerini frontend'e güvenli bir şekilde göndermek için kullanılır.
 // Hassas bilgiler (örn. şifre) içermez.
+import {CourseResponse} from "../../courses/models/course.models";
+
 export interface UserResponse {
   id: number;          // Kullanıcı ID'si
   email: string;     // Kullanıcı e-posta adresi
@@ -68,6 +70,7 @@ export interface InstructorProfileDTO {
 
   // Sosyal Medya Linkleri
   socialLinks?: string[];
+  taughtCourses?: CourseResponse[];
 
   // Eğitmen Durumu
   isFeatured?: boolean;

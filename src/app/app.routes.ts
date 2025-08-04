@@ -4,6 +4,9 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
 import {HomeComponent} from "./features/home/components/home/home.component";
+import {
+  InstructorProfileComponent
+} from "./features/home/features/instructor/instructor-profile/instructor-profile.component";
 
 
 // Uygulamanın ana yönlendirme tanımları.
@@ -15,6 +18,11 @@ export const routes: Routes = [
   {
     path: 'home', // 'home' yolunu da home component'e yönlendirebilirsiniz
     component: HomeComponent,
+  },
+  {
+    path: 'instructor/:id',
+    component: InstructorProfileComponent,
+    title: 'Eğitmen Profili'
   },
   {
     path: 'auth',
