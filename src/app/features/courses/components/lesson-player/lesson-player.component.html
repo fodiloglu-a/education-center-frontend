@@ -1,90 +1,340 @@
 <div class="lesson-player-container">
-    <app-loading-spinner *ngIf="isLoading || isSavingNote"></app-loading-spinner>
+    <!-- Loading Spinner -->
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Error Messages -->
+    <app-alert-dialog
+            *ngIf="errorMessage"
+            [message]="errorMessage"
+            type="error"
+            [autoClose]="true"
+            (closed)="clearMessages()">
+    </app-alert-dialog>
 
-    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Success Messages -->
+    <app-alert-dialog
+            *ngIf="successMessage"
+            [message]="successMessage"
+            type="success"
+            [autoClose]="true"
+            (closed)="clearMessages()">
+    </app-alert-dialog>
 
+    <!-- Main Content -->
     <div class="lesson-player-content" *ngIf="!isLoading && course && currentLesson">
-        <h1 class="lesson-title">{{ currentLesson.title }}</h1>
-        <p class="course-title-link">
-            <a [routerLink]="['/courses', course.id]">{{ course.title }}</a>
-        </p>
 
-        <div class="video-player-wrapper">
-            <ng-container *ngIf="videoUrl">
-                <iframe [src]="videoUrl" frameborder="0" allowfullscreen class="video-iframe"></iframe>
-            </ng-container>
-            <div *ngIf="!videoUrl" class="no-video-message">
-                <p>{{ 'NO_VIDEO_AVAILABLE' | translate }}</p>
+        <!-- Course Header -->
+        <div class="course-header">
+            <div class="course-breadcrumb">
+                <a [routerLink]="['/courses']" class="breadcrumb-link">
+                    <i class="fas fa-arrow-left"></i>
+                    {{ 'ALL_COURSES' | translate }}
+                </a>
+                <span class="breadcrumb-separator">></span>
+                <a [routerLink]="['/courses', course.id]" class="breadcrumb-link course-link">
+                    {{ course.title }}
+                </a>
+            </div>
+
+            <!-- Instructor Actions -->
+            <div class="instructor-actions" *ngIf="isCourseOwner">
+                <button class="action-btn edit-lesson-btn" (click)="editCurrentLesson()" [title]="'EDIT_LESSON' | translate">
+                    <i class="fas fa-edit"></i>
+                    <span class="btn-text">{{ 'EDIT_LESSON' | translate }}</span>
+                </button>
+                <button class="action-btn edit-course-btn" (click)="editCourse()" [title]="'EDIT_COURSE' | translate">
+                    <i class="fas fa-cog"></i>
+                    <span class="btn-text">{{ 'EDIT_COURSE' | translate }}</span>
+                </button>
             </div>
         </div>
 
-        <div class="lesson-details-and-navigation">
-            <div class="lesson-description-card">
-                <h2 class="card-title">{{ 'DESCRIPTION' | translate }}</h2>
-                <p class="lesson-description">{{ currentLesson.description }}</p>
-                <div class="lesson-resources" *ngIf="currentLesson.resources && currentLesson.resources.length > 0">
-                    <h3 class="resources-title">{{ 'LESSON_RESOURCES' | translate }}</h3>
-                    <ul class="resources-list">
-                        <li *ngFor="let resource of currentLesson.resources">
-                            <a [href]="resource" target="_blank">{{ resource }}</a>
-                        </li>
-                    </ul>
+        <!-- Lesson Title -->
+        <div class="lesson-header">
+            <h1 class="lesson-title">{{ currentLesson.title }}</h1>
+            <div class="lesson-meta">
+                <span class="lesson-order">{{ 'LESSON' | translate }} {{ currentLesson.lessonOrder }}</span>
+                <span *ngIf="currentLesson.duration > 0" class="lesson-duration">
+                    <i class="fas fa-clock"></i>
+                    {{ formatDuration(currentLesson.duration) }}
+                </span>
+                <span *ngIf="currentLesson.isPreview" class="preview-badge">
+                    <i class="fas fa-eye"></i>
+                    {{ 'PREVIEW' | translate }}
+                </span>
+                <span *ngIf="!canAccessLesson(currentLesson)" class="locked-badge">
+                    <i class="fas fa-lock"></i>
+                    {{ 'LOCKED' | translate }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Video Player Section -->
+        <div class="video-section">
+            <!-- Accessible Video -->
+            <div class="video-player-wrapper" *ngIf="isCurrentLessonAccessible()">
+                <ng-container *ngIf="videoUrl">
+                    <iframe [src]="videoUrl" frameborder="0" allowfullscreen class="video-iframe"></iframe>
+                </ng-container>
+                <div *ngIf="!videoUrl" class="no-video-message">
+                    <i class="fas fa-video-slash"></i>
+                    <p>{{ 'NO_VIDEO_AVAILABLE' | translate }}</p>
                 </div>
             </div>
 
-            <div class="lesson-navigation-card">
-                <h2 class="card-title">{{ 'COURSE_LESSONS' | translate }}</h2>
-                <ul class="lesson-list">
-                    <li *ngFor="let lesson of course.lessons"
-                        [class.active-lesson]="lesson.id === currentLesson.id"
-                        (click)="goToLesson(lesson)">
-                        <span class="lesson-order">{{ lesson.lessonOrder }}.</span>
-                        <span class="lesson-nav-title">{{ lesson.title }}</span>
-                        <span class="material-icons play-icon" *ngIf="lesson.id === currentLesson.id">play_circle_filled</span>
-                    </li>
-                </ul>
-                <div class="lesson-player-actions">
-                    <button class="action-button secondary-btn"
+            <!-- Locked Video -->
+            <div class="locked-video-wrapper" *ngIf="!isCurrentLessonAccessible()">
+                <div class="locked-video-overlay">
+                    <div class="lock-content">
+                        <i class="fas fa-lock lock-icon"></i>
+                        <h3>{{ 'LESSON_LOCKED' | translate }}</h3>
+                        <p>{{ 'PURCHASE_COURSE_TO_ACCESS' | translate }}</p>
+                        <button class="action-btn purchase-btn" (click)="goToCourse()">
+                            <i class="fas fa-shopping-cart"></i>
+                            {{ 'VIEW_COURSE' | translate }}
+                        </button>
+                    </div>
+                </div>
+                <!-- Blurred background video preview -->
+                <div class="video-preview-blur">
+                    <div class="blur-overlay"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+
+            <!-- Left Column: Lesson Details -->
+            <div class="lesson-details-column">
+
+                <!-- Lesson Description -->
+                <div class="lesson-description-card">
+                    <h2 class="card-title">
+                        <i class="fas fa-info-circle"></i>
+                        {{ 'DESCRIPTION' | translate }}
+                    </h2>
+                    <div class="lesson-description" [innerHTML]="currentLesson.description"></div>
+
+                    <!-- Lesson Resources -->
+                    <div class="lesson-resources" *ngIf="currentLesson.resources && currentLesson.resources.length > 0 && isCurrentLessonAccessible()">
+                        <h3 class="resources-title">
+                            <i class="fas fa-paperclip"></i>
+                            {{ 'LESSON_RESOURCES' | translate }}
+                        </h3>
+                        <ul class="resources-list">
+                            <li *ngFor="let resource of currentLesson.resources">
+                                <a [href]="resource" target="_blank" rel="noopener noreferrer" class="resource-link">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    {{ resource }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Locked Resources -->
+                    <div class="locked-resources" *ngIf="currentLesson.resources && currentLesson.resources.length > 0 && !isCurrentLessonAccessible()">
+                        <h3 class="resources-title">
+                            <i class="fas fa-lock"></i>
+                            {{ 'LESSON_RESOURCES' | translate }}
+                        </h3>
+                        <div class="locked-resources-message">
+                            <p>{{ currentLesson.resources.length }} {{ 'RESOURCES_AVAILABLE' | translate }}</p>
+                            <p class="unlock-message">{{ 'PURCHASE_TO_ACCESS_RESOURCES' | translate }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Notes Section -->
+                <div class="user-notes-section" *ngIf="isLoggedIn && isCurrentLessonAccessible()">
+                    <h2 class="section-title">
+                        <i class="fas fa-sticky-note"></i>
+                        {{ 'YOUR_NOTES' | translate }}
+                    </h2>
+                    <div class="note-form">
+                        <textarea
+                                [formControl]="noteContentControl"
+                                rows="6"
+                                class="note-textarea"
+                                [placeholder]="'NOTE_PLACEHOLDER' | translate">
+                        </textarea>
+                        <div class="note-actions">
+                            <button
+                                    class="action-btn save-note-btn"
+                                    (click)="saveNote()"
+                                    [disabled]="isSavingNote || !noteContentControl.value?.trim()">
+                                <i class="fas fa-save" *ngIf="!isSavingNote"></i>
+                                <i class="fas fa-spinner fa-spin" *ngIf="isSavingNote"></i>
+                                <span>{{ currentNote ? ('UPDATE_NOTE' | translate) : ('ADD_NOTE' | translate) }}</span>
+                            </button>
+                            <button
+                                    *ngIf="currentNote"
+                                    class="action-btn delete-note-btn"
+                                    (click)="deleteNote()"
+                                    [disabled]="isSavingNote">
+                                <i class="fas fa-trash"></i>
+                                <span>{{ 'DELETE_NOTE' | translate }}</span>
+                            </button>
+                        </div>
+                        <div *ngIf="currentNote" class="note-timestamp">
+                            <i class="fas fa-clock"></i>
+                            <span *ngIf="currentNote.updatedAt">
+                                {{ 'LAST_UPDATED' | translate }}: {{ currentNote.updatedAt | date:'short' }}
+                            </span>
+                            <span *ngIf="!currentNote.updatedAt">
+                                {{ 'CREATED_AT' | translate }}: {{ currentNote.createdAt | date:'short' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login Required for Notes -->
+                <div class="login-required-notes" *ngIf="!isLoggedIn && isCurrentLessonAccessible()">
+                    <div class="login-prompt">
+                        <i class="fas fa-user-lock"></i>
+                        <h3>{{ 'LOGIN_TO_TAKE_NOTES' | translate }}</h3>
+                        <p>{{ 'NOTES_LOGIN_DESCRIPTION' | translate }}</p>
+                        <a routerLink="/login" class="action-btn login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            {{ 'LOGIN' | translate }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Course Navigation -->
+            <div class="lesson-navigation-column">
+
+                <!-- Navigation Controls -->
+                <div class="navigation-controls">
+                    <button
+                            class="nav-btn prev-btn"
                             (click)="goToPreviousLesson()"
                             [disabled]="isPreviousButtonDisabled()">
-                        <span class="material-icons">skip_previous</span>
-                        {{ 'PREVIOUS_LESSON' | translate }}
+                        <i class="fas fa-chevron-left"></i>
+                        <span>{{ 'PREVIOUS' | translate }}</span>
                     </button>
 
-                    <button class="action-button primary-btn"
+                    <button
+                            class="nav-btn next-btn"
                             (click)="goToNextLesson()"
                             [disabled]="isNextButtonDisabled()">
-                        {{ 'NEXT_LESSON' | translate }}
-                        <span class="material-icons">skip_next</span>
+                        <span>{{ 'NEXT' | translate }}</span>
+                        <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
-            </div>
-        </div>
 
-        <div class="section-card user-notes-section" *ngIf="isLoggedIn">
-            <h2 class="section-title">{{ 'YOUR_NOTES' | translate }}</h2>
-            <textarea [formControl]="noteContentControl" rows="8" class="note-textarea"
-                      placeholder="{{ 'NOTE_PLACEHOLDER' | translate }}"></textarea>
-            <div class="note-actions">
-                <button class="action-button primary-btn save-note-button" (click)="saveNote()" [disabled]="isSavingNote || !noteContentControl.value?.trim()">
-                    <ng-container *ngIf="currentNote">{{ 'UPDATE_NOTE' | translate }}</ng-container>
-                    <ng-container *ngIf="!currentNote">{{ 'ADD_NOTE' | translate }}</ng-container>
-                </button>
-                <button *ngIf="currentNote" class="action-button danger-btn delete-note-button" (click)="deleteNote()" [disabled]="isSavingNote">
-                    {{ 'DELETE_NOTE' | translate }}
-                </button>
+                <!-- Lessons List -->
+                <div class="lessons-navigation-card">
+                    <div class="lessons-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-list"></i>
+                            {{ 'COURSE_LESSONS' | translate }}
+                        </h2>
+                        <div class="lessons-stats">
+                            <span class="accessible-count">{{ getAccessibleLessons().length }}</span>
+                            <span class="separator">/</span>
+                            <span class="total-count">{{ course.lessons.length }}</span>
+                            <span class="stats-label">{{ 'ACCESSIBLE' | translate }}</span>
+                        </div>
+                    </div>
+
+                    <div class="lessons-list-container">
+                        <ul class="lessons-list">
+                            <li
+                                    *ngFor="let lesson of course.lessons; trackBy: trackByLessonId"
+                                    class="lesson-item"
+                                    [class.active-lesson]="isCurrentLesson(lesson)"
+                                    [class.accessible]="canAccessLesson(lesson)"
+                                    [class.locked]="!canAccessLesson(lesson)"
+                                    [class.preview]="lesson.isPreview"
+                                    (click)="goToLesson(lesson)">
+
+                                <div class="lesson-number">{{ lesson.lessonOrder }}</div>
+
+                                <div class="lesson-info">
+                                    <h4 class="lesson-nav-title">{{ lesson.title }}</h4>
+                                    <div class="lesson-nav-meta">
+                                        <span *ngIf="lesson.duration > 0" class="duration">
+                                            <i class="fas fa-clock"></i>
+                                            {{ formatDuration(lesson.duration) }}
+                                        </span>
+                                        <span *ngIf="lesson.isPreview" class="preview-tag">
+                                            <i class="fas fa-eye"></i>
+                                            {{ 'PREVIEW' | translate }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="lesson-status">
+                                    <i *ngIf="isCurrentLesson(lesson)" class="fas fa-play-circle current-icon"></i>
+                                    <i *ngIf="!canAccessLesson(lesson)" class="fas fa-lock lock-icon"></i>
+                                    <i *ngIf="canAccessLesson(lesson) && !isCurrentLesson(lesson)" class="fas fa-chevron-right access-icon"></i>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Course Progress -->
+                    <div class="course-progress" *ngIf="needsToPurchaseCourse()">
+                        <div class="progress-info">
+                            <h3>{{ 'UNLOCK_FULL_COURSE' | translate }}</h3>
+                            <p>{{ getLockedLessonsCount() }} {{ 'LESSONS_LOCKED' | translate }}</p>
+                            <button class="action-btn unlock-btn" (click)="goToCourse()">
+                                <i class="fas fa-unlock"></i>
+                                {{ 'PURCHASE_COURSE' | translate }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Course Completed -->
+                    <div class="course-completed" *ngIf="!needsToPurchaseCourse() && isCurrentLesson(course.lessons[course.lessons.length - 1])">
+                        <div class="completion-info">
+                            <i class="fas fa-trophy"></i>
+                            <h3>{{ 'CONGRATULATIONS' | translate }}</h3>
+                            <p>{{ 'COURSE_COMPLETED_MESSAGE' | translate }}</p>
+                            <button class="action-btn certificate-btn" (click)="goToCourse()">
+                                <i class="fas fa-certificate"></i>
+                                {{ 'VIEW_CERTIFICATE' | translate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <p *ngIf="currentNote" class="note-timestamp">
-                <ng-container *ngIf="currentNote.updatedAt">{{ 'LAST_UPDATED' | translate }}: {{ currentNote.updatedAt | date:'short' }}</ng-container>
-                <ng-container *ngIf="!currentNote.updatedAt">{{ 'CREATED_AT' | translate }}: {{ currentNote.createdAt | date:'short' }}</ng-container>
-            </p>
         </div>
     </div>
 
+    <!-- No Content Found / Error State -->
     <div *ngIf="!isLoading && (!course || !currentLesson) && !errorMessage" class="no-content-found">
-        <p>{{ 'LESSON_NOT_LOADED' | translate }}</p>
-        <button class="action-button primary-btn" (click)="loadCourseAndLessonDetails(courseId || 0, lessonId || 0)">{{ 'RETRY_LOAD_LESSON' | translate }}</button>
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>{{ 'LESSON_NOT_LOADED' | translate }}</h2>
+            <p>{{ 'LESSON_LOAD_ERROR_DESCRIPTION' | translate }}</p>
+            <button class="action-btn retry-btn" (click)="retryLoadLesson()">
+                <i class="fas fa-redo"></i>
+                {{ 'RETRY_LOAD_LESSON' | translate }}
+            </button>
+            <a routerLink="/courses" class="action-btn secondary-btn">
+                <i class="fas fa-arrow-left"></i>
+                {{ 'BACK_TO_COURSES' | translate }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Access Denied State -->
+    <div *ngIf="!isLoading && course && currentLesson && !isCurrentLessonAccessible() && !currentLesson.isPreview" class="access-denied">
+        <div class="access-denied-content">
+            <i class="fas fa-lock"></i>
+            <h2>{{ 'ACCESS_DENIED' | translate }}</h2>
+            <p>{{ 'LESSON_ACCESS_DENIED_MESSAGE' | translate }}</p>
+            <button class="action-btn purchase-btn" (click)="goToCourse()">
+                <i class="fas fa-shopping-cart"></i>
+                {{ 'PURCHASE_COURSE' | translate }}
+            </button>
+            <a routerLink="/courses" class="action-btn secondary-btn">
+                <i class="fas fa-arrow-left"></i>
+                {{ 'BROWSE_COURSES' | translate }}
+            </a>
+        </div>
     </div>
 </div>

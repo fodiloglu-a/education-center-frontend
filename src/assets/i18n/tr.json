@@ -581,8 +581,8 @@
   "LEVEL.ALL_LEVELS": "Tüm Seviyeler",
   "YOU_ARE_COURSE_OWNER": "Bu kursun sahibisiniz",
 
-  "UNAUTHORIZED_ACTION": "Bu işlemi gerçekleştirme yetkiniz yok"
-
-
-
+  "UNAUTHORIZED_ACTION": "Bu işlemi gerçekleştirme yetkiniz yok",
+  "CONGRATULATIONS": "Tebrikler!",
+  "COURSE_COMPLETED_MESSAGE": "Bu kursu başarıyla tamamladınız. Harika iş çıkardınız!",
+  "VIEW_CERTIFICATE": "Sertifikayı Görüntüle"
 }

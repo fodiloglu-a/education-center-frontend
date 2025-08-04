@@ -617,5 +617,8 @@
   "LEVEL.ADVANCED": "Просунутий",
   "LEVEL.ALL_LEVELS": "Усі рівні",
   "YOU_ARE_COURSE_OWNER": "Ви власник курсу",
-  "UNAUTHORIZED_ACTION": "У вас немає дозволу на виконання цієї дії"
+  "UNAUTHORIZED_ACTION": "У вас немає дозволу на виконання цієї дії",
+  "CONGRATULATIONS": "Вітаємо!",
+  "COURSE_COMPLETED_MESSAGE": "Ви успішно завершили цей курс. Чудова робота!",
+  "VIEW_CERTIFICATE": "Переглянути сертифікат"
 }
