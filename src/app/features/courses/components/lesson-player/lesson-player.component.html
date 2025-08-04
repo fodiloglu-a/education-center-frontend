@@ -58,7 +58,7 @@
                     <i class="fas fa-clock"></i>
                     {{ formatDuration(currentLesson.duration) }}
                 </span>
-                <span *ngIf="currentLesson.isPreview" class="preview-badge">
+                <span *ngIf="currentLesson.preview" class="preview-badge">
                     <i class="fas fa-eye"></i>
                     {{ 'PREVIEW' | translate }}
                 </span>
@@ -247,7 +247,7 @@
                                     [class.active-lesson]="isCurrentLesson(lesson)"
                                     [class.accessible]="canAccessLesson(lesson)"
                                     [class.locked]="!canAccessLesson(lesson)"
-                                    [class.preview]="lesson.isPreview"
+                                    [class.preview]="lesson.preview"
                                     (click)="goToLesson(lesson)">
 
                                 <div class="lesson-number">{{ lesson.lessonOrder }}</div>
@@ -259,7 +259,7 @@
                                             <i class="fas fa-clock"></i>
                                             {{ formatDuration(lesson.duration) }}
                                         </span>
-                                        <span *ngIf="lesson.isPreview" class="preview-tag">
+                                        <span *ngIf="lesson.preview" class="preview-tag">
                                             <i class="fas fa-eye"></i>
                                             {{ 'PREVIEW' | translate }}
                                         </span>
@@ -322,7 +322,7 @@
     </div>
 
     <!-- Access Denied State -->
-    <div *ngIf="!isLoading && course && currentLesson && !isCurrentLessonAccessible() && !currentLesson.isPreview" class="access-denied">
+    <div *ngIf="!isLoading && course && currentLesson && !isCurrentLessonAccessible() && !currentLesson.preview" class="access-denied">
         <div class="access-denied-content">
             <i class="fas fa-lock"></i>
             <h2>{{ 'ACCESS_DENIED' | translate }}</h2>

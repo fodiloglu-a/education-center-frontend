@@ -584,5 +584,10 @@
   "UNAUTHORIZED_ACTION": "Bu işlemi gerçekleştirme yetkiniz yok",
   "CONGRATULATIONS": "Tebrikler!",
   "COURSE_COMPLETED_MESSAGE": "Bu kursu başarıyla tamamladınız. Harika iş çıkardınız!",
-  "VIEW_CERTIFICATE": "Sertifikayı Görüntüle"
+  "VIEW_CERTIFICATE": "Sertifikayı Görüntüle",
+  "PURCHASE_REQUIRED": "Satın Alma Gerekli",
+  "UNLOCK_FULL_COURSE": "Tüm Kursu Aç",
+  "LESSONS_LOCKED": "ders kilitli",
+  "PURCHASE_COURSE": "Kursu Satın Al",
+  "PREVIEW_LESSON": "Önizleme Dersi"
 }

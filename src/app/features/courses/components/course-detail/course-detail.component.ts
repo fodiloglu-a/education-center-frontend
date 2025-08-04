@@ -37,7 +37,7 @@ interface ComponentState {
   isInstructorOrAdmin: boolean;
   showReviewForm: boolean;
   isSubmittingReview: boolean;
-  isCourseOwner: boolean; // Yeni eklenen özellik
+  isCourseOwner: boolean;
 }
 
 @Component({
@@ -67,7 +67,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   reviewForm!: FormGroup;
 
   // State management
-  private componentState$ = new Subject<ComponentState>();
   private currentState: ComponentState = {
     isLoading: true,
     errorMessage: null,
@@ -164,7 +163,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     this.updateState({ isLoading: true, errorMessage: null });
 
-    // First check if user has purchased the course and is course owner
+    // Check user permissions
     const checkAccess$ = this.isLoggedIn
         ? this.courseService.checkCourseAccess(this.currentUser?.id || 0, this.courseId)
         : of(false);
@@ -522,23 +521,37 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Preview dersi mi kontrolü
+   * Belirli bir derse erişim kontrolü
    */
   canAccessLesson(lesson: LessonDTO): boolean {
-    return lesson.isPreview || this.canAccessLessons();
+    // Preview lessons are accessible to EVERYONE (logged in or not)
+
+    if (lesson.preview) {
+      return true;
+    }
+
+    // Non-preview lessons: only purchased users, course owners, and admins
+    return this.hasPurchasedCourse || this.isCourseOwner || this.hasAdminRole();
   }
 
   /**
-   * Yorum yapabilir mi kontrolü - Sadece satın alan kullanıcılar ve kurs sahibi
+   * Yorum yapabilir mi kontrolü - Sadece satın alan kullanıcılar (kurs sahibi değil)
    */
   canReview(): boolean {
-    return this.isLoggedIn && (this.hasPurchasedCourse || this.isCourseOwner);
+    // Kurs sahibi kendi kursuna yorum yapmamalı
+    if (this.isCourseOwner) {
+      return false;
+    }
+
+    // Sadece giriş yapmış ve satın almış kullanıcılar yorum yapabilir
+    return this.isLoggedIn && this.hasPurchasedCourse;
   }
 
   /**
    * Yorumu düzenleyebilir mi kontrolü
    */
   canModifyReview(review: ReviewResponse): boolean {
+    // Kendi yorumunu düzenleyebilir veya admin/kurs sahibi silebilir
     return (this.isLoggedIn && this.currentUser?.id === review.userId) ||
         this.isCourseOwner || this.hasAdminRole();
   }

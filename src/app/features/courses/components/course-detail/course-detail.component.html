@@ -34,16 +34,16 @@
 
                 <!-- Course Status Badges -->
                 <div class="course-badges">
-          <span class="category-badge">
-            {{ getCategoryTranslation(course.category) }}
-          </span>
+                    <span class="category-badge">
+                        {{ getCategoryTranslation(course.category) }}
+                    </span>
                     <span class="level-badge" [class]="'level-' + course.level.toLowerCase()">
-            {{ getLevelTranslation(course.level) }}
-          </span>
+                        {{ getLevelTranslation(course.level) }}
+                    </span>
                     <span *ngIf="isCourseDetailsResponse(course) && course.certificateAvailable" class="certificate-badge">
-            <i class="fas fa-certificate"></i>
+                        <i class="fas fa-certificate"></i>
                         {{ 'CERTIFICATE_AVAILABLE' | translate }}
-          </span>
+                    </span>
                 </div>
             </div>
 
@@ -61,13 +61,13 @@
                     <div class="meta-item" *ngIf="courseReviews.length > 0">
                         <div class="rating-display">
                             <div class="stars">
-                <span
-                        *ngFor="let star of getStarArray(getAverageRating())"
-                        class="star"
-                        [class.filled]="star.filled"
-                        [class.half]="star.half">
-                  <i class="fas fa-star"></i>
-                </span>
+                                <span
+                                        *ngFor="let star of getStarArray(getAverageRating())"
+                                        class="star"
+                                        [class.filled]="star.filled"
+                                        [class.half]="star.half">
+                                    <i class="fas fa-star"></i>
+                                </span>
                             </div>
                             <span class="rating-text">{{ getAverageRating() | number:'1.1-1' }}</span>
                             <span class="review-count">({{ courseReviews.length }} {{ 'REVIEWS' | translate }})</span>
@@ -199,7 +199,7 @@
                 </ul>
             </div>
 
-            <!-- Lessons (publicly accessible - show lesson titles and basic info) -->
+            <!-- Lessons Section -->
             <div class="content-section lessons-section">
                 <div class="section-header">
                     <h2 class="section-title">{{ 'COURSE_LESSONS' | translate }}</h2>
@@ -207,63 +207,71 @@
                     <span class="lesson-count" *ngIf="!hasLessons()">0 {{ 'LESSONS' | translate }}</span>
                 </div>
 
-                <!-- Lessons List (Public View) -->
+                <!-- Lessons List -->
                 <div class="lessons-list" *ngIf="hasLessons()">
                     <div
                             class="lesson-item"
                             *ngFor="let lesson of getCourseLessons(); let i = index; trackBy: trackByLessonId"
-                            [class.locked]="!canAccessLesson(lesson)">
+                            [class.locked]="!canAccessLesson(lesson)"
+                            [class.preview]="lesson.preview"
+                            [class.accessible]="canAccessLesson(lesson)"
+                    >
+
                         <div class="lesson-info">
                             <span class="lesson-number">{{ i + 1 }}</span>
                             <div class="lesson-details">
                                 <h4 class="lesson-title">{{ lesson.title }}</h4>
                                 <p class="lesson-description" *ngIf="lesson.description">{{ lesson.description }}</p>
                                 <div class="lesson-meta">
-                  <span *ngIf="lesson.duration > 0" class="lesson-duration">
-                    <i class="fas fa-clock"></i>
-                      {{ formatDuration(lesson.duration) }}
-                  </span>
-                                    <span *ngIf="lesson.isPreview" class="preview-badge">
-                    <i class="fas fa-eye"></i>
+                                    <span *ngIf="lesson.duration > 0" class="lesson-duration">
+                                        <i class="fas fa-clock"></i>
+                                        {{ formatDuration(lesson.duration) }}
+                                    </span>
+
+                                    <!-- Preview Badge - Sadece preview derslerde -->
+                                    <span *ngIf="lesson.preview" class="preview-badge">
+                                        <i class="fas fa-eye"></i>
                                         {{ 'PREVIEW' | translate }}
-                  </span>
+                                    </span>
+
+                                    <!-- Resources Badge -->
                                     <span *ngIf="lesson.resources && lesson.resources.length > 0" class="resources-badge">
-                    <i class="fas fa-paperclip"></i>
+                                        <i class="fas fa-paperclip"></i>
                                         {{ lesson.resources.length }} {{ 'RESOURCES' | translate }}
-                  </span>
-                                    <!-- Lock indicator for non-accessible lessons -->
+                                    </span>
+
+                                    <!-- Locked Badge - Sadece erişilemeyen derslerde -->
                                     <span *ngIf="!canAccessLesson(lesson)" class="locked-badge">
-                    <i class="fas fa-lock"></i>
+                                        <i class="fas fa-lock"></i>
                                         {{ 'LOCKED' | translate }}
-                  </span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="lesson-actions">
-                            <!-- Play button for accessible lessons -->
-                            <button
-                                    *ngIf="canAccessLesson(lesson)"
-                                    class="play-btn"
-                                    (click)="navigateToPlayLesson(lesson.id)">
+                            <!-- Play Button - Her zaman canAccessLesson kontrolü ile -->
+                            <a *ngIf="canAccessLesson(lesson)"
+                               [routerLink]="['/courses', courseId, 'lessons', lesson.id]"
+                               class="play-btn">
                                 <i class="fas fa-play"></i>
-                                {{ 'PLAY_LESSON' | translate }}
-                            </button>
+                                {{ lesson.preview ? ('PREVIEW_LESSON' | translate) : ('PLAY_LESSON' | translate) }}
+                            </a>
 
-                            <!-- Purchase required message for locked lessons -->
+                            <!-- Purchase Required - Sadece erişilemeyen dersler için -->
                             <div *ngIf="!canAccessLesson(lesson)" class="purchase-required">
                                 <i class="fas fa-lock"></i>
                                 <span>{{ 'PURCHASE_REQUIRED' | translate }}</span>
                             </div>
 
-                            <!-- Admin lesson actions - Sadece kurs sahibi ve admin görebilir -->
+                            <!-- Admin Lesson Actions - Sadece kurs sahibi ve admin -->
                             <div class="admin-lesson-actions" *ngIf="canEditCourse()">
                                 <button
                                         class="edit-lesson-btn"
                                         (click)="navigateToLessonEdit(lesson.id)"
                                         [title]="'EDIT_LESSON' | translate">
                                     <i class="fas fa-edit"></i>
-                                    {{ 'EDIT_LESSON' | translate }}
+                                    <span class="btn-text">{{ 'EDIT_LESSON' | translate }}</span>
                                 </button>
                                 <button
                                         class="delete-lesson-btn"
@@ -271,7 +279,7 @@
                                         [title]="'DELETE_LESSON' | translate"
                                         [disabled]="isLoading">
                                     <i class="fas fa-trash"></i>
-                                    {{ 'DELETE_LESSON' | translate }}
+                                    <span class="btn-text">{{ 'DELETE_LESSON' | translate }}</span>
                                 </button>
                             </div>
                         </div>
@@ -311,13 +319,13 @@
                     <div class="summary-rating">
                         <span class="average-score">{{ getAverageRating() | number:'1.1-1' }}</span>
                         <div class="stars-large">
-              <span
-                      *ngFor="let star of getStarArray(getAverageRating())"
-                      class="star"
-                      [class.filled]="star.filled"
-                      [class.half]="star.half">
-                <i class="fas fa-star"></i>
-              </span>
+                            <span
+                                    *ngFor="let star of getStarArray(getAverageRating())"
+                                    class="star"
+                                    [class.filled]="star.filled"
+                                    [class.half]="star.half">
+                                <i class="fas fa-star"></i>
+                            </span>
                         </div>
                         <span class="total-reviews">{{ courseReviews.length }} {{ 'REVIEWS' | translate }}</span>
                     </div>
@@ -353,7 +361,7 @@
                                     rows="4"
                                     [placeholder]="'COMMENT_PLACEHOLDER' | translate"
                                     [class.is-invalid]="comment?.invalid && (comment?.dirty || comment?.touched)">
-              </textarea>
+                            </textarea>
                             <div class="char-count" [class.over-limit]="(comment?.value?.length || 0) > 500">
                                 {{ comment?.value?.length || 0 }}/500
                             </div>
@@ -394,12 +402,12 @@
                             <div class="reviewer-info">
                                 <span class="reviewer-name">{{ review.userName }}</span>
                                 <div class="review-rating">
-                  <span
-                          *ngFor="let star of getStarArray(review.rating)"
-                          class="star"
-                          [class.filled]="star.filled">
-                    <i class="fas fa-star"></i>
-                  </span>
+                                    <span
+                                            *ngFor="let star of getStarArray(review.rating)"
+                                            class="star"
+                                            [class.filled]="star.filled">
+                                        <i class="fas fa-star"></i>
+                                    </span>
                                     <span class="rating-number">({{ review.rating }})</span>
                                 </div>
                             </div>

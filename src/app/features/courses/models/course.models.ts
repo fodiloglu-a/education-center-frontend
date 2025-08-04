@@ -97,7 +97,7 @@ export interface LessonDTO {
 
   // Yeni eklenen alanlar
   duration: number;      // Dersin süresi (dakika cinsinden)
-  isPreview: boolean;    // Ücretsiz önizleme olarak izlenebilir mi
+  preview: boolean;    // Ücretsiz önizleme olarak izlenebilir mi
   resources?: string[];  // Ders kaynakları/dökümanları (opsiyonel)
 }
 

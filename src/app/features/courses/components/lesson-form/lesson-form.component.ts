@@ -143,7 +143,7 @@ export class LessonFormComponent implements OnInit {
             lessonOrder: lesson.lessonOrder,
             // YENİ EKLENEN ALANLARIN PATCH EDİLMESİ
             duration: lesson.duration,
-            isPreview: lesson.isPreview,
+            isPreview: lesson.preview,
             resources: lesson.resources ? lesson.resources.join('\n') : '' // Diziyi textarea için stringe çevir
           });
         } else {

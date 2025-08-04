@@ -268,7 +268,7 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
   canAccessLesson(lesson: LessonDTO): boolean {
     // Preview lessons are accessible to everyone
     console.log('Preview lessons are accessible to everyone', lesson);
-    if (lesson.isPreview) {
+    if (lesson.preview) {
       return true;
     }
 

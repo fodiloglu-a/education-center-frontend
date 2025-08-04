@@ -620,5 +620,10 @@
   "UNAUTHORIZED_ACTION": "У вас немає дозволу на виконання цієї дії",
   "CONGRATULATIONS": "Вітаємо!",
   "COURSE_COMPLETED_MESSAGE": "Ви успішно завершили цей курс. Чудова робота!",
-  "VIEW_CERTIFICATE": "Переглянути сертифікат"
+  "VIEW_CERTIFICATE": "Переглянути сертифікат",
+  "PURCHASE_REQUIRED": "Потрібна покупка",
+  "UNLOCK_FULL_COURSE": "Розблокувати повний курс",
+  "LESSONS_LOCKED": "уроків заблоковано",
+  "PURCHASE_COURSE": "Придбати курс",
+  "PREVIEW_LESSON": "Оглядовий урок"
 }
