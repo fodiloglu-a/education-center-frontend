@@ -1,64 +1,349 @@
 <!-- instructor-dashboard.component.html -->
 
 <div class="dashboard-container">
-  <!-- Yükleme Spinner'ı -->
-  <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <!-- Loading Spinner -->
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-  <!-- Hata Mesajı -->
-  <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Alert Messages -->
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-  <h2 class="page-title">{{ 'INSTRUCTOR_DASHBOARD' | translate }}</h2>
-  <p class="page-subtitle">{{ 'INSTRUCTOR_DASHBOARD_SUBTITLE' | translate }}</p>
-
-  <div class="dashboard-content" *ngIf="!isLoading && stats">
-    <!-- İstatistik Kartları -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="material-icons stat-icon">school</span>
-        <h3>{{ 'TOTAL_COURSES' | translate }}</h3>
-        <p class="stat-value">{{ stats.totalCourses }}</p>
-      </div>
-      <div class="stat-card">
-        <span class="material-icons stat-icon">group</span>
-        <h3>{{ 'TOTAL_STUDENTS' | translate }}</h3>
-        <p class="stat-value">{{ stats.totalStudents }}</p>
-      </div>
-      <div class="stat-card">
-        <span class="material-icons stat-icon">star_half</span>
-        <h3>{{ 'AVERAGE_RATING' | translate }}</h3>
-        <p class="stat-value">{{ stats.averageRating | number:'1.1-1' }}</p>
-      </div>
-      <div class="stat-card">
-        <span class="material-icons stat-icon">reviews</span>
-        <h3>{{ 'TOTAL_REVIEWS' | translate }}</h3>
-        <p class="stat-value">{{ stats.totalReviews }}</p>
-      </div>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="instructor-info">
+                <div class="avatar">
+                    <img *ngIf="instructorProfile?.profileImageUrl" [src]="instructorProfile?.profileImageUrl" [alt]="(instructorProfile?.firstName || '') + ' ' + (instructorProfile?.lastName || '')">
+                    <div *ngIf="!instructorProfile?.profileImageUrl" class="avatar-placeholder">
+                        <span class="material-icons">person</span>
+                    </div>
+                </div>
+                <div class="info">
+                    <h1 class="instructor-name">
+                        {{ instructorProfile?.firstName || 'Unknown' }} {{ instructorProfile?.lastName || 'Instructor' }}
+                    </h1>
+                    <p class="instructor-title">{{ instructorProfile?.jobTitle || ('INSTRUCTOR' | translate) }}</p>
+                    <div class="badges" *ngIf="instructorProfile">
+            <span class="badge verified" *ngIf="instructorProfile.isVerified">
+              <span class="material-icons">verified</span> {{ 'VERIFIED' | translate }}
+            </span>
+                        <span class="badge featured" *ngIf="instructorProfile.isFeatured">
+              <span class="material-icons">star</span> {{ 'FEATURED' | translate }}
+            </span>
+                    </div>
+                </div>
+            </div>
+            <button class="refresh-btn" (click)="refreshDashboard()" [disabled]="isLoading">
+                <span class="material-icons">refresh</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Hızlı Erişim Butonları -->
-    <div class="quick-actions">
-      <h3 class="section-title">{{ 'QUICK_ACTIONS' | translate }}</h3>
-      <div class="action-buttons-grid">
-        <a [routerLink]="['/courses', 'new']" class="action-button primary-btn">
-          <span class="material-icons">add_circle</span> {{ 'CREATE_NEW_COURSE' | translate }}
-        </a>
-        <a [routerLink]="['/instructor', 'courses']" class="action-button secondary-btn">
-          <span class="material-icons">list_alt</span> {{ 'MY_COURSES' | translate }}
-        </a>
-        <a [routerLink]="['/instructor', 'reviews']" class="action-button secondary-btn">
-          <span class="material-icons">comment</span> {{ 'MY_REVIEWS' | translate }}
-        </a>
-
-          <a [routerLink]="['/instructor', 'add-material']" class="action-button secondary-btn">
-              <span class="material-icons">comment</span> {{ 'ADD_MATERIAL' | translate }}
-          </a>
-        <!-- İleride eklenebilecek diğer hızlı eylemler -->
-      </div>
+    <!-- Navigation Tabs -->
+    <div class="tab-navigation">
+        <button
+                class="tab-btn"
+                [class.active]="activeTab === 'dashboard'"
+                (click)="setActiveTab('dashboard')">
+            <span class="material-icons">dashboard</span>
+            {{ 'DASHBOARD' | translate }}
+        </button>
+        <button
+                class="tab-btn"
+                [class.active]="activeTab === 'profile'"
+                (click)="setActiveTab('profile')">
+            <span class="material-icons">person</span>
+            {{ 'PROFILE' | translate }}
+        </button>
+        <button
+                class="tab-btn"
+                [class.active]="activeTab === 'settings'"
+                (click)="setActiveTab('settings')">
+            <span class="material-icons">settings</span>
+            {{ 'SETTINGS' | translate }}
+        </button>
     </div>
-  </div>
 
-  <div *ngIf="!isLoading && !stats && !errorMessage" class="no-content-found">
-    <p>{{ 'NO_DASHBOARD_STATS' | translate }}</p>
-    <button class="action-button primary-btn" (click)="loadDashboardStats(instructorId || 0)">{{ 'RETRY_LOAD_STATS' | translate }}</button>
-  </div>
+    <!-- Dashboard Content -->
+    <div class="dashboard-content" *ngIf="!isLoading">
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content" *ngIf="activeTab === 'dashboard' && stats">
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <span class="material-icons stat-icon">school</span>
+                    <div class="stat-content">
+                        <h3>{{ 'TOTAL_COURSES' | translate }}</h3>
+                        <p class="stat-value">{{ stats.totalCourses }}</p>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <span class="material-icons stat-icon">group</span>
+                    <div class="stat-content">
+                        <h3>{{ 'TOTAL_STUDENTS' | translate }}</h3>
+                        <p class="stat-value">{{ stats.totalStudents }}</p>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <span class="material-icons stat-icon">star_half</span>
+                    <div class="stat-content">
+                        <h3>{{ 'AVERAGE_RATING' | translate }}</h3>
+                        <p class="stat-value">{{ stats.averageRating | number:'1.1-1' }}</p>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <span class="material-icons stat-icon">reviews</span>
+                    <div class="stat-content">
+                        <h3>{{ 'TOTAL_REVIEWS' | translate }}</h3>
+                        <p class="stat-value">{{ stats.totalReviews }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions-section">
+                <h3 class="section-title">{{ 'QUICK_ACTIONS' | translate }}</h3>
+                <div class="action-buttons-grid">
+                    <a [routerLink]="['/courses', 'new']" class="action-button primary-btn">
+                        <span class="material-icons">add_circle</span>
+                        <span>{{ 'CREATE_NEW_COURSE' | translate }}</span>
+                    </a>
+                    <a [routerLink]="['/instructor', 'courses']" class="action-button secondary-btn">
+                        <span class="material-icons">list_alt</span>
+                        <span>{{ 'MY_COURSES' | translate }}</span>
+                    </a>
+                    <a [routerLink]="['/instructor', 'reviews']" class="action-button secondary-btn">
+                        <span class="material-icons">comment</span>
+                        <span>{{ 'MY_REVIEWS' | translate }}</span>
+                    </a>
+                    <a [routerLink]="['/instructor', 'add-material']" class="action-button secondary-btn">
+                        <span class="material-icons">library_add</span>
+                        <span>{{ 'ADD_MATERIAL' | translate }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div class="tab-content" *ngIf="activeTab === 'profile'">
+            <div class="profile-section">
+                <div class="section-header">
+                    <h3>{{ 'INSTRUCTOR_PROFILE' | translate }}</h3>
+                    <button class="edit-profile-btn" (click)="toggleProfileEditor()" [disabled]="isUpdatingProfile">
+                        <span class="material-icons">{{ showProfileEditor ? 'close' : 'edit' }}</span>
+                        {{ showProfileEditor ? ('CANCEL' | translate) : ('EDIT_PROFILE' | translate) }}
+                    </button>
+                </div>
+
+                <!-- Profile Display -->
+                <div class="profile-display" *ngIf="!showProfileEditor && instructorProfile">
+                    <div class="profile-grid">
+                        <div class="profile-item">
+                            <label>{{ 'BIO' | translate }}</label>
+                            <p>{{ instructorProfile.bio || ('NOT_PROVIDED' | translate) }}</p>
+                        </div>
+                        <div class="profile-item">
+                            <label>{{ 'JOB_TITLE' | translate }}</label>
+                            <p>{{ instructorProfile.jobTitle || ('NOT_PROVIDED' | translate) }}</p>
+                        </div>
+                        <div class="profile-item">
+                            <label>{{ 'COMPANY' | translate }}</label>
+                            <p>{{ instructorProfile.company || ('NOT_PROVIDED' | translate) }}</p>
+                        </div>
+                        <div class="profile-item">
+                            <label>{{ 'YEARS_OF_EXPERIENCE' | translate }}</label>
+                            <p>{{ instructorProfile.yearsOfExperience || ('NOT_PROVIDED' | translate) }}</p>
+                        </div>
+                        <div class="profile-item">
+                            <label>{{ 'EDUCATION_LEVEL' | translate }}</label>
+                            <p>{{ instructorProfile.educationLevel || ('NOT_PROVIDED' | translate) }}</p>
+                        </div>
+                        <div class="profile-item">
+                            <label>{{ 'UNIVERSITY' | translate }}</label>
+                            <p>{{ instructorProfile.university || ('NOT_PROVIDED' | translate) }}</p>
+                        </div>
+                        <div class="profile-item full-width" *ngIf="instructorProfile.specializations?.length">
+                            <label>{{ 'SPECIALIZATIONS' | translate }}</label>
+                            <div class="tag-list">
+                                <span class="tag" *ngFor="let spec of instructorProfile.specializations">{{ spec }}</span>
+                            </div>
+                        </div>
+                        <div class="profile-item full-width" *ngIf="instructorProfile.certifications?.length">
+                            <label>{{ 'CERTIFICATIONS' | translate }}</label>
+                            <div class="tag-list">
+                                <span class="tag" *ngFor="let cert of instructorProfile.certifications">{{ cert }}</span>
+                            </div>
+                        </div>
+                        <div class="profile-item full-width" *ngIf="instructorProfile.socialLinks?.length">
+                            <label>{{ 'SOCIAL_LINKS' | translate }}</label>
+                            <div class="social-links">
+                                <a *ngFor="let link of instructorProfile.socialLinks" [href]="link" target="_blank" class="social-link">
+                                    {{ link }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Editor -->
+                <div class="profile-editor" *ngIf="showProfileEditor">
+                    <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="profile-form">
+
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h4>{{ 'BASIC_INFORMATION' | translate }}</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="bio">{{ 'BIO' | translate }}</label>
+                                    <textarea id="bio" formControlName="bio" rows="4" [placeholder]="'BIO_PLACEHOLDER' | translate"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileImageUrl">{{ 'PROFILE_IMAGE_URL' | translate }}</label>
+                                    <input type="url" id="profileImageUrl" formControlName="profileImageUrl" [placeholder]="'PROFILE_IMAGE_URL_PLACEHOLDER' | translate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="linkedinUrl">{{ 'LINKEDIN_URL' | translate }}</label>
+                                    <input type="url" id="linkedinUrl" formControlName="linkedinUrl" [placeholder]="'LINKEDIN_URL_PLACEHOLDER' | translate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="websiteUrl">{{ 'WEBSITE_URL' | translate }}</label>
+                                    <input type="url" id="websiteUrl" formControlName="websiteUrl" [placeholder]="'WEBSITE_URL_PLACEHOLDER' | translate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Information -->
+                        <div class="form-section">
+                            <h4>{{ 'PROFESSIONAL_INFORMATION' | translate }}</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="jobTitle">{{ 'JOB_TITLE' | translate }}</label>
+                                    <input type="text" id="jobTitle" formControlName="jobTitle" [placeholder]="'JOB_TITLE_PLACEHOLDER' | translate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="company">{{ 'COMPANY' | translate }}</label>
+                                    <input type="text" id="company" formControlName="company" [placeholder]="'COMPANY_PLACEHOLDER' | translate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="yearsOfExperience">{{ 'YEARS_OF_EXPERIENCE' | translate }}</label>
+                                    <input type="number" id="yearsOfExperience" formControlName="yearsOfExperience" min="0" max="50" [placeholder]="'YEARS_OF_EXPERIENCE_PLACEHOLDER' | translate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="hourlyRate">{{ 'HOURLY_RATE' | translate }}</label>
+                                    <input type="number" id="hourlyRate" formControlName="hourlyRate" min="0" step="0.01" [placeholder]="'HOURLY_RATE_PLACEHOLDER' | translate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Education -->
+                        <div class="form-section">
+                            <h4>{{ 'EDUCATION' | translate }}</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="educationLevel">{{ 'EDUCATION_LEVEL' | translate }}</label>
+                                    <select id="educationLevel" formControlName="educationLevel">
+                                        <option value="">{{ 'SELECT_EDUCATION_LEVEL' | translate }}</option>
+                                        <option value="High School">{{ 'HIGH_SCHOOL' | translate }}</option>
+                                        <option value="Associate">{{ 'ASSOCIATE' | translate }}</option>
+                                        <option value="Bachelor">{{ 'BACHELOR' | translate }}</option>
+                                        <option value="Master">{{ 'MASTER' | translate }}</option>
+                                        <option value="PhD">{{ 'PHD' | translate }}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="university">{{ 'UNIVERSITY' | translate }}</label>
+                                    <input type="text" id="university" formControlName="university" [placeholder]="'UNIVERSITY_PLACEHOLDER' | translate">
+                                </div>
+                                <div class="form-group">
+                                    <label for="graduationYear">{{ 'GRADUATION_YEAR' | translate }}</label>
+                                    <input type="number" id="graduationYear" formControlName="graduationYear" [min]="1950" [max]="currentYear" [placeholder]="'GRADUATION_YEAR_PLACEHOLDER' | translate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Specializations -->
+                        <div class="form-section">
+                            <h4>{{ 'SPECIALIZATIONS' | translate }}</h4>
+                            <div class="dynamic-list">
+                                <div class="list-item" *ngFor="let spec of (profileForm.get('specializations')?.value || []); let i = index">
+                                    <input type="text" [value]="spec" (input)="updateSpecialization(i, $any($event.target).value)" [placeholder]="'SPECIALIZATION_PLACEHOLDER' | translate">
+                                    <button type="button" class="remove-btn" (click)="removeSpecialization(i)">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <button type="button" class="add-btn" (click)="addSpecialization()">
+                                    <span class="material-icons">add</span> {{ 'ADD_SPECIALIZATION' | translate }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Certifications -->
+                        <div class="form-section">
+                            <h4>{{ 'CERTIFICATIONS' | translate }}</h4>
+                            <div class="dynamic-list">
+                                <div class="list-item" *ngFor="let cert of (profileForm.get('certifications')?.value || []); let i = index">
+                                    <input type="text" [value]="cert" (input)="updateCertification(i, $any($event.target).value)" [placeholder]="'CERTIFICATION_PLACEHOLDER' | translate">
+                                    <button type="button" class="remove-btn" (click)="removeCertification(i)">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <button type="button" class="add-btn" (click)="addCertification()">
+                                    <span class="material-icons">add</span> {{ 'ADD_CERTIFICATION' | translate }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="form-section">
+                            <h4>{{ 'SOCIAL_LINKS' | translate }}</h4>
+                            <div class="dynamic-list">
+                                <div class="list-item" *ngFor="let link of (profileForm.get('socialLinks')?.value || []); let i = index">
+                                    <input type="url" [value]="link" (input)="updateSocialLink(i, $any($event.target).value)" [placeholder]="'SOCIAL_LINK_PLACEHOLDER' | translate">
+                                    <button type="button" class="remove-btn" (click)="removeSocialLink(i)">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                </div>
+                                <button type="button" class="add-btn" (click)="addSocialLink()">
+                                    <span class="material-icons">add</span> {{ 'ADD_SOCIAL_LINK' | translate }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="button" class="cancel-btn" (click)="toggleProfileEditor()">
+                                {{ 'CANCEL' | translate }}
+                            </button>
+                            <button type="submit" class="save-btn" [disabled]="profileForm.invalid || isUpdatingProfile">
+                                <span *ngIf="isUpdatingProfile" class="material-icons spinner">hourglass_empty</span>
+                                {{ 'SAVE_CHANGES' | translate }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" *ngIf="activeTab === 'settings'">
+            <div class="settings-section">
+                <h3>{{ 'INSTRUCTOR_SETTINGS' | translate }}</h3>
+                <p class="coming-soon">{{ 'SETTINGS_COMING_SOON' | translate }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- No Content State -->
+    <div *ngIf="!isLoading && !stats && !errorMessage" class="no-content-found">
+        <div class="no-content-icon">
+            <span class="material-icons">dashboard</span>
+        </div>
+        <h3>{{ 'NO_DASHBOARD_STATS' | translate }}</h3>
+        <p>{{ 'NO_DASHBOARD_STATS_DESCRIPTION' | translate }}</p>
+        <button class="retry-btn" (click)="loadDashboardStats(instructorId || 0)">
+            <span class="material-icons">refresh</span>
+            {{ 'RETRY_LOAD_STATS' | translate }}
+        </button>
+    </div>
 </div>

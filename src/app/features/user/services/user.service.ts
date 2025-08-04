@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserResponse, UserUpdateRequest, PasswordChangeRequest } from '../models/user.models'; // Kullanıcı modellerini import ediyoruz
+import {UserResponse, UserUpdateRequest, PasswordChangeRequest, InstructorProfileDTO} from '../models/user.models'; // Kullanıcı modellerini import ediyoruz
 import { environment } from '../../../../environments/environment'; // Ortam değişkenlerini import ediyoruz
 
 // UserService, kullanıcı profili ve yönetimi ile ilgili backend API çağrılarını yönetir.
@@ -60,5 +60,23 @@ export class UserService {
    */
   deleteUser(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/users/${id}`);
+  }
+  /**
+   * Eğitmen profil bilgilerini getirir.
+   * @param id Eğitmenin ID'si.
+   * @returns Eğitmen profil bilgilerini içeren InstructorProfileDTO nesnesini içeren Observable.
+   */
+  getInstructorProfile(id: number): Observable<InstructorProfileDTO> {
+    return this.http.get<InstructorProfileDTO>(`${this.apiUrl}/users/${id}/instructor-profile`);
+  }
+
+  /**
+   * Eğitmen profil bilgilerini günceller.
+   * @param id Güncellenecek eğitmenin ID'si.
+   * @param instructorProfileDTO Güncel bilgileri içeren InstructorProfileDTO nesnesi.
+   * @returns Güncellenen eğitmen profil bilgilerini içeren InstructorProfileDTO nesnesini içeren Observable.
+   */
+  updateInstructorProfile(id: number, instructorProfileDTO: InstructorProfileDTO): Observable<InstructorProfileDTO> {
+    return this.http.put<InstructorProfileDTO>(`${this.apiUrl}/users/${id}/instructor-profile`, instructorProfileDTO);
   }
 }

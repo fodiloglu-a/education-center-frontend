@@ -53,40 +53,93 @@
 
                 <!-- Course Meta Information -->
                 <div class="course-meta">
-                    <div class="meta-item">
-                        <i class="fas fa-user-tie"></i>
-                        <span>{{ course.instructorName }}</span>
-                    </div>
-
-                    <div class="meta-item" *ngIf="courseReviews.length > 0">
-                        <div class="rating-display">
-                            <div class="stars">
-                                <span
-                                        *ngFor="let star of getStarArray(getAverageRating())"
-                                        class="star"
-                                        [class.filled]="star.filled"
-                                        [class.half]="star.half">
-                                    <i class="fas fa-star"></i>
-                                </span>
-                            </div>
-                            <span class="rating-text">{{ getAverageRating() | number:'1.1-1' }}</span>
-                            <span class="review-count">({{ courseReviews.length }} {{ 'REVIEWS' | translate }})</span>
+                    <!-- Instructor Info -->
+                    <div class="meta-item instructor-info">
+                        <div class="meta-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'INSTRUCTOR' | translate }}</span>
+                            <span class="meta-value instructor-name">{{ course.instructorName }}</span>
                         </div>
                     </div>
 
-                    <div class="meta-item">
-                        <i class="fas fa-users"></i>
-                        <span>{{ course.enrollmentCount }} {{ 'STUDENTS' | translate }}</span>
+                    <!-- Rating and Reviews -->
+                    <div class="meta-item rating-info" *ngIf="courseReviews.length > 0">
+                        <div class="meta-icon">
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'RATING' | translate }}</span>
+                            <div class="rating-display">
+                                <div class="stars">
+                    <span
+                            *ngFor="let star of getStarArray(getAverageRating())"
+                            class="star"
+                            [class.filled]="star.filled"
+                            [class.half]="star.half">
+                        <i class="fas fa-star"></i>
+                    </span>
+                                </div>
+                                <span class="rating-text">{{ getAverageRating() | number:'1.1-1' }}</span>
+                                <span class="review-count">({{ courseReviews.length }} {{ 'REVIEWS' | translate }})</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="meta-item" *ngIf="course.duration > 0">
-                        <i class="fas fa-clock"></i>
-                        <span>{{ formatDuration(course.duration) }}</span>
+                    <!-- Student Count -->
+                    <div class="meta-item student-info">
+                        <div class="meta-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'ENROLLED_STUDENTS' | translate }}</span>
+                            <span class="meta-value student-count">{{ course.enrollmentCount | number }} {{ 'STUDENTS' | translate }}</span>
+                        </div>
                     </div>
 
-                    <div class="meta-item">
-                        <i class="fas fa-globe"></i>
-                        <span>{{ 'LANGUAGE.' + course.language.toUpperCase() | translate }}</span>
+                    <!-- Duration -->
+                    <div class="meta-item duration-info" *ngIf="course.duration > 0">
+                        <div class="meta-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'DURATION' | translate }}</span>
+                            <span class="meta-value duration-text">{{ formatDuration(course.duration) }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Language -->
+                    <div class="meta-item language-info">
+                        <div class="meta-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'LANGUAGE' | translate }}</span>
+                            <span class="meta-value language-text">{{ 'LANGUAGE.' + course.language.toUpperCase() | translate }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Course Level (if available) -->
+                    <div class="meta-item level-info" *ngIf="course.level">
+                        <div class="meta-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'LEVEL' | translate }}</span>
+                            <span class="meta-value level-text">{{ 'LEVEL.' + course.level.toUpperCase() | translate }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Last Updated (if available) -->
+                    <div class="meta-item updated-info" *ngIf="course.updatedAt">
+                        <div class="meta-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="meta-content">
+                            <span class="meta-label">{{ 'LAST_UPDATED' | translate }}</span>
+                            <span class="meta-value updated-text">{{ course.updatedAt | date:'MMM yyyy' }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -108,6 +161,16 @@
                     [disabled]="isLoading">
                 <i class="fas fa-shopping-cart"></i>
                 {{ 'BUY_NOW' | translate }} - {{ formatPrice(course.price) }}
+            </button>
+
+            <!-- GO TO INS PROF Button -->
+            <button
+
+                    class="action-btn purchase-btn"
+                    (click)="goToInsProfile()"
+                    [disabled]="isLoading">
+                <i class="fas fa-shopping-cart"></i>
+                {{ 'GO_INS_PROFILE' | translate }}
             </button>
 
             <!-- Free Enroll Button -->

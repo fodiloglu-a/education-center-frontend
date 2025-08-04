@@ -63,6 +63,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   userReview: ReviewResponse | null = null;
   courseId: number | null = null;
 
+
   // Form
   reviewForm!: FormGroup;
 
@@ -749,5 +750,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   trackByRequirementIndex(index: number, requirement: string): number {
     return index;
+  }
+
+  goToInsProfile() {
+
   }
 }

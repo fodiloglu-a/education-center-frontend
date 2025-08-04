@@ -28,6 +28,7 @@ export interface CourseResponse {
   targetAudience: string[];    // Hedef kitle
   certificateAvailable: boolean; // Sertifika verilip verilmediği
   reviews: ReviewResponse[];   // Eğitime yapılan yorumların listesi
+  updatedAt: string | null;
 }
 
 // Backend'deki CourseDetailsResponse DTO'suna karşılık gelen arayüz.

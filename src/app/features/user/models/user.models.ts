@@ -28,3 +28,58 @@ export interface PasswordChangeRequest {
   oldPassword: string; // Kullanıcının mevcut şifresi
   newPassword: string; // Kullanıcının belirleyeceği yeni şifre
 }
+// Backend'deki InstructorProfileDTO'ya karşılık gelen arayüz.
+// Eğitmen profil bilgilerini frontend'e güvenli bir şekilde göndermek için kullanılır.
+export interface InstructorProfileDTO {
+  // Temel Bilgiler
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+
+  // Profil Bilgileri
+  bio?: string;
+  profileImageUrl?: string;
+  phoneNumber?: string;
+  linkedinUrl?: string;
+  websiteUrl?: string;
+
+  // Mesleki Bilgiler
+  jobTitle?: string;
+  company?: string;
+  yearsOfExperience?: number;
+  specializations?: string[];
+  certifications?: string[];
+
+  // Eğitim Geçmişi
+  educationLevel?: string;
+  university?: string;
+  graduationYear?: number;
+
+  // Platform İstatistikleri
+  totalStudents?: number;
+  averageRating?: number;
+  totalCourses?: number;
+  totalReviews?: number;
+
+  // Sosyal Medya Linkleri
+  socialLinks?: string[];
+
+  // Eğitmen Durumu
+  isFeatured?: boolean;
+  isVerified?: boolean;
+  hourlyRate?: number;
+  teachingLanguage?: string;
+
+  // Performans Metrikleri
+  responseTimeHours?: number;
+  studentCompletionRate?: number;
+  lastActiveDate?: string;
+
+  // Medya Dosyaları
+  mediaFiles?: string[];
+}
