@@ -625,5 +625,14 @@
   "UNLOCK_FULL_COURSE": "Розблокувати повний курс",
   "LESSONS_LOCKED": "уроків заблоковано",
   "PURCHASE_COURSE": "Придбати курс",
-  "PREVIEW_LESSON": "Оглядовий урок"
+  "PREVIEW_LESSON": "Оглядовий урок",
+  "NO_CERTIFICATES_YET": "Ще немає сертифікатів",
+  "NO_CERTIFICATES_DESCRIPTION": "Після завершення курсів ви побачите свої сертифікати тут.",
+
+  "START_LEARNING": "Почати навчання",
+
+  "NO_COURSES_YET": "У вас ще немає курсів",
+  "NO_COURSES_DESCRIPTION": "Після реєстрації на курси вони з’являться тут.",
+
+  "BROWSE_COURSES": "Переглянути курси"
 }

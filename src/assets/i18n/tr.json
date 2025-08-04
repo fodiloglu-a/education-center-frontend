@@ -589,5 +589,15 @@
   "UNLOCK_FULL_COURSE": "Tüm Kursu Aç",
   "LESSONS_LOCKED": "ders kilitli",
   "PURCHASE_COURSE": "Kursu Satın Al",
-  "PREVIEW_LESSON": "Önizleme Dersi"
+  "PREVIEW_LESSON": "Önizleme Dersi",
+
+  "NO_CERTIFICATES_YET": "Henüz sertifikanız yok",
+  "NO_CERTIFICATES_DESCRIPTION": "Eğitimleri tamamladığınızda burada sertifikalarınızı görebileceksiniz.",
+
+  "START_LEARNING": "Öğrenmeye Başla",
+
+  "NO_COURSES_YET": "Henüz eğitiminiz yok",
+  "NO_COURSES_DESCRIPTION": "Eğitimlere kaydolduğunuzda burada görünecekler.",
+
+  "BROWSE_COURSES": "Eğitimleri Keşfet"
 }

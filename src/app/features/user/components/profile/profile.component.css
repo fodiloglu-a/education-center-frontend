@@ -1,31 +1,89 @@
-/* profile.component.css */
+/* profile.component.css - Revize Edilmiş Responsive Tasarım */
 
+/* ========================================= */
+/* CSS VARIABLES - Renk Paleti */
+/* ========================================= */
+:root {
+  /* Ana Renkler */
+  --primary-color: #4361ee;
+  --secondary-color: #7209b7;
+  --accent-color: #f72585;
+  --success-color: #06d6a0;
+  --warning-color: #ffb700;
+  --error-color: #f72585;
+  --info-color: #4cc9f0;
+
+  /* Arka Plan Renkleri */
+  --background-color: #f8faff;
+  --card-bg: #ffffff;
+  --surface-bg: #f1f5f9;
+  --input-bg: #ffffff;
+  --hover-bg: #e2e8f0;
+  --selection-bg: rgba(67, 97, 238, 0.1);
+
+  /* Metin Renkleri */
+  --text-color: #1e293b;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --link-color: #4361ee;
+
+  /* Kenarlık & Gölge */
+  --border-color: #e2e8f0;
+  --divider-color: #cbd5e1;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  /* Boyutlar */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
+
+  --border-radius-sm: 0.375rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-radius-full: 9999px;
+
+  /* Animasyon */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* ========================================= */
+/* BASE CONTAINER */
+/* ========================================= */
 .profile-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px);
   padding: var(--spacing-lg);
-  background-color: var(--background-color);
+  background: linear-gradient(135deg, var(--background-color) 0%, #e8f2ff 100%);
   box-sizing: border-box;
 }
 
 .profile-card {
-  background-color: var(--card-bg);
+  background: var(--card-bg);
   padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-xl);
   width: 100%;
-  max-width: 700px; /* Daha geniş ve modern bir profil kartı için */
+  max-width: 1200px;
   text-align: center;
   box-sizing: border-box;
-  animation: fadeIn 0.8s ease-out forwards; /* Kart için giriş animasyonu */
+  animation: slideInUp 0.6s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -33,26 +91,32 @@
   }
 }
 
+/* ========================================= */
+/* PROFILE HEADER */
+/* ========================================= */
 .profile-header {
   margin-bottom: var(--spacing-xl);
 }
 
 .card-title {
   color: var(--primary-color);
-  font-size: var(--font-size-xxxl); /* Daha büyük başlık */
+  font-size: 2.5rem;
   margin-bottom: var(--spacing-sm);
   font-weight: 700;
 }
 
 .card-subtitle {
   color: var(--text-color);
-  font-size: var(--font-size-lg); /* Daha belirgin alt başlık */
+  font-size: 1.125rem;
   opacity: 0.8;
 }
 
+/* ========================================= */
+/* USER INFO GRID */
+/* ========================================= */
 .profile-details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Esnek grid yapısı */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xxl);
   text-align: left;
@@ -61,23 +125,25 @@
 .detail-item {
   display: flex;
   align-items: center;
-  padding: var(--spacing-md);
-  background-color: var(--surface-bg); /* Hafif farklı arka plan */
-  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  background: var(--surface-bg);
+  border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  transition: all var(--transition-normal);
+  border: 1px solid var(--border-color);
 }
 
 .detail-item:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
 }
 
 .detail-icon {
-  font-size: var(--font-size-xxl); /* Daha büyük ikonlar */
+  font-size: 2rem;
   color: var(--accent-color);
   margin-right: var(--spacing-md);
-  flex-shrink: 0; /* Küçülmesini engelle */
+  flex-shrink: 0;
 }
 
 .detail-content {
@@ -88,160 +154,684 @@
 
 .detail-label {
   font-weight: 600;
-  color: var(--text-color);
-  font-size: var(--font-size-sm); /* Etiket daha küçük ve net */
+  color: var(--text-muted);
+  font-size: 0.875rem;
   text-transform: uppercase;
   opacity: 0.7;
+  margin-bottom: var(--spacing-xs);
 }
 
 .detail-value {
-  color: var(--dark-color);
-  font-size: var(--font-size-base); /* Değer normal boyutta */
+  color: var(--text-color);
+  font-size: 1rem;
   word-break: break-all;
   font-weight: 500;
 }
 
-/* Eylem Bölümü */
+/* ========================================= */
+/* ACCOUNT ACTIONS */
+/* ========================================= */
 .profile-actions-section {
-  margin-top: var(--spacing-xxl);
+  margin: var(--spacing-xxl) 0;
 }
 
 .section-title {
   color: var(--accent-color);
-  font-size: var(--font-size-xxl);
-  margin-top: 0;
-  margin-bottom: var(--spacing-lg);
+  font-size: 1.5rem;
+  margin: 0 0 var(--spacing-lg) 0;
   text-align: center;
   border-bottom: 2px solid var(--divider-color);
   padding-bottom: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.section-icon {
+  font-size: 1.75rem !important;
+  color: var(--primary-color);
 }
 
 .profile-actions {
   display: flex;
-  flex-direction: column; /* Mobil için alt alta */
   gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
-  align-items: center; /* Ortala */
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.action-button {
-  width: 100%; /* Mobil için tam genişlik */
-  max-width: 280px; /* Maksimum genişlik */
-  padding: var(--spacing-md);
-  font-size: var(--font-size-base); /* Buton yazıları normal */
+/* ========================================= */
+/* COURSES & CERTIFICATES SECTIONS */
+/* ========================================= */
+.my-courses-section,
+.my-certificates-section {
+  margin: var(--spacing-xxl) 0;
+  padding: var(--spacing-xl);
+  background: var(--surface-bg);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.section-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.courses-count,
+.certificates-count {
+  color: var(--text-muted);
+  font-size: 0.875rem;
   font-weight: 600;
+}
+
+.view-all-btn {
+  background: var(--primary-color);
+  color: white;
   border: none;
-  border-radius: var(--border-radius-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
+  transition: all var(--transition-normal);
+}
+
+.view-all-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-  display: inline-flex;
+}
+
+/* ========================================= */
+/* LOADING SECTION */
+/* ========================================= */
+.loading-section {
+  text-align: center;
+  padding: var(--spacing-xxl);
+}
+
+.loading-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.loading-icon {
+  font-size: 2.5rem !important;
+  color: var(--primary-color);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ========================================= */
+/* COURSES GRID */
+/* ========================================= */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.course-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-color);
+}
+
+.course-image {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.course-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-normal);
+}
+
+.course-card:hover .course-image img {
+  transform: scale(1.05);
+}
+
+.course-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(67, 97, 238, 0.8);
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm); /* İkon ve metin arası boşluk */
+  opacity: 0;
+  transition: opacity var(--transition-normal);
 }
 
-.action-button .material-icons {
-  font-size: var(--font-size-lg);
+.course-card:hover .course-overlay {
+  opacity: 1;
 }
 
-.action-button.primary-btn {
-  background-color: var(--primary-color);
+.play-icon {
+  font-size: 3rem !important;
   color: white;
 }
 
-.action-button.primary-btn:hover {
-  background-color: var(--deep-blue);
-  transform: translateY(-1px);
+.course-info {
+  padding: var(--spacing-lg);
 }
 
-.action-button.secondary-btn {
-  background-color: var(--light-accent);
-  color: var(--accent-color);
+.course-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.action-button.secondary-btn:hover {
-  background-color: var(--secondary-color);
-  transform: translateY(-1px);
+.course-instructor {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0 0 var(--spacing-md) 0;
 }
 
+.course-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.course-category {
+  background: var(--primary-color);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.course-duration {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.course-duration .material-icons {
+  font-size: 1rem !important;
+}
+
+.course-price {
+  text-align: right;
+}
+
+.price-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--success-color);
+}
+
+/* ========================================= */
+/* CERTIFICATES GRID */
+/* ========================================= */
+.certificates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.certificate-card {
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--surface-bg) 100%);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--warning-color);
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.certificate-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--warning-color) 0%, #ffd700 100%);
+}
+
+.certificate-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--shadow-xl);
+  border-color: #ffd700;
+}
+
+.certificate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.certificate-icon {
+  font-size: 2rem !important;
+  color: var(--warning-color);
+}
+
+.certificate-date {
+  background: var(--warning-color);
+  color: white;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.certificate-content {
+  margin-bottom: var(--spacing-lg);
+}
+
+.certificate-course {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0 0 var(--spacing-sm) 0;
+  line-height: 1.4;
+}
+
+.certificate-code {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: monospace;
+  background: var(--hover-bg);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  margin: 0;
+  word-break: break-all;
+}
+
+.certificate-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.cert-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.view-btn {
+  background: var(--primary-color);
+  color: white;
+}
+
+.view-btn:hover {
+  background: var(--secondary-color);
+}
+
+.download-btn {
+  background: var(--success-color);
+  color: white;
+}
+
+.download-btn:hover {
+  background: #059669;
+  text-decoration: none;
+  color: white;
+}
+
+.cert-action-btn .material-icons {
+  font-size: 1rem !important;
+}
+
+/* ========================================= */
+/* NO CONTENT STATES */
+/* ========================================= */
+.no-content {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  color: var(--text-muted);
+}
+
+.no-content-icon {
+  font-size: 4rem !important;
+  color: var(--text-light);
+  margin-bottom: var(--spacing-lg);
+}
+
+.no-content h4 {
+  font-size: 1.25rem;
+  color: var(--text-color);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.no-content p {
+  margin: 0 0 var(--spacing-lg) 0;
+  line-height: 1.6;
+}
+
+/* ========================================= */
+/* ACTION BUTTONS */
+/* ========================================= */
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.action-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.action-button .material-icons {
+  font-size: 1.125rem !important;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+  text-decoration: none;
+  color: white;
+}
+
+.secondary-btn {
+  background: var(--surface-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.secondary-btn:hover {
+  background: var(--hover-bg);
+  border-color: var(--primary-color);
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+/* ========================================= */
+/* ERROR STATES */
+/* ========================================= */
 .no-user-found {
   text-align: center;
-  padding: var(--spacing-xl);
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xxl);
+  background: var(--card-bg);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-lg);
   color: var(--text-color);
   max-width: 500px;
   margin: var(--spacing-xxl) auto;
 }
 
-.no-user-found p {
-  font-size: var(--font-size-lg);
+.error-icon {
+  font-size: 4rem !important;
+  color: var(--error-color);
   margin-bottom: var(--spacing-lg);
 }
 
-/* ========================================= */
-/* Duyarlı Tasarım (Responsive Design) */
-/* ========================================= */
-
-@media (min-width: 768px) {
-  .profile-actions {
-    flex-direction: row; /* Tablet ve üzeri için yan yana butonlar */
-    justify-content: center;
-    max-width: none; /* Kısıtlamayı kaldır */
-  }
-
-  .action-button {
-    width: auto; /* Genişliği içeriğe göre ayarla */
-    min-width: 180px; /* Minimum genişlik */
-  }
-
-  .profile-details-grid {
-    grid-template-columns: repeat(2, 1fr); /* Tablet ve üzeri için 2 sütun */
-  }
+.no-user-found h3 {
+  font-size: 1.5rem;
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--text-color);
 }
 
-@media (min-width: 1024px) {
-  .profile-details-grid {
-    grid-template-columns: repeat(3, 1fr); /* Daha büyük ekranlarda 3 sütun */
-  }
+.no-user-found p {
+  color: var(--text-muted);
+  margin: 0 0 var(--spacing-xl) 0;
+  line-height: 1.6;
 }
 
-@media (max-width: 480px) {
+/* ========================================= */
+/* MOBILE RESPONSIVE - UNDER 900PX */
+/* ========================================= */
+@media (max-width: 899px) {
+  /* Container */
+  .profile-container {
+    padding: var(--spacing-md);
+  }
+
   .profile-card {
     padding: var(--spacing-lg);
-    margin: var(--spacing-md);
+    border-radius: var(--border-radius-md);
   }
 
+  /* Header */
   .card-title {
-    font-size: var(--font-size-xxl);
+    font-size: 2rem;
   }
 
   .card-subtitle {
-    font-size: var(--font-size-base);
+    font-size: 1rem;
+  }
+
+  /* User Info Grid */
+  .profile-details-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
 
   .detail-item {
-    padding: var(--spacing-sm);
-    flex-direction: row; /* İkon ve içerik yine yan yana */
-    align-items: center;
+    padding: var(--spacing-md);
   }
 
   .detail-icon {
-    font-size: var(--font-size-xl);
+    font-size: 1.5rem;
     margin-right: var(--spacing-sm);
   }
 
-  .detail-label, .detail-value {
-    font-size: var(--font-size-sm);
+  /* Section Headers */
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: var(--spacing-sm);
   }
 
-  .detail-content {
+  .section-info {
+    justify-content: center;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  /* Actions */
+  .profile-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Courses Grid */
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .course-card {
+    max-width: none;
+  }
+
+  .course-image {
+    height: 160px;
+  }
+
+  .course-info {
+    padding: var(--spacing-md);
+  }
+
+  .course-title {
+    font-size: 1rem;
+  }
+
+  .course-meta {
+    flex-direction: column;
     align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  /* Certificates Grid */
+  .certificates-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .certificate-card {
+    padding: var(--spacing-md);
+  }
+
+  .certificate-actions {
+    flex-direction: column;
+  }
+
+  .cert-action-btn {
+    width: 100%;
+  }
+
+  /* Sections */
+  .my-courses-section,
+  .my-certificates-section {
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+  }
+
+  /* No Content */
+  .no-content {
+    padding: var(--spacing-xl);
+  }
+
+  .no-content-icon {
+    font-size: 3rem !important;
+  }
+
+  /* Loading */
+  .loading-section {
+    padding: var(--spacing-xl);
+  }
+
+  .loading-icon {
+    font-size: 2rem !important;
+  }
+}
+
+/* Tablet Adjustments - 600px to 899px */
+@media (min-width: 600px) and (max-width: 899px) {
+  .profile-details-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .profile-actions {
-    align-items: stretch; /* Mobil dikeyde tam genişlik */
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .action-button {
+    width: auto;
+    min-width: 180px;
+  }
+
+  .courses-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .certificates-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-header {
+    flex-direction: row;
+    text-align: left;
+  }
+}
+
+/* Large Desktop - Above 1200px */
+@media (min-width: 1200px) {
+  .profile-card {
+    max-width: 1400px;
+    padding: var(--spacing-xxl);
+  }
+
+  .courses-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .certificates-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .profile-details-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

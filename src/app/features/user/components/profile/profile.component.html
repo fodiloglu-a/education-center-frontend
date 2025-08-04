@@ -6,11 +6,13 @@
     <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" (closed)="clearMessages()"></app-alert-dialog>
 
     <div class="profile-card" *ngIf="!isLoading && user">
+        <!-- Profile Header -->
         <div class="profile-header">
             <h2 class="card-title">{{ 'PROFILE' | translate }}</h2>
             <p class="card-subtitle">{{ 'PROFILE_SUBTITLE' | translate }}</p>
         </div>
 
+        <!-- User Info Grid -->
         <div class="profile-details-grid">
             <div class="detail-item">
                 <span class="detail-icon material-icons">person</span>
@@ -49,6 +51,7 @@
             </div>
         </div>
 
+        <!-- Account Actions -->
         <div class="profile-actions-section">
             <h3 class="section-title">{{ 'ACCOUNT_ACTIONS' | translate }}</h3>
             <div class="profile-actions">
@@ -58,19 +61,152 @@
                 <button class="action-button secondary-btn" routerLink="/profile/change-password">
                     <span class="material-icons">vpn_key</span> {{ 'CHANGE_PASSWORD' | translate }}
                 </button>
-                <button class="action-button secondary-btn" routerLink="/certificates">
-                    <span class="material-icons">receipt_long</span> {{ 'MY_CERTIFICATES' | translate }}
-                </button>
-                <button class="action-button secondary-btn" routerLink="/reviews/user/{{user.id}}">
-                    <span class="material-icons">rate_review</span> {{ 'MY_REVIEWS' | translate }}
-                </button>
+            </div>
+        </div>
 
+        <!-- My Courses Section -->
+        <div class="my-courses-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="material-icons section-icon">school</span>
+                    {{ 'MY_COURSES' | translate }}
+                </h3>
+                <div class="section-info">
+                    <span class="courses-count">{{ purchasedCourses.length }} {{ 'COURSES' | translate }}</span>
+                    <button *ngIf="purchasedCourses.length > 6"
+                            class="view-all-btn"
+                            (click)="viewAllCourses()">
+                        {{ 'VIEW_ALL' | translate }} (+{{ getRemainingCoursesCount() }})
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Courses -->
+            <div *ngIf="isLoadingCourses" class="loading-section">
+                <div class="loading-message">
+                    <span class="material-icons loading-icon">hourglass_empty</span>
+                    {{ 'LOADING_COURSES' | translate }}
+                </div>
+            </div>
+
+            <!-- Courses Grid -->
+            <div *ngIf="!isLoadingCourses && purchasedCourses.length > 0" class="courses-grid">
+                <div *ngFor="let course of getDisplayedCourses(); trackBy: trackByCourseId"
+                     class="course-card"
+                     (click)="navigateToCourse(course.id)">
+                    <div class="course-image">
+                        <img [src]="course.imageUrl"
+                             [alt]="course.title"
+                             onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
+                        <div class="course-overlay">
+                            <span class="material-icons play-icon">play_circle_filled</span>
+                        </div>
+                    </div>
+                    <div class="course-info">
+                        <h4 class="course-title">{{ course.title }}</h4>
+                        <p class="course-instructor">{{ course.instructorName }}</p>
+                        <div class="course-meta">
+                            <span class="course-category">{{ getCategoryTranslation(course.category) }}</span>
+                            <span *ngIf="course.duration > 0" class="course-duration">
+                                <span class="material-icons">schedule</span>
+                                {{ formatDuration(course.duration) }}
+                            </span>
+                        </div>
+                        <div class="course-price">
+                            <span class="price-value">{{ formatPrice(course.price) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Courses -->
+            <div *ngIf="!isLoadingCourses && purchasedCourses.length === 0" class="no-content">
+                <span class="material-icons no-content-icon">school</span>
+                <h4>{{ 'NO_COURSES_YET' | translate }}</h4>
+                <p>{{ 'NO_COURSES_DESCRIPTION' | translate }}</p>
+                <button class="action-button primary-btn" routerLink="/courses">
+                    <span class="material-icons">explore</span>
+                    {{ 'BROWSE_COURSES' | translate }}
+                </button>
+            </div>
+        </div>
+
+        <!-- My Certificates Section -->
+        <div class="my-certificates-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <span class="material-icons section-icon">workspace_premium</span>
+                    {{ 'MY_CERTIFICATES' | translate }}
+                </h3>
+                <div class="section-info">
+                    <span class="certificates-count">{{ userCertificates.length }} {{ 'CERTIFICATES' | translate }}</span>
+                    <button *ngIf="userCertificates.length > 4"
+                            class="view-all-btn"
+                            (click)="viewAllCertificates()">
+                        {{ 'VIEW_ALL' | translate }} (+{{ getRemainingCertificatesCount() }})
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Certificates -->
+            <div *ngIf="isLoadingCertificates" class="loading-section">
+                <div class="loading-message">
+                    <span class="material-icons loading-icon">hourglass_empty</span>
+                    {{ 'LOADING_CERTIFICATES' | translate }}
+                </div>
+            </div>
+
+            <!-- Certificates Grid -->
+            <div *ngIf="!isLoadingCertificates && userCertificates.length > 0" class="certificates-grid">
+                <div *ngFor="let certificate of getDisplayedCertificates(); trackBy: trackByCertificateId"
+                     class="certificate-card"
+                     (click)="navigateToCertificate(certificate.id)">
+                    <div class="certificate-header">
+                        <span class="material-icons certificate-icon">workspace_premium</span>
+                        <div class="certificate-date">{{ certificate.issueDate | date:'shortDate' }}</div>
+                    </div>
+                    <div class="certificate-content">
+                        <h4 class="certificate-course">{{ certificate.courseTitle }}</h4>
+                        <p class="certificate-code">{{ 'CODE' | translate }}: {{ certificate.uniqueCode }}</p>
+                    </div>
+                    <div class="certificate-actions">
+                        <button class="cert-action-btn view-btn">
+                            <span class="material-icons">visibility</span>
+                            {{ 'VIEW' | translate }}
+                        </button>
+                        <a *ngIf="certificate.certificateUrl"
+                           [href]="certificate.certificateUrl"
+                           target="_blank"
+                           class="cert-action-btn download-btn"
+                           (click)="$event.stopPropagation()">
+                            <span class="material-icons">download</span>
+                            {{ 'DOWNLOAD' | translate }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Certificates -->
+            <div *ngIf="!isLoadingCertificates && userCertificates.length === 0" class="no-content">
+                <span class="material-icons no-content-icon">workspace_premium</span>
+                <h4>{{ 'NO_CERTIFICATES_YET' | translate }}</h4>
+                <p>{{ 'NO_CERTIFICATES_DESCRIPTION' | translate }}</p>
+                <button class="action-button secondary-btn" routerLink="/courses">
+                    <span class="material-icons">school</span>
+                    {{ 'START_LEARNING' | translate }}
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- User Not Found -->
     <div *ngIf="!isLoading && !user && !errorMessage" class="no-user-found">
-        <p>{{ 'USER_NOT_LOADED' | translate }}</p>
-        <button class="action-button primary-btn" (click)="loadUserProfile()">{{ 'RETRY_LOAD_PROFILE' | translate }}</button>
+        <span class="material-icons error-icon">person_off</span>
+        <h3>{{ 'USER_NOT_LOADED' | translate }}</h3>
+        <p>{{ 'USER_LOAD_ERROR_DESCRIPTION' | translate }}</p>
+        <button class="action-button primary-btn" (click)="loadUserProfile()">
+            <span class="material-icons">refresh</span>
+            {{ 'RETRY_LOAD_PROFILE' | translate }}
+        </button>
     </div>
 </div>
