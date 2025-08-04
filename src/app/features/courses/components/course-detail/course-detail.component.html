@@ -102,7 +102,7 @@
         <div class="course-actions">
             <!-- Purchase Button -->
             <button
-                    *ngIf="isLoggedIn && !hasPurchasedCourse && !isInstructorOrAdmin && course.price > 0"
+                    *ngIf="shouldShowPurchaseButton()"
                     class="action-btn purchase-btn"
                     (click)="purchaseCourse()"
                     [disabled]="isLoading">
@@ -112,7 +112,7 @@
 
             <!-- Free Enroll Button -->
             <button
-                    *ngIf="isLoggedIn && !hasPurchasedCourse && !isInstructorOrAdmin && course.price === 0"
+                    *ngIf="shouldShowEnrollButton()"
                     class="action-btn enroll-btn"
                     (click)="purchaseCourse()"
                     [disabled]="isLoading">
@@ -120,19 +120,8 @@
                 {{ 'ENROLL_FREE' | translate }}
             </button>
 
-            <!-- External Purchase Link -->
-            <a
-                    *ngIf="isCourseDetailsResponse(course) && course.externalPurchaseUrl && !hasPurchasedCourse"
-                    [href]="course.externalPurchaseUrl"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="action-btn external-btn">
-                <i class="fas fa-external-link-alt"></i>
-                {{ 'EXTERNAL_PURCHASE' | translate }}
-            </a>
-
             <!-- Login Required Message -->
-            <div class="login-required" *ngIf="!isLoggedIn && !hasPurchasedCourse">
+            <div class="login-required" *ngIf="!isLoggedIn && !hasPurchasedCourse && !isCourseOwner">
                 <p class="login-message">{{ 'LOGIN_REQUIRED_TO_PURCHASE' | translate }}</p>
                 <a routerLink="/login" class="action-btn login-btn">
                     <i class="fas fa-sign-in-alt"></i>
@@ -141,13 +130,19 @@
             </div>
 
             <!-- Already Purchased Message -->
-            <div class="purchased-message" *ngIf="hasPurchasedCourse && !isInstructorOrAdmin">
+            <div class="purchased-message" *ngIf="hasPurchasedCourse && !isCourseOwner">
                 <i class="fas fa-check-circle"></i>
                 <span>{{ 'COURSE_PURCHASED' | translate }}</span>
             </div>
 
-            <!-- Admin Actions -->
-            <div class="admin-actions" *ngIf="isInstructorOrAdmin">
+            <!-- Course Owner Message -->
+            <div class="owner-message" *ngIf="isCourseOwner">
+                <i class="fas fa-crown"></i>
+                <span>{{ 'YOU_ARE_COURSE_OWNER' | translate }}</span>
+            </div>
+
+            <!-- Admin Actions - Sadece kurs sahibi ve admin görebilir -->
+            <div class="admin-actions" *ngIf="canEditCourse()">
                 <button class="action-btn edit-btn" (click)="navigateToCourseEdit()">
                     <i class="fas fa-edit"></i>
                     {{ 'EDIT_COURSE' | translate }}
@@ -179,7 +174,7 @@
             <!-- Course Details (publicly accessible) -->
             <div *ngIf="hasRequirements()" class="content-section">
                 <h2 class="section-title">{{ 'REQUIREMENTS' | translate }}</h2>
-                <ul class="requirements-list">
+                <ul class="requirements-list" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
                     <li *ngFor="let requirement of getCourseRequirements(); trackBy: trackByRequirementIndex">
                         {{ requirement }}
                     </li>
@@ -188,7 +183,7 @@
 
             <div *ngIf="hasWhatYouWillLearn()" class="content-section">
                 <h2 class="section-title">{{ 'WHAT_YOU_WILL_LEARN' | translate }}</h2>
-                <ul class="learning-list">
+                <ul class="learning-list" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
                     <li *ngFor="let item of getCourseWhatYouWillLearn(); trackBy: trackByRequirementIndex">
                         {{ item }}
                     </li>
@@ -197,7 +192,7 @@
 
             <div *ngIf="hasTargetAudience()" class="content-section">
                 <h2 class="section-title">{{ 'TARGET_AUDIENCE' | translate }}</h2>
-                <ul class="audience-list">
+                <ul class="audience-list" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
                     <li *ngFor="let audience of getCourseTargetAudience(); trackBy: trackByRequirementIndex">
                         {{ audience }}
                     </li>
@@ -217,7 +212,7 @@
                     <div
                             class="lesson-item"
                             *ngFor="let lesson of getCourseLessons(); let i = index; trackBy: trackByLessonId"
-                            [class.locked]="">
+                            [class.locked]="!canAccessLesson(lesson)">
                         <div class="lesson-info">
                             <span class="lesson-number">{{ i + 1 }}</span>
                             <div class="lesson-details">
@@ -236,8 +231,8 @@
                     <i class="fas fa-paperclip"></i>
                                         {{ lesson.resources.length }} {{ 'RESOURCES' | translate }}
                   </span>
-                                    <!-- Lock indicator for non-purchased users -->
-                                    <span *ngIf="!hasPurchasedCourse && !lesson.isPreview" class="locked-badge">
+                                    <!-- Lock indicator for non-accessible lessons -->
+                                    <span *ngIf="!canAccessLesson(lesson)" class="locked-badge">
                     <i class="fas fa-lock"></i>
                                         {{ 'LOCKED' | translate }}
                   </span>
@@ -246,9 +241,9 @@
                         </div>
 
                         <div class="lesson-actions">
-                            <!-- Play button for purchased users, instructors, or preview lessons -->
+                            <!-- Play button for accessible lessons -->
                             <button
-
+                                    *ngIf="canAccessLesson(lesson)"
                                     class="play-btn"
                                     (click)="navigateToPlayLesson(lesson.id)">
                                 <i class="fas fa-play"></i>
@@ -256,18 +251,19 @@
                             </button>
 
                             <!-- Purchase required message for locked lessons -->
-                            <div *ngIf="!hasPurchasedCourse && !isInstructorOrAdmin && !lesson.isPreview" class="purchase-required">
+                            <div *ngIf="!canAccessLesson(lesson)" class="purchase-required">
                                 <i class="fas fa-lock"></i>
                                 <span>{{ 'PURCHASE_REQUIRED' | translate }}</span>
                             </div>
 
-                            <!-- Admin lesson actions -->
-                            <div class="admin-lesson-actions" *ngIf="isInstructorOrAdmin">
+                            <!-- Admin lesson actions - Sadece kurs sahibi ve admin görebilir -->
+                            <div class="admin-lesson-actions" *ngIf="canEditCourse()">
                                 <button
                                         class="edit-lesson-btn"
                                         (click)="navigateToLessonEdit(lesson.id)"
                                         [title]="'EDIT_LESSON' | translate">
                                     <i class="fas fa-edit"></i>
+                                    {{ 'EDIT_LESSON' | translate }}
                                 </button>
                                 <button
                                         class="delete-lesson-btn"
@@ -275,6 +271,7 @@
                                         [title]="'DELETE_LESSON' | translate"
                                         [disabled]="isLoading">
                                     <i class="fas fa-trash"></i>
+                                    {{ 'DELETE_LESSON' | translate }}
                                 </button>
                             </div>
                         </div>
@@ -286,7 +283,7 @@
                     <i class="fas fa-video"></i>
                     <h3>{{ 'NO_LESSONS_YET' | translate }}</h3>
                     <p>{{ 'LESSONS_COMING_SOON' | translate }}</p>
-                    <button *ngIf="isInstructorOrAdmin" class="action-btn add-lesson-btn" (click)="navigateToAddLesson()">
+                    <button *ngIf="canEditCourse()" class="action-btn add-lesson-btn" (click)="navigateToAddLesson()">
                         <i class="fas fa-plus"></i>
                         {{ 'ADD_FIRST_LESSON' | translate }}
                     </button>
@@ -298,9 +295,9 @@
                 <div class="section-header">
                     <h2 class="section-title">{{ 'COURSE_REVIEWS' | translate }}</h2>
 
-                    <!-- Add/Edit Review Button -->
+                    <!-- Add/Edit Review Button - Sadece satın alan kullanıcılar ve kurs sahibi -->
                     <button
-                            *ngIf="isLoggedIn && hasPurchasedCourse"
+                            *ngIf="canReview()"
                             class="action-btn review-action-btn"
                             (click)="toggleReviewForm()"
                             [disabled]="isSubmittingReview">
@@ -441,7 +438,7 @@
                     <h3>{{ 'NO_REVIEWS_YET' | translate }}</h3>
                     <p>{{ 'BE_FIRST_TO_REVIEW' | translate }}</p>
                     <button
-                            *ngIf="isLoggedIn && hasPurchasedCourse && !userReview"
+                            *ngIf="canReview() && !userReview"
                             class="action-btn review-action-btn"
                             (click)="toggleReviewForm()">
                         <i class="fas fa-plus"></i>
@@ -459,7 +456,7 @@
                 </div>
 
                 <!-- Purchase Required for Reviews -->
-                <div class="review-purchase-required" *ngIf="isLoggedIn && !hasPurchasedCourse && !isInstructorOrAdmin">
+                <div class="review-purchase-required" *ngIf="isLoggedIn && !canReview()">
                     <p>{{ 'PURCHASE_REQUIRED_TO_REVIEW' | translate }}</p>
                 </div>
             </div>

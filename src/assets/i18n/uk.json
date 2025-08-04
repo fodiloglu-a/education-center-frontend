@@ -615,5 +615,7 @@
   "LEVEL.BEGINNER": "Початковий",
   "LEVEL.INTERMEDIATE": "Середній",
   "LEVEL.ADVANCED": "Просунутий",
-  "LEVEL.ALL_LEVELS": "Усі рівні"
+  "LEVEL.ALL_LEVELS": "Усі рівні",
+  "YOU_ARE_COURSE_OWNER": "Ви власник курсу",
+  "UNAUTHORIZED_ACTION": "У вас немає дозволу на виконання цієї дії"
 }

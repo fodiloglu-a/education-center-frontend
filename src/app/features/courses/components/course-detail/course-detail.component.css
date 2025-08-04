@@ -1,5 +1,86 @@
 /* Course Detail Component Premium Styles */
+.owner-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: 2px solid #f9ca24;
+  border-radius: 12px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
 
+.owner-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f39c12, #e74c3c, #9b59b6, #3498db, #2ecc71, #f1c40f);
+  background-size: 300% 100%;
+  animation: rainbow 3s linear infinite;
+}
+
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.owner-message i.fa-crown {
+  font-size: 20px;
+  color: #e67e22;
+  animation: crown-glow 2s ease-in-out infinite alternate;
+  text-shadow: 0 0 10px rgba(230, 126, 34, 0.3);
+}
+
+@keyframes crown-glow {
+  0% {
+    transform: scale(1);
+    text-shadow: 0 0 10px rgba(230, 126, 34, 0.3);
+  }
+  100% {
+    transform: scale(1.1);
+    text-shadow: 0 0 15px rgba(230, 126, 34, 0.6);
+  }
+}
+
+.owner-message span {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2c3e50;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.5px;
+}
+
+.owner-message:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.owner-message:hover i.fa-crown {
+  animation-duration: 1s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .owner-message {
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  .owner-message i.fa-crown {
+    font-size: 18px;
+  }
+
+  .owner-message span {
+    font-size: 14px;
+  }
+}
 .course-detail-container {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-bg) 100%);

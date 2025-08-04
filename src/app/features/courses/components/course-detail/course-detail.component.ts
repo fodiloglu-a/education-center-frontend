@@ -37,6 +37,7 @@ interface ComponentState {
   isInstructorOrAdmin: boolean;
   showReviewForm: boolean;
   isSubmittingReview: boolean;
+  isCourseOwner: boolean; // Yeni eklenen özellik
 }
 
 @Component({
@@ -76,9 +77,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     hasPurchasedCourse: false,
     isInstructorOrAdmin: false,
     showReviewForm: false,
-    isSubmittingReview: false
+    isSubmittingReview: false,
+    isCourseOwner: false
   };
-  isInstructorCourses: boolean=false
 
   // Lifecycle
   private destroy$ = new Subject<void>();
@@ -93,6 +94,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   get isInstructorOrAdmin(): boolean { return this.currentState.isInstructorOrAdmin; }
   get showReviewForm(): boolean { return this.currentState.showReviewForm; }
   get isSubmittingReview(): boolean { return this.currentState.isSubmittingReview; }
+  get isCourseOwner(): boolean { return this.currentState.isCourseOwner; }
 
   constructor(
       private route: ActivatedRoute,
@@ -134,7 +136,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
             }),
             switchMap(() => this.route.paramMap)
         )
-
         .subscribe(params => {
           const id = params.get('courseId');
           if (id) {
@@ -147,7 +148,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
             });
           }
         });
-    this.checkInstructorCourse()
   }
 
   private initializeReviewForm(): void {
@@ -164,19 +164,30 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     this.updateState({ isLoading: true, errorMessage: null });
 
-    // First check if user has purchased the course
+    // First check if user has purchased the course and is course owner
     const checkAccess$ = this.isLoggedIn
-        ? this.courseService.checkCourseAccess(this.userReview?.id||0,this.courseId)
+        ? this.courseService.checkCourseAccess(this.currentUser?.id || 0, this.courseId)
         : of(false);
 
-    checkAccess$
+    const checkOwnership$ = this.isLoggedIn
+        ? this.courseService.checkCourseForInstructor(this.currentUser?.id || 0, this.courseId)
+        : of(false);
+
+    forkJoin({
+      hasPurchased: checkAccess$,
+      isCourseOwner: checkOwnership$
+    })
         .pipe(
             takeUntil(this.destroy$),
-            switchMap(hasPurchased => {
-              this.updateState({ hasPurchasedCourse: hasPurchased });
+            switchMap(({ hasPurchased, isCourseOwner }) => {
+              this.updateState({
+                hasPurchasedCourse: hasPurchased,
+                isCourseOwner: isCourseOwner,
+                isInstructorOrAdmin: isCourseOwner || this.hasAdminRole()
+              });
 
-              // Load appropriate course data based on purchase status
-              const courseData$ = hasPurchased
+              // Load appropriate course data based on purchase status or ownership
+              const courseData$ = (hasPurchased || isCourseOwner)
                   ? this.courseService.getCourseDetailsById(this.courseId!)
                   : this.courseService.getCourseResponseById(this.courseId!);
 
@@ -217,7 +228,10 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
           review => review.userId === this.currentUser!.id
       ) || null;
     }
+  }
 
+  private hasAdminRole(): boolean {
+    return this.currentUser?.role?.includes('ADMIN') || false;
   }
 
   // ========== COURSE ACTIONS ==========
@@ -444,7 +458,24 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   // ========== LESSON ACTIONS ==========
 
+  editLesson(lessonId: number): void {
+    if (!this.canEditCourse()) {
+      this.updateState({
+        errorMessage: this.translate.instant('UNAUTHORIZED_ACTION')
+      });
+      return;
+    }
+    this.navigateToLessonEdit(lessonId);
+  }
+
   deleteLesson(lessonId: number): void {
+    if (!this.canEditCourse()) {
+      this.updateState({
+        errorMessage: this.translate.instant('UNAUTHORIZED_ACTION')
+      });
+      return;
+    }
+
     if (!this.courseId || !confirm(this.translate.instant('CONFIRM_DELETE_LESSON'))) {
       return;
     }
@@ -472,6 +503,66 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
             });
           }
         });
+  }
+
+  // ========== AUTHORIZATION HELPERS ==========
+
+  /**
+   * Kurs sahibi mi kontrolü yapar
+   */
+  canEditCourse(): boolean {
+    return this.isCourseOwner || this.hasAdminRole();
+  }
+
+  /**
+   * Dersleri görüntüleyebilir mi kontrolü
+   */
+  canAccessLessons(): boolean {
+    return this.hasPurchasedCourse || this.isCourseOwner || this.hasAdminRole();
+  }
+
+  /**
+   * Preview dersi mi kontrolü
+   */
+  canAccessLesson(lesson: LessonDTO): boolean {
+    return lesson.isPreview || this.canAccessLessons();
+  }
+
+  /**
+   * Yorum yapabilir mi kontrolü - Sadece satın alan kullanıcılar ve kurs sahibi
+   */
+  canReview(): boolean {
+    return this.isLoggedIn && (this.hasPurchasedCourse || this.isCourseOwner);
+  }
+
+  /**
+   * Yorumu düzenleyebilir mi kontrolü
+   */
+  canModifyReview(review: ReviewResponse): boolean {
+    return (this.isLoggedIn && this.currentUser?.id === review.userId) ||
+        this.isCourseOwner || this.hasAdminRole();
+  }
+
+  /**
+   * Satın alma butonunu göster mi kontrolü
+   */
+  shouldShowPurchaseButton(): boolean {
+    return this.isLoggedIn &&
+        !this.hasPurchasedCourse &&
+        !this.isCourseOwner &&
+        !this.hasAdminRole() &&
+        this.course!.price > 0;
+  }
+
+  /**
+   * Ücretsiz kayıt butonunu göster mi kontrolü
+   */
+  shouldShowEnrollButton(): boolean {
+    return this.isLoggedIn &&
+        !this.hasPurchasedCourse &&
+        !this.isCourseOwner &&
+        !this.hasAdminRole() &&
+        this.course!.price === 0;
   }
 
   // ========== UTILITY METHODS ==========
@@ -546,14 +637,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     return total / this.courseReviews.length;
   }
 
-  canModifyReview(review: ReviewResponse): boolean {
-    return (this.isLoggedIn && this.currentUser?.id === review.userId) || this.isInstructorOrAdmin;
-  }
-
-  canAccessLessons(): boolean {
-    return this.hasPurchasedCourse || this.isInstructorOrAdmin;
-  }
-
   // ========== TYPE GUARDS ==========
 
   isCourseDetailsResponse(course: CourseResponse | CourseDetailsResponse): course is CourseDetailsResponse {
@@ -592,8 +675,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     if (this.isCourseDetailsResponse(this.course!) && this.course.lessons) {
       return [...this.course.lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
     }
-    return  this.course?.lessons||[]
-
+    return this.course?.lessons || [];
   }
 
   // ========== NAVIGATION HELPERS ==========
@@ -654,21 +736,5 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   trackByRequirementIndex(index: number, requirement: string): number {
     return index;
-  }
-  checkInstructorCourse(): void {
-    console.log('this.currentState');
-    console.log(this.currentState);
-    this.courseService.checkCourseForInstructor(this.currentState.currentUser?.id||0,this.courseId||0).subscribe(
-        result => {
-          if (result) {
-            console.log(result,'result')
-               this.currentState.isInstructorOrAdmin=result;
-          }else {
-              this.currentState.isInstructorOrAdmin=false;
-
-          }
-        }
-    )
-    console.log(this.currentState);
   }
 }

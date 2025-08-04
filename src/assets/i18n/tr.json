@@ -578,7 +578,10 @@
   "LEVEL.BEGINNER": "Başlangıç",
   "LEVEL.INTERMEDIATE": "Orta",
   "LEVEL.ADVANCED": "İleri",
-  "LEVEL.ALL_LEVELS": "Tüm Seviyeler"
+  "LEVEL.ALL_LEVELS": "Tüm Seviyeler",
+  "YOU_ARE_COURSE_OWNER": "Bu kursun sahibisiniz",
+
+  "UNAUTHORIZED_ACTION": "Bu işlemi gerçekleştirme yetkiniz yok"
 
 
 
