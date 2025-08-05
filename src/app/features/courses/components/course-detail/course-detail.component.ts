@@ -1,28 +1,33 @@
 // course-detail.component.ts
 
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  Inject,
+  PLATFORM_ID,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Subject, forkJoin, of } from 'rxjs';
 import { takeUntil, catchError, finalize, switchMap, tap } from 'rxjs/operators';
-
-// Services
 import { CourseService } from '../../services/course.service';
 import { ReviewService } from '../../../reviews/services/review.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { PaymentService } from '../../../payment/payment.service';
-
-// Models
 import { CourseResponse, CourseDetailsResponse, CourseCategory, CourseLevel, LessonDTO } from '../../models/course.models';
 import { ReviewResponse, ReviewRequest } from '../../../reviews/models/review.models';
 import { UserProfile } from '../../../auth/models/auth.models';
-import { PaymentResponse } from '../../../payment/models/payment.models';
-
-// Components
-import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
-import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
+import { PaymentResponse, isValidPaymentResponse, LiqPayStatus } from '../../../payment/models/payment.models';
+import {AlertDialogComponent} from "../../../../shared/components/alert-dialog/alert-dialog.component";
+import {LoadingSpinnerComponent} from "../../../../shared/components/loading-spinner/loading-spinner.component";
+import {TokenService} from "../../../../core/services/token.service";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {environment} from "../../../../../environments/environment";
 
 // LiqPayCheckout global declaration
 declare const LiqPayCheckout: any;
@@ -38,6 +43,8 @@ interface ComponentState {
   showReviewForm: boolean;
   isSubmittingReview: boolean;
   isCourseOwner: boolean;
+  showLiqpayContainer: boolean;
+  isProcessingPayment: boolean;
 }
 
 @Component({
@@ -63,7 +70,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   userReview: ReviewResponse | null = null;
   courseId: number | null = null;
 
-
   // Form
   reviewForm!: FormGroup;
 
@@ -78,7 +84,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
     isInstructorOrAdmin: false,
     showReviewForm: false,
     isSubmittingReview: false,
-    isCourseOwner: false
+    isCourseOwner: false,
+    showLiqpayContainer: false,
+    isProcessingPayment: false,
   };
 
   // Lifecycle
@@ -95,6 +103,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   get showReviewForm(): boolean { return this.currentState.showReviewForm; }
   get isSubmittingReview(): boolean { return this.currentState.isSubmittingReview; }
   get isCourseOwner(): boolean { return this.currentState.isCourseOwner; }
+  get showLiqpayContainer(): boolean { return this.currentState.showLiqpayContainer; }
+  get isProcessingPayment(): boolean { return this.currentState.isProcessingPayment; }
 
   constructor(
       private route: ActivatedRoute,
@@ -105,6 +115,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       private paymentService: PaymentService,
       private translate: TranslateService,
       private cdr: ChangeDetectorRef,
+      private tokenService: TokenService,
+      private http: HttpClient,
       @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.initializeReviewForm();
@@ -166,7 +178,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     // Check user permissions
     const checkAccess$ = this.isLoggedIn
-        ? this.courseService.checkCourseAccess(this.currentUser?.id || 0, this.courseId)
+        ? this.courseService.checkCourseAccess(this.currentUser?.id||0,this.courseId)
         : of(false);
 
     const checkOwnership$ = this.isLoggedIn
@@ -220,7 +232,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
             this.cdr.markForCheck();
           }
         });
-
   }
 
   private processUserReview(): void {
@@ -245,22 +256,62 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.updateState({ isLoading: true, errorMessage: null });
+    // Daha önce satın alınmış mı kontrol et
+    if (this.hasPurchasedCourse) {
+      this.updateState({
+        errorMessage: this.translate.instant('COURSE_ALREADY_PURCHASED')
+      });
+      return;
+    }
+
+    // Kurs sahibi kontrolü
+    if (this.isCourseOwner) {
+      this.updateState({
+        errorMessage: this.translate.instant('CANNOT_PURCHASE_OWN_COURSE')
+      });
+      return;
+    }
+
+    this.updateState({
+      isLoading: true,
+      errorMessage: null,
+      showLiqpayContainer: false,
+      isProcessingPayment: true
+    });
 
     this.paymentService.initiatePayment(this.courseId)
         .pipe(
             takeUntil(this.destroy$),
             finalize(() => {
-              this.updateState({ isLoading: false });
+              this.updateState({
+                isLoading: false,
+                isProcessingPayment: false
+              });
               this.cdr.markForCheck();
             })
         )
         .subscribe({
           next: (response: PaymentResponse) => {
-            this.initializeLiqPay(response);
+            // Response'u validate et
+            if (!isValidPaymentResponse(response)) {
+              this.updateState({
+                errorMessage: this.translate.instant('INVALID_PAYMENT_RESPONSE')
+              });
+              return;
+            }
+
+            // Ödeme formu container'ı göster
+            this.updateState({ showLiqpayContainer: true });
+
+            // Kısa bir delay ile LiqPay'i başlat
+            setTimeout(() => {
+              this.initializeLiqPay(response);
+            }, 100);
           },
           error: (error) => {
+            console.error('Payment initiation error:', error);
             this.updateState({
+              showLiqpayContainer: false,
               errorMessage: error.message || this.translate.instant('PAYMENT_INITIATE_FAILED')
             });
           }
@@ -268,38 +319,162 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   private initializeLiqPay(response: PaymentResponse): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+    // Browser kontrolü
+    if (!isPlatformBrowser(this.platformId)) {
+      console.warn('LiqPay can only be initialized in browser environment');
+      return;
+    }
+
+    // LiqPayCheckout global objesinin varlığını kontrol et
+    if (typeof LiqPayCheckout === 'undefined') {
+      console.error('LiqPayCheckout is not loaded');
+      this.updateState({
+        errorMessage: this.translate.instant('LIQPAY_NOT_LOADED'),
+        showLiqpayContainer: false
+      });
+      return;
+    }
+
+    // Container element'in varlığını kontrol et
+    const container = document.getElementById('liqpay_checkout');
+    if (!container) {
+      console.error('LiqPay container not found');
+      this.updateState({
+        errorMessage: this.translate.instant('LIQPAY_CONTAINER_NOT_FOUND'),
+        showLiqpayContainer: false
+      });
+      return;
+    }
+
+    // Container'ı temizle
+    container.innerHTML = '';
 
     try {
-      LiqPayCheckout.init({
+      console.log('Initializing LiqPay with data:', {
+        hasData: !!response.data,
+        hasSignature: !!response.signature,
+        dataLength: response.data?.length || 0
+      });
+
+      const checkout = LiqPayCheckout.init({
         data: response.data,
         signature: response.signature,
         embedTo: "#liqpay_checkout",
         mode: "embed"
-      }).on("liqpay.callback", (data: any) => {
+      });
+
+      // Event handler'ları ekle
+      checkout.on("liqpay.callback", (data: any) => {
+        console.log('LiqPay callback received:', data);
         this.handlePaymentCallback(data);
-      }).on("liqpay.close", () => {
+      });
+
+      checkout.on("liqpay.ready", () => {
+        console.log('LiqPay form is ready');
+        this.cdr.markForCheck();
+      });
+
+      checkout.on("liqpay.close", () => {
+        console.log('LiqPay form closed');
+        this.updateState({ showLiqpayContainer: false });
+        // Kurs verilerini yenile (ödeme başarılı olmuş olabilir)
         this.loadCourseData();
       });
+
+      checkout.on("liqpay.error", (error: any) => {
+        console.error('LiqPay error:', error);
+        this.updateState({
+          errorMessage: this.translate.instant('LIQPAY_ERROR'),
+          showLiqpayContainer: false
+        });
+      });
+
     } catch (error) {
       console.error('LiqPay initialization error:', error);
       this.updateState({
-        errorMessage: this.translate.instant('PAYMENT_INIT_ERROR')
+        errorMessage: this.translate.instant('PAYMENT_INIT_ERROR'),
+        showLiqpayContainer: false
       });
     }
   }
 
   private handlePaymentCallback(data: any): void {
-    if (data.status === 'success') {
+    console.log('Processing payment callback:', data);
+
+    if (!data) {
       this.updateState({
-        successMessage: this.translate.instant('PAYMENT_SUCCESSFUL')
+        errorMessage: this.translate.instant('INVALID_PAYMENT_CALLBACK')
       });
-      this.loadCourseData();
-    } else {
-      this.updateState({
-        errorMessage: this.translate.instant('PAYMENT_FAILED_WITH_STATUS', { status: data.status })
-      });
+      return;
     }
+
+    // İlk olarak client callback'i backend'e gönder
+    this.sendClientCallback(data);
+
+    // Ödeme durumunu kontrol et
+    if (data.status === LiqPayStatus.SUCCESS || data.status === LiqPayStatus.SANDBOX) {
+      this.updateState({
+        successMessage: this.translate.instant('PAYMENT_SUCCESSFUL'),
+        showLiqpayContainer: false
+      });
+
+      // Kurs verilerini yenile
+      setTimeout(() => {
+        this.loadCourseData();
+      }, 1000);
+
+    } else if (data.status === LiqPayStatus.FAILURE || data.status === LiqPayStatus.ERROR) {
+      this.updateState({
+        errorMessage: this.translate.instant('PAYMENT_FAILED_WITH_STATUS', { status: data.status }),
+        showLiqpayContainer: false
+      });
+    } else {
+      // Diğer durumlar (processing, wait_secure vb.)
+      this.updateState({
+        successMessage: this.translate.instant('PAYMENT_PROCESSING', { status: data.status }),
+        showLiqpayContainer: false
+      });
+
+      // Biraz bekleyip kurs verilerini yenile
+      setTimeout(() => {
+        this.loadCourseData();
+      }, 3000);
+    }
+  }
+
+
+  // YENİ METHOD: Client callback'i backend'e gönder
+  private sendClientCallback(callbackData: any): void {
+    const token = this.tokenService.getAccessToken();
+
+    if (!token) {
+      console.warn('No token available for client callback');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    this.http.post(`${environment.apiUrl}/payment/client-callback`, callbackData, { headers })
+        .pipe(
+            takeUntil(this.destroy$),
+            catchError(error => {
+              console.error('Client callback error:', error);
+              return of(null);
+            })
+        )
+        .subscribe(response => {
+          if (response) {
+            console.log('Client callback response:', response);
+          }
+        });
+  }
+  // Ödeme container'ını manuel olarak kapatma methodu
+  closeLiqPayContainer(): void {
+    this.updateState({ showLiqpayContainer: false });
+    this.cdr.markForCheck();
   }
 
   // ========== REVIEW ACTIONS ==========
@@ -322,6 +497,13 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   submitReview(): void {
     if (this.reviewForm.invalid || !this.courseId || !this.isLoggedIn) {
       this.reviewForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.hasPurchasedCourse && !this.isInstructorOrAdmin) {
+      this.updateState({
+        errorMessage: this.translate.instant('PURCHASE_REQUIRED_TO_REVIEW')
+      });
       return;
     }
 
@@ -527,7 +709,6 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
    */
   canAccessLesson(lesson: LessonDTO): boolean {
     // Preview lessons are accessible to EVERYONE (logged in or not)
-
     if (lesson.preview) {
       return true;
     }
@@ -754,10 +935,19 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   goToInsProfile() {
-   if (this.isLoggedIn){
-     this.router.navigate(['/instructor', this.course?.instructorId]);
-   }else {
-     this.router.navigate(['/auth/login']);
-   }
+    if (this.isLoggedIn){
+      this.router.navigate(['/instructor', this.course?.instructorId]);
+    }else {
+      this.router.navigate(['/auth/login']);
+    }
+  }
+
+  editReview(id: number) {
+    // Find the review to edit
+    const reviewToEdit = this.courseReviews.find(review => review.id === id);
+    if (reviewToEdit && this.canModifyReview(reviewToEdit)) {
+      this.userReview = reviewToEdit;
+      this.toggleReviewForm();
+    }
   }
 }

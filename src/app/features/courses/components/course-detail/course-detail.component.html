@@ -20,6 +20,41 @@
             (closed)="clearMessages()">
     </app-alert-dialog>
 
+    <!-- Payment Checkout Container -->
+    <div class="payment-container" [class.show]="showLiqpayContainer">
+        <!-- Loading State -->
+        <div *ngIf="showLiqpayContainer && isProcessingPayment" class="liqpay-loading-box">
+            <div class="loading-content">
+                <i class="fas fa-spinner fa-spin liqpay-spinner"></i>
+                <p class="liqpay-loading-text">{{ 'LIQPAY_LOADING_FORM' | translate }}</p>
+            </div>
+        </div>
+
+        <!-- LiqPay Container with Close Button -->
+        <div *ngIf="showLiqpayContainer && !isProcessingPayment" class="liqpay-wrapper">
+            <div class="liqpay-header">
+                <h3 class="liqpay-title">{{ 'PAYMENT_FORM' | translate }}</h3>
+                <button
+                        class="close-payment-btn"
+                        (click)="closeLiqPayContainer()"
+                        type="button"
+                        aria-label="Close payment form">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Actual LiqPay Embed Container -->
+            <div id="liqpay_checkout" class="liqpay-embed-container"></div>
+
+            <div class="liqpay-footer">
+                <p class="payment-security-note">
+                    <i class="fas fa-shield-alt"></i>
+                    {{ 'SECURE_PAYMENT_NOTE' | translate }}
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Course Content -->
     <div class="course-content-wrapper" *ngIf="!isLoading && course">
 
@@ -30,7 +65,7 @@
                         [src]="course.imageUrl"
                         [alt]="course.title"
                         class="course-hero-image"
-                        onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
+                        onerror="this.onerror=null;this.src='https://placehold.co/800x450/C3AD90/3D2010?text=Course+Image';" />
 
                 <!-- Course Status Badges -->
                 <div class="course-badges">
@@ -60,7 +95,7 @@
                         </div>
                         <div class="meta-content">
                             <span class="meta-label">{{ 'INSTRUCTOR' | translate }}</span>
-                            <span class="meta-value instructor-name">{{ course.instructorName }}</span>
+                            <a [routerLink]="['/instructors', course.instructorId]" class="meta-value instructor-name">{{ course.instructorName }}</a>
                         </div>
                     </div>
 
@@ -73,13 +108,9 @@
                             <span class="meta-label">{{ 'RATING' | translate }}</span>
                             <div class="rating-display">
                                 <div class="stars">
-                    <span
-                            *ngFor="let star of getStarArray(getAverageRating())"
-                            class="star"
-                            [class.filled]="star.filled"
-                            [class.half]="star.half">
-                        <i class="fas fa-star"></i>
-                    </span>
+                                    <span *ngFor="let star of getStarArray(getAverageRating())" class="star" [class.filled]="star.filled" [class.half]="star.half">
+                                        <i class="fas fa-star"></i>
+                                    </span>
                                 </div>
                                 <span class="rating-text">{{ getAverageRating() | number:'1.1-1' }}</span>
                                 <span class="review-count">({{ courseReviews.length }} {{ 'REVIEWS' | translate }})</span>
@@ -152,44 +183,44 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="course-actions">
+        <div class="course-actions-wrapper">
             <!-- Purchase Button -->
             <button
                     *ngIf="shouldShowPurchaseButton()"
                     class="action-btn purchase-btn"
                     (click)="purchaseCourse()"
-                    [disabled]="isLoading">
-                <i class="fas fa-shopping-cart"></i>
-                {{ 'BUY_NOW' | translate }} - {{ formatPrice(course.price) }}
+                    [disabled]="isLoading || showLiqpayContainer || isProcessingPayment">
+                <i class="fas fa-shopping-cart" *ngIf="!isProcessingPayment"></i>
+                <i class="fas fa-spinner fa-spin" *ngIf="isProcessingPayment"></i>
+                <span>{{ isProcessingPayment ? ('PROCESSING' | translate) : ('BUY_NOW' | translate) }}</span>
+                <span *ngIf="!isProcessingPayment"> - {{ formatPrice(course.price) }}</span>
             </button>
 
-            <!-- GO TO INS PROF Button -->
-            <button
-
-                    class="action-btn edit-btn"
-                    (click)="goToInsProfile()"
-                    [disabled]="isLoading">
-                <i class="fas fa-edit"></i>
-                {{ 'GO_INS_PROFILE' | translate }}
-            </button>
-
-
-            <!-- Free Enroll Button -->
+            <!-- Ücretsiz Kayıt Butonu -->
             <button
                     *ngIf="shouldShowEnrollButton()"
                     class="action-btn enroll-btn"
                     (click)="purchaseCourse()"
-                    [disabled]="isLoading">
-                <i class="fas fa-graduation-cap"></i>
-                {{ 'ENROLL_FREE' | translate }}
+                    [disabled]="isLoading || showLiqpayContainer || isProcessingPayment">
+                <i class="fas fa-graduation-cap" *ngIf="!isProcessingPayment"></i>
+                <i class="fas fa-spinner fa-spin" *ngIf="isProcessingPayment"></i>
+                <span>{{ isProcessingPayment ? ('PROCESSING' | translate) : ('ENROLL_FREE' | translate) }}</span>
+            </button>
+
+            <!-- Eğitmen Profili Butonu -->
+            <button
+                    class="action-btn ins-profile-btn"
+                    (click)="goToInsProfile()">
+                <i class="fas fa-user-circle"></i>
+                <span>{{ 'GO_TO_INS_PROFILE' | translate }}</span>
             </button>
 
             <!-- Login Required Message -->
-            <div class="login-required" *ngIf="!isLoggedIn && !hasPurchasedCourse && !isCourseOwner">
+            <div class="login-required" *ngIf="!isLoggedIn && !isCourseOwner">
                 <p class="login-message">{{ 'LOGIN_REQUIRED_TO_PURCHASE' | translate }}</p>
-                <a routerLink="/login" class="action-btn login-btn">
+                <a routerLink="/auth/login" class="action-btn login-btn">
                     <i class="fas fa-sign-in-alt"></i>
-                    {{ 'LOGIN' | translate }}
+                    <span>{{ 'LOGIN' | translate }}</span>
                 </a>
             </div>
 
@@ -205,62 +236,66 @@
                 <span>{{ 'YOU_ARE_COURSE_OWNER' | translate }}</span>
             </div>
 
-            <!-- Admin Actions - Sadece kurs sahibi ve admin görebilir -->
+            <!-- Admin Actions -->
             <div class="admin-actions" *ngIf="canEditCourse()">
                 <button class="action-btn edit-btn" (click)="navigateToCourseEdit()">
                     <i class="fas fa-edit"></i>
-                    {{ 'EDIT_COURSE' | translate }}
+                    <span>{{ 'EDIT_COURSE' | translate }}</span>
                 </button>
 
                 <button class="action-btn publish-btn" (click)="togglePublishStatus()" [disabled]="isLoading">
                     <i class="fas" [class.fa-eye]="!course.published" [class.fa-eye-slash]="course.published"></i>
-                    {{ course.published ? ('UNPUBLISH_COURSE' | translate) : ('PUBLISH_COURSE' | translate) }}
+                    <span>{{ course.published ? ('UNPUBLISH_COURSE' | translate) : ('PUBLISH_COURSE' | translate) }}</span>
                 </button>
 
                 <button class="action-btn add-lesson-btn" (click)="navigateToAddLesson()">
                     <i class="fas fa-plus"></i>
-                    {{ 'ADD_LESSON' | translate }}
+                    <span>{{ 'ADD_LESSON' | translate }}</span>
                 </button>
 
                 <button class="action-btn delete-btn" (click)="deleteCourse()" [disabled]="isLoading">
                     <i class="fas fa-trash"></i>
-                    {{ 'DELETE_COURSE' | translate }}
+                    <span>{{ 'DELETE_COURSE' | translate }}</span>
                 </button>
             </div>
         </div>
 
-        <!-- Payment Checkout Container -->
-        <div id="liqpay_checkout" class="payment-container"></div>
-
         <!-- Course Content Sections -->
         <div class="course-sections">
 
-            <!-- Course Details (publicly accessible) -->
-            <div *ngIf="hasRequirements()" class="content-section">
-                <h2 class="section-title">{{ 'REQUIREMENTS' | translate }}</h2>
-                <ul class="requirements-list" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
-                    <li *ngFor="let requirement of getCourseRequirements(); trackBy: trackByRequirementIndex">
-                        {{ requirement }}
-                    </li>
-                </ul>
-            </div>
-
-            <div *ngIf="hasWhatYouWillLearn()" class="content-section">
-                <h2 class="section-title">{{ 'WHAT_YOU_WILL_LEARN' | translate }}</h2>
-                <ul class="learning-list" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
-                    <li *ngFor="let item of getCourseWhatYouWillLearn(); trackBy: trackByRequirementIndex">
-                        {{ item }}
-                    </li>
-                </ul>
-            </div>
-
-            <div *ngIf="hasTargetAudience()" class="content-section">
-                <h2 class="section-title">{{ 'TARGET_AUDIENCE' | translate }}</h2>
-                <ul class="audience-list" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
-                    <li *ngFor="let audience of getCourseTargetAudience(); trackBy: trackByRequirementIndex">
-                        {{ audience }}
-                    </li>
-                </ul>
+            <!-- Description, Requirements, What You Will Learn, Target Audience -->
+            <div class="content-section info-blocks">
+                <div *ngIf="isCourseDetailsResponse(course) && course.description" class="content-block">
+                    <h3 class="block-title">{{ 'DESCRIPTION' | translate }}</h3>
+                    <p class="long-description">{{ course.description }}</p>
+                </div>
+                <div *ngIf="isCourseDetailsResponse(course) && hasRequirements()" class="content-block">
+                    <h3 class="block-title">{{ 'REQUIREMENTS' | translate }}</h3>
+                    <ul class="info-list">
+                        <li *ngFor="let item of getCourseRequirements(); trackBy: trackByRequirementIndex">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <span class="info-text">{{ item }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="isCourseDetailsResponse(course) && hasWhatYouWillLearn()" class="content-block">
+                    <h3 class="block-title">{{ 'WHAT_YOU_WILL_LEARN' | translate }}</h3>
+                    <ul class="info-list">
+                        <li *ngFor="let item of getCourseWhatYouWillLearn(); trackBy: trackByRequirementIndex">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <span class="info-text">{{ item }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div *ngIf="isCourseDetailsResponse(course) && hasTargetAudience()" class="content-block">
+                    <h3 class="block-title">{{ 'TARGET_AUDIENCE' | translate }}</h3>
+                    <ul class="info-list">
+                        <li *ngFor="let item of getCourseTargetAudience(); trackBy: trackByRequirementIndex">
+                            <i class="fas fa-check-circle check-icon"></i>
+                            <span class="info-text">{{ item }}</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Lessons Section -->
@@ -268,96 +303,64 @@
                 <div class="section-header">
                     <h2 class="section-title">{{ 'COURSE_LESSONS' | translate }}</h2>
                     <span class="lesson-count" *ngIf="hasLessons()">{{ getCourseLessons().length }} {{ 'LESSONS' | translate }}</span>
-                    <span class="lesson-count" *ngIf="!hasLessons()">0 {{ 'LESSONS' | translate }}</span>
                 </div>
 
-                <!-- Lessons List -->
                 <div class="lessons-list" *ngIf="hasLessons()">
                     <div
                             class="lesson-item"
-                            *ngFor="let lesson of getCourseLessons(); let i = index; trackBy: trackByLessonId"
-                            [class.locked]="!canAccessLesson(lesson)"
-                            [class.preview]="lesson.preview"
-                            [class.accessible]="canAccessLesson(lesson)"
-                    >
+                            *ngFor="let lesson of getCourseLessons(); let i = index; trackBy: trackByLessonId">
 
                         <div class="lesson-info">
                             <span class="lesson-number">{{ i + 1 }}</span>
                             <div class="lesson-details">
                                 <h4 class="lesson-title">{{ lesson.title }}</h4>
-                                <p class="lesson-description" *ngIf="lesson.description">{{ lesson.description }}</p>
                                 <div class="lesson-meta">
                                     <span *ngIf="lesson.duration > 0" class="lesson-duration">
                                         <i class="fas fa-clock"></i>
                                         {{ formatDuration(lesson.duration) }}
                                     </span>
-
-                                    <!-- Preview Badge - Sadece preview derslerde -->
                                     <span *ngIf="lesson.preview" class="preview-badge">
                                         <i class="fas fa-eye"></i>
                                         {{ 'PREVIEW' | translate }}
-                                    </span>
-
-                                    <!-- Resources Badge -->
-                                    <span *ngIf="lesson.resources && lesson.resources.length > 0" class="resources-badge">
-                                        <i class="fas fa-paperclip"></i>
-                                        {{ lesson.resources.length }} {{ 'RESOURCES' | translate }}
-                                    </span>
-
-                                    <!-- Locked Badge - Sadece erişilemeyen derslerde -->
-                                    <span *ngIf="!canAccessLesson(lesson)" class="locked-badge">
-                                        <i class="fas fa-lock"></i>
-                                        {{ 'LOCKED' | translate }}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="lesson-actions">
-                            <!-- Play Button - Her zaman canAccessLesson kontrolü ile -->
                             <a *ngIf="canAccessLesson(lesson)"
                                [routerLink]="['/courses', courseId, 'lessons', lesson.id]"
-                               class="play-btn">
-                                <i class="fas fa-play"></i>
-                                {{ lesson.preview ? ('PREVIEW_LESSON' | translate) : ('PLAY_LESSON' | translate) }}
+                               class="action-btn play-btn">
+                                <i class="fas fa-play-circle"></i>
+                                <span>{{ 'PLAY' | translate }}</span>
                             </a>
-
-                            <!-- Purchase Required - Sadece erişilemeyen dersler için -->
-                            <div *ngIf="!canAccessLesson(lesson)" class="purchase-required">
+                            <button *ngIf="!canAccessLesson(lesson)" class="action-btn locked-btn" disabled>
                                 <i class="fas fa-lock"></i>
-                                <span>{{ 'PURCHASE_REQUIRED' | translate }}</span>
-                            </div>
+                                <span>{{ 'LOCKED' | translate }}</span>
+                            </button>
 
-                            <!-- Admin Lesson Actions - Sadece kurs sahibi ve admin -->
+                            <!-- Admin lesson actions -->
                             <div class="admin-lesson-actions" *ngIf="canEditCourse()">
-                                <button
-                                        class="edit-lesson-btn"
-                                        (click)="navigateToLessonEdit(lesson.id)"
-                                        [title]="'EDIT_LESSON' | translate">
+                                <button class="action-btn secondary-btn" (click)="editLesson(lesson.id)">
                                     <i class="fas fa-edit"></i>
-                                    <span class="btn-text">{{ 'EDIT_LESSON' | translate }}</span>
+                                    <span>{{ 'EDIT' | translate }}</span>
                                 </button>
-                                <button
-                                        class="delete-lesson-btn"
-                                        (click)="deleteLesson(lesson.id)"
-                                        [title]="'DELETE_LESSON' | translate"
-                                        [disabled]="isLoading">
+                                <button class="action-btn danger-btn" (click)="deleteLesson(lesson.id)">
                                     <i class="fas fa-trash"></i>
-                                    <span class="btn-text">{{ 'DELETE_LESSON' | translate }}</span>
+                                    <span>{{ 'DELETE' | translate }}</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Empty Lessons State -->
                 <div *ngIf="!hasLessons()" class="no-lessons">
                     <i class="fas fa-video"></i>
                     <h3>{{ 'NO_LESSONS_YET' | translate }}</h3>
                     <p>{{ 'LESSONS_COMING_SOON' | translate }}</p>
                     <button *ngIf="canEditCourse()" class="action-btn add-lesson-btn" (click)="navigateToAddLesson()">
                         <i class="fas fa-plus"></i>
-                        {{ 'ADD_FIRST_LESSON' | translate }}
+                        <span>{{ 'ADD_FIRST_LESSON' | translate }}</span>
                     </button>
                 </div>
             </div>
@@ -366,56 +369,44 @@
             <div class="content-section reviews-section">
                 <div class="section-header">
                     <h2 class="section-title">{{ 'COURSE_REVIEWS' | translate }}</h2>
+                </div>
 
-                    <!-- Add/Edit Review Button - Sadece satın alan kullanıcılar ve kurs sahibi -->
-                    <button
-                            *ngIf="canReview()"
-                            class="action-btn review-action-btn"
-                            (click)="toggleReviewForm()"
-                            [disabled]="isSubmittingReview">
-                        <i class="fas" [class.fa-plus]="!userReview" [class.fa-edit]="userReview"></i>
-                        {{ userReview ? ('EDIT_MY_REVIEW' | translate) : ('ADD_REVIEW' | translate) }}
+                <div class="review-summary" *ngIf="courseReviews.length > 0">
+                    <div class="summary-rating-stars">
+                        <span class="average-score">{{ getAverageRating() | number:'1.1-1' }}</span>
+                        <div class="stars-large">
+                            <i *ngFor="let star of getStarArray(getAverageRating())" class="fas fa-star" [class.filled]="star.filled" [class.half]="star.half"></i>
+                        </div>
+                    </div>
+                    <span class="total-reviews">({{ courseReviews.length }} {{ 'REVIEWS_IN_TOTAL' | translate }})</span>
+                </div>
+
+                <div class="review-action-buttons">
+                    <button *ngIf="canReview() && !userReview" class="action-btn primary-btn add-review-btn" (click)="toggleReviewForm()">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>{{ 'ADD_REVIEW' | translate }}</span>
+                    </button>
+                    <button *ngIf="userReview" class="action-btn secondary-btn edit-review-btn" (click)="toggleReviewForm()">
+                        <i class="fas fa-edit"></i>
+                        <span>{{ 'EDIT_MY_REVIEW' | translate }}</span>
                     </button>
                 </div>
 
-                <!-- Review Summary -->
-                <div class="review-summary" *ngIf="courseReviews.length > 0">
-                    <div class="summary-rating">
-                        <span class="average-score">{{ getAverageRating() | number:'1.1-1' }}</span>
-                        <div class="stars-large">
-                            <span
-                                    *ngFor="let star of getStarArray(getAverageRating())"
-                                    class="star"
-                                    [class.filled]="star.filled"
-                                    [class.half]="star.half">
-                                <i class="fas fa-star"></i>
-                            </span>
-                        </div>
-                        <span class="total-reviews">{{ courseReviews.length }} {{ 'REVIEWS' | translate }}</span>
-                    </div>
-                </div>
-
-                <!-- Review Form -->
                 <div class="review-form-container" *ngIf="showReviewForm">
                     <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
                         <div class="form-group">
                             <label for="rating">{{ 'RATING' | translate }}</label>
-                            <select
-                                    id="rating"
-                                    formControlName="rating"
-                                    class="rating-select"
-                                    [class.is-invalid]="rating?.invalid && (rating?.dirty || rating?.touched)">
-                                <option value="5">5 {{ 'STARS' | translate }} - {{ 'EXCELLENT' | translate }}</option>
-                                <option value="4">4 {{ 'STARS' | translate }} - {{ 'VERY_GOOD' | translate }}</option>
-                                <option value="3">3 {{ 'STARS' | translate }} - {{ 'GOOD' | translate }}</option>
-                                <option value="2">2 {{ 'STARS' | translate }} - {{ 'FAIR' | translate }}</option>
-                                <option value="1">1 {{ 'STAR' | translate }} - {{ 'POOR' | translate }}</option>
+                            <select id="rating" formControlName="rating" class="rating-select" [class.is-invalid]="rating?.invalid && (rating?.dirty || rating?.touched)">
+                                <option value="5">5 {{ 'STARS' | translate }}</option>
+                                <option value="4">4 {{ 'STARS' | translate }}</option>
+                                <option value="3">3 {{ 'STARS' | translate }}</option>
+                                <option value="2">2 {{ 'STARS' | translate }}</option>
+                                <option value="1">1 {{ 'STAR' | translate }}</option>
                             </select>
                             <div *ngIf="rating?.invalid && (rating?.dirty || rating?.touched)" class="invalid-feedback">
                                 {{ 'RATING_REQUIRED' | translate }}
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label for="comment">{{ 'COMMENT' | translate }}</label>
                             <textarea
@@ -426,109 +417,75 @@
                                     [placeholder]="'COMMENT_PLACEHOLDER' | translate"
                                     [class.is-invalid]="comment?.invalid && (comment?.dirty || comment?.touched)">
                             </textarea>
-                            <div class="char-count" [class.over-limit]="(comment?.value?.length || 0) > 500">
-                                {{ comment?.value?.length || 0 }}/500
-                            </div>
                             <div *ngIf="comment?.invalid && (comment?.dirty || comment?.touched)" class="invalid-feedback">
-                                {{ 'COMMENT_MAX_LENGTH' | translate }}
+                                {{ 'COMMENT_TOO_LONG' | translate }}
                             </div>
                         </div>
-
                         <div class="form-actions">
-                            <button
-                                    type="submit"
-                                    class="submit-btn"
-                                    [disabled]="reviewForm.invalid || isSubmittingReview">
+                            <button type="submit" class="submit-btn" [disabled]="reviewForm.invalid || isSubmittingReview">
                                 <i class="fas fa-save" *ngIf="!isSubmittingReview"></i>
                                 <i class="fas fa-spinner fa-spin" *ngIf="isSubmittingReview"></i>
-                                {{ userReview ? ('UPDATE_REVIEW' | translate) : ('SUBMIT_REVIEW' | translate) }}
+                                <span>{{ userReview ? ('UPDATE_REVIEW' | translate) : ('SUBMIT_REVIEW' | translate) }}</span>
                             </button>
-
-                            <button
-                                    type="button"
-                                    class="cancel-btn"
-                                    (click)="toggleReviewForm()"
-                                    [disabled]="isSubmittingReview">
-                                {{ 'CANCEL' | translate }}
+                            <button type="button" class="cancel-btn" (click)="toggleReviewForm()" [disabled]="isSubmittingReview">
+                                <span>{{ 'CANCEL' | translate }}</span>
                             </button>
                         </div>
                     </form>
                 </div>
 
-                <!-- Reviews List -->
-                <div class="reviews-list" *ngIf="courseReviews.length > 0">
-                    <div
-                            class="review-item"
-                            *ngFor="let review of courseReviews; trackBy: trackByReviewId"
-                            [class.user-review]="currentUser?.id === review.userId">
-
+                <div class="review-list" *ngIf="courseReviews.length > 0">
+                    <div class="review-item" *ngFor="let review of courseReviews; trackBy: trackByReviewId">
                         <div class="review-header">
                             <div class="reviewer-info">
-                                <span class="reviewer-name">{{ review.userName }}</span>
-                                <div class="review-rating">
-                                    <span
-                                            *ngFor="let star of getStarArray(review.rating)"
-                                            class="star"
-                                            [class.filled]="star.filled">
-                                        <i class="fas fa-star"></i>
-                                    </span>
-                                    <span class="rating-number">({{ review.rating }})</span>
+                                <i class="fas fa-user-circle reviewer-avatar"></i>
+                                <div class="reviewer-details">
+                                    <span class="reviewer-name">{{ review.userName }}</span>
+                                    <div class="review-rating-stars">
+                                        <i *ngFor="let star of getStarArray(review.rating)" class="fas fa-star" [class.filled]="star.filled"></i>
+                                    </div>
                                 </div>
                             </div>
-
                             <div class="review-meta">
-                                <span class="review-date">{{ review.createdAt | date:'mediumDate' }}</span>
+                                <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
                                 <div class="review-actions" *ngIf="canModifyReview(review)">
                                     <button
-                                            class="edit-review-btn"
-                                            (click)="toggleReviewForm()"
                                             *ngIf="currentUser?.id === review.userId"
-                                            [disabled]="isSubmittingReview"
-                                            [title]="'EDIT_REVIEW' | translate">
+                                            class="action-btn secondary-btn"
+                                            (click)="editReview(review.id)">
                                         <i class="fas fa-edit"></i>
+                                        <span>{{ 'EDIT' | translate }}</span>
                                     </button>
-                                    <button
-                                            class="delete-review-btn"
-                                            (click)="deleteReview(review.id)"
-                                            [disabled]="isLoading"
-                                            [title]="'DELETE_REVIEW' | translate">
+                                    <button class="action-btn danger-btn" (click)="deleteReview(review.id)">
                                         <i class="fas fa-trash"></i>
+                                        <span>{{ 'DELETE' | translate }}</span>
                                     </button>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="review-content" *ngIf="review.comment && review.comment.trim()">
-                            <p class="review-comment">{{ review.comment }}</p>
-                        </div>
+                        <p class="review-comment" *ngIf="review.comment">{{ review.comment }}</p>
                     </div>
                 </div>
 
-                <!-- No Reviews Message -->
                 <div class="no-reviews" *ngIf="courseReviews.length === 0">
                     <i class="fas fa-comments"></i>
                     <h3>{{ 'NO_REVIEWS_YET' | translate }}</h3>
                     <p>{{ 'BE_FIRST_TO_REVIEW' | translate }}</p>
-                    <button
-                            *ngIf="canReview() && !userReview"
-                            class="action-btn review-action-btn"
-                            (click)="toggleReviewForm()">
-                        <i class="fas fa-plus"></i>
-                        {{ 'ADD_FIRST_REVIEW' | translate }}
+                    <button *ngIf="canReview()" class="action-btn primary-btn" (click)="toggleReviewForm()">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>{{ 'ADD_FIRST_REVIEW' | translate }}</span>
                     </button>
                 </div>
 
-                <!-- Login Required for Reviews -->
                 <div class="review-login-required" *ngIf="!isLoggedIn">
                     <p>{{ 'LOGIN_REQUIRED_TO_REVIEW' | translate }}</p>
-                    <a routerLink="/login" class="action-btn login-btn">
+                    <a routerLink="/auth/login" class="action-btn login-btn">
                         <i class="fas fa-sign-in-alt"></i>
-                        {{ 'LOGIN' | translate }}
+                        <span>{{ 'LOGIN' | translate }}</span>
                     </a>
                 </div>
 
-                <!-- Purchase Required for Reviews -->
-                <div class="review-purchase-required" *ngIf="isLoggedIn && !canReview()">
+                <div class="review-purchase-required" *ngIf="isLoggedIn && !canReview() && !isCourseOwner">
                     <p>{{ 'PURCHASE_REQUIRED_TO_REVIEW' | translate }}</p>
                 </div>
             </div>
@@ -542,7 +499,7 @@
         <p>{{ 'COURSE_NOT_FOUND_MESSAGE' | translate }}</p>
         <button class="action-btn primary-btn" routerLink="/courses">
             <i class="fas fa-arrow-left"></i>
-            {{ 'BACK_TO_COURSES' | translate }}
+            <span>{{ 'BACK_TO_COURSES' | translate }}</span>
         </button>
     </div>
 </div>

@@ -1,11 +1,12 @@
 // src/app/features/payment/payment.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
-import { TokenService } from '../../core/services/token.service'; // TokenService'i import ediyoruz
+import { TokenService } from '../../core/services/token.service';
 import { PaymentResponse } from './models/payment.models';
-import {environment} from "../../../environments/environment";
+import { environment } from "../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -28,16 +29,55 @@ export class PaymentService {
     const token = this.tokenService.getAccessToken();
 
     if (!token) {
-      return new Observable(observer => {
-        observer.error(new Error('JWT token bulunamadı. Lütfen giriş yapın.'));
-        observer.complete();
-      });
+      return throwError(() => new Error('JWT token bulunamadı. Lütfen giriş yapın.'));
     }
 
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
 
-    return this.http.post<PaymentResponse>(`${this.apiUrl}/checkout/${courseId}`, {}, { headers });
+    return this.http.post<PaymentResponse>(
+        `${this.apiUrl}/checkout/${courseId}`,
+        {},
+        { headers }
+    ).pipe(
+        catchError(this.handleError)
+    );
+  }
+
+  /**
+   * HTTP hatalarını işler
+   */
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Ödeme işlemi başlatılırken bir hata oluştu.';
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Hata: ${error.error.message}`;
+    } else {
+      // Server-side error
+      switch (error.status) {
+        case 401:
+          errorMessage = 'Yetkilendirme hatası. Lütfen tekrar giriş yapın.';
+          break;
+        case 403:
+          errorMessage = 'Bu kursa erişim yetkiniz bulunmuyor.';
+          break;
+        case 404:
+          errorMessage = 'Kurs bulunamadı.';
+          break;
+        case 409:
+          errorMessage = 'Bu kursu zaten satın aldınız.';
+          break;
+        case 500:
+          errorMessage = 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+          break;
+        default:
+          errorMessage = error.error?.message || `Hata kodu: ${error.status}`;
+      }
+    }
+
+    return throwError(() => new Error(errorMessage));
   }
 }
