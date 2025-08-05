@@ -6,7 +6,7 @@ import { RoleGuard } from './core/guards/role.guard';
 import {HomeComponent} from "./features/home/components/home/home.component";
 import {
   InstructorProfileComponent
-} from "./features/home/features/instructor/instructor-profile/instructor-profile.component";
+} from "./features/instructor/components/instructor-profile/instructor-profile.component";
 
 
 // Uygulamanın ana yönlendirme tanımları.

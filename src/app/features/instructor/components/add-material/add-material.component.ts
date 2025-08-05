@@ -26,9 +26,12 @@ export class AddMaterialComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private mediaService: AddMaterialService) {}
+  constructor(private mediaService: AddMaterialService) {
+    console.log('BETHOD GIRIS')
+  }
 
   ngOnInit(): void {
+    console.log('BETHOD GIRIS')
     this.loadMedia();
   }
 

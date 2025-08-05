@@ -754,6 +754,10 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   }
 
   goToInsProfile() {
-   this.router.navigate(['/instructor', this.course?.instructorId]);
+   if (this.isLoggedIn){
+     this.router.navigate(['/instructor', this.course?.instructorId]);
+   }else {
+     this.router.navigate(['/auth/login']);
+   }
   }
 }

@@ -15,7 +15,7 @@ export const INSTRUCTOR_ROUTES: Routes = [
     title: 'Eğitmen Paneli' // Sayfa başlığı
   },
   {
-    path: 'add-material', // '/instructor/courses' yolu (eğitmen kurs listesi)
+    path: 'add-material', //
     component: AddMaterialComponent,
     title: 'Eğitmen Kurslarım'
   },

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { InstructorProfileDTO } from "../../../../user/models/user.models";
-import { UserService } from "../../../../user/services/user.service";
+import { InstructorProfileDTO } from "../../../user/models/user.models";
+import { UserService } from "../../../user/services/user.service";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
-import {CourseResponse} from "../../../../courses/models/course.models";
+import {CourseResponse} from "../../../courses/models/course.models";
 
 
 @Component({
