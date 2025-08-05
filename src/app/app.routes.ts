@@ -20,11 +20,6 @@ export const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'instructor/:id',
-    component: InstructorProfileComponent,
-    title: 'Eğitmen Profili'
-  },
-  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
@@ -52,6 +47,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
     title: 'Eğitmen Paneli'
+  },
+  {
+    path: 'instructor/:id',
+    component: InstructorProfileComponent,
+    title: 'Eğitmen Profili'
   },
   {
     path: 'admin',
