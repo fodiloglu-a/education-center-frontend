@@ -18,7 +18,7 @@ import { takeUntil, catchError, finalize, switchMap, tap } from 'rxjs/operators'
 import { CourseService } from '../../services/course.service';
 import { ReviewService } from '../../../reviews/services/review.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { PaymentService } from '../../../payment/payment.service';
+import { PaymentService } from '../../../payment/services/payment.service';
 import { CourseResponse, CourseDetailsResponse, CourseCategory, CourseLevel, LessonDTO } from '../../models/course.models';
 import { ReviewResponse, ReviewRequest } from '../../../reviews/models/review.models';
 import { UserProfile } from '../../../auth/models/auth.models';
@@ -249,6 +249,8 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   // ========== COURSE ACTIONS ==========
 
   purchaseCourse(): void {
+    console.log('Purchase button clicked, courseId:', this.courseId); // BU SATIRI EKLEYİN
+
     if (!this.courseId || !this.course || !this.isLoggedIn) {
       this.updateState({
         errorMessage: this.translate.instant('PURCHASE_ERROR_REQUIREMENTS')
@@ -272,50 +274,9 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.updateState({
-      isLoading: true,
-      errorMessage: null,
-      showLiqpayContainer: false,
-      isProcessingPayment: true
-    });
-
-    this.paymentService.initiatePayment(this.courseId)
-        .pipe(
-            takeUntil(this.destroy$),
-            finalize(() => {
-              this.updateState({
-                isLoading: false,
-                isProcessingPayment: false
-              });
-              this.cdr.markForCheck();
-            })
-        )
-        .subscribe({
-          next: (response: PaymentResponse) => {
-            // Response'u validate et
-            if (!isValidPaymentResponse(response)) {
-              this.updateState({
-                errorMessage: this.translate.instant('INVALID_PAYMENT_RESPONSE')
-              });
-              return;
-            }
-
-            // Ödeme formu container'ı göster
-            this.updateState({ showLiqpayContainer: true });
-
-            // Kısa bir delay ile LiqPay'i başlat
-            setTimeout(() => {
-              this.initializeLiqPay(response);
-            }, 100);
-          },
-          error: (error) => {
-            console.error('Payment initiation error:', error);
-            this.updateState({
-              showLiqpayContainer: false,
-              errorMessage: error.message || this.translate.instant('PAYMENT_INITIATE_FAILED')
-            });
-          }
-        });
+    // YENİ: Checkout sayfasına yönlendir
+    console.log('Navigating to checkout:', this.courseId);
+    this.router.navigate(['/checkout', this.courseId]);
   }
 
   private initializeLiqPay(response: PaymentResponse): void {

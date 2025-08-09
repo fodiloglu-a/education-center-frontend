@@ -4,9 +4,9 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { TokenService } from '../../core/services/token.service';
-import { PaymentResponse } from './models/payment.models';
-import { environment } from "../../../environments/environment";
+import { TokenService } from '../../../core/services/token.service';
+import { PaymentResponse } from '../models/payment.models';
+import { environment } from "../../../../environments/environment";
 
 @Injectable({
   providedIn: 'root'

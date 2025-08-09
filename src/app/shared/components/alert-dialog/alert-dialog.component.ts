@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core'; // ngx-translate için
   styleUrl: './alert-dialog.component.css' // Bileşenin CSS stil dosyası
 })
 export class AlertDialogComponent implements OnInit {
-  @Input() message: string = ''; // Gösterilecek mesaj
+  @Input({transform: (value: string | null): string => ''}) message: string = ''; // Gösterilecek mesaj
   @Input() type: 'success' | 'error' | 'info' | 'warning' = 'info'; // Mesajın türü
   @Input() showCloseButton: boolean = true; // Kapatma butonu gösterilsin mi?
   @Input() autoClose: boolean = false; // Otomatik kapansın mı?
@@ -22,6 +22,7 @@ export class AlertDialogComponent implements OnInit {
   @Output() closed = new EventEmitter<void>(); // Kapatma olayı
 
   private timeoutId: any; // Otomatik kapanma zamanlayıcısı için
+  @Input() isError!: boolean;
 
   ngOnInit(): void {
     if (this.autoClose) {

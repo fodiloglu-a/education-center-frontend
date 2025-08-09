@@ -7,16 +7,17 @@ import {HomeComponent} from "./features/home/components/home/home.component";
 import {
   InstructorProfileComponent
 } from "./features/instructor/components/instructor-profile/instructor-profile.component";
+import {PaymentCheckoutComponent} from "./features/payment/components/payment-checkout/payment-checkout.component";
 
 
 // Uygulamanın ana yönlendirme tanımları.
 export const routes: Routes = [
   {
     path: '',
-    component: HomeComponent, // Ana yolu Home Component'e yönlendiriyoruz
+    component: HomeComponent,
   },
   {
-    path: 'home', // 'home' yolunu da home component'e yönlendirebilirsiniz
+    path: 'home',
     component: HomeComponent,
   },
   {
@@ -42,7 +43,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'instructor', // Yeni eğitmen rotası
+    path: 'instructor',
     loadChildren: () => import('./features/instructor/instructor.routes').then(m => m.INSTRUCTOR_ROUTES),
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ROLE_INSTRUCTOR', 'ROLE_ADMIN'] },
@@ -60,8 +61,15 @@ export const routes: Routes = [
     data: { roles: ['ROLE_ADMIN'] },
     title: 'Yönetici Paneli'
   },
+  // CHECKOUT ROUTE'U BURAYA TAŞIYIN:
+  {
+    path: 'checkout/:courseId',
+    component: PaymentCheckoutComponent,
+    title: 'Checkout'
+  },
+  // WILDCARD EN SONDA OLMALI:
   {
     path: '**',
-    redirectTo: '' // Tanımsız yollar için ana sayfaya yönlendirme
+    redirectTo: ''
   }
 ];

@@ -1,0 +1,337 @@
+<div class="checkout-container">
+    <!-- Loading Spinner -->
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+
+    <!-- Alert Messages -->
+    <div class="alert-messages" *ngIf="errorMessage || successMessage || warningMessage">
+        <!-- Error Messages -->
+        <app-alert-dialog
+                *ngIf="errorMessage"
+                [message]="errorMessage"
+                type="error"
+                [autoClose]="true"
+                (closed)="clearMessages()">
+        </app-alert-dialog>
+
+        <!-- Success Messages -->
+        <app-alert-dialog
+                *ngIf="successMessage"
+                [message]="successMessage"
+                type="success"
+                [autoClose]="true"
+                (closed)="clearMessages()">
+        </app-alert-dialog>
+
+        <!-- Warning Messages -->
+        <app-alert-dialog
+                *ngIf="warningMessage"
+                [message]="warningMessage"
+                type="warning"
+                [autoClose]="true"
+                (closed)="clearMessages()">
+        </app-alert-dialog>
+    </div>
+
+    <!-- Main Content -->
+    <div class="checkout-content" *ngIf="!isLoading && course">
+
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button class="back-btn" (click)="goBack()" type="button" [attr.aria-label]="'BACK' | translate">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1 class="checkout-title">{{ 'CHECKOUT' | translate }}</h1>
+            <div class="header-spacer"></div>
+        </div>
+
+        <!-- Course Info Card -->
+        <div class="course-info-card">
+            <div class="course-image-wrapper">
+                <img
+                        class="course-image"
+                        [src]="course.imageUrl"
+                        [alt]="course.title"
+                        onerror="this.onerror=null;this.src='https://placehold.co/350x200/C3AD90/3D2010?text=Course+Image';"
+                        loading="lazy">
+                <div class="course-price-badge">
+                    {{ formatCurrency(course.price) }}
+                </div>
+            </div>
+            <div class="course-details">
+                <h2 class="course-title">{{ course.title }}</h2>
+                <p class="course-instructor">
+                    <i class="fas fa-user-tie"></i>
+                    {{ course.instructorName }}
+                </p>
+                <div class="course-meta">
+                    <div class="meta-item" *ngIf="course.duration > 0">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ course.duration }} {{ 'MINUTES' | translate }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-signal"></i>
+                        <span>{{ 'LEVEL.' + course.level.toUpperCase() | translate }}</span>
+                    </div>
+                    <div class="meta-item" *ngIf="course.category">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ 'CATEGORY.' + course.category.toUpperCase() | translate }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Savings Alert -->
+        <div class="savings-alert" *ngIf="getDiscountAmount() > 0">
+            <i class="fas fa-fire"></i>
+            <span>{{ 'YOU_SAVE' | translate }}: <strong>{{ formatCurrency(getDiscountAmount()) }}</strong></span>
+        </div>
+
+        <!-- Coupon Section -->
+        <div class="coupon-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-ticket-alt"></i>
+                    {{ 'DISCOUNT_COUPON' | translate }}
+                </h3>
+            </div>
+
+            <!-- Coupon Input Form -->
+            <form [formGroup]="couponForm" class="coupon-form">
+                <div class="form-group">
+                    <label for="couponCode" class="form-label">{{ 'ENTER_COUPON_CODE' | translate }}</label>
+                    <div class="input-wrapper">
+                        <div class="input-group">
+                            <input
+                                    id="couponCode"
+                                    type="text"
+                                    formControlName="couponCode"
+                                    class="coupon-input"
+                                    [class.is-valid]="appliedCoupon"
+                                    [class.is-invalid]="couponCode?.invalid && (couponCode?.dirty || couponCode?.touched)"
+                                    [placeholder]="'COUPON_CODE_PLACEHOLDER' | translate"
+                                    autocomplete="off"
+                                    autocorrect="off"
+                                    autocapitalize="characters">
+
+                            <div class="input-actions">
+                                <!-- Validating State -->
+                                <button
+                                        *ngIf="isValidatingCoupon"
+                                        class="action-btn validating-btn"
+                                        type="button"
+                                        disabled
+                                        [attr.aria-label]="'VALIDATING_COUPON' | translate">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </button>
+
+                                <!-- Applied State -->
+                                <button
+                                        *ngIf="appliedCoupon && !isValidatingCoupon"
+                                        class="action-btn success-btn"
+                                        type="button"
+                                        (click)="removeCoupon()"
+                                        [attr.aria-label]="'REMOVE_COUPON' | translate">
+                                    <i class="fas fa-times"></i>
+                                </button>
+
+                                <!-- Apply State -->
+                                <button
+                                        *ngIf="!appliedCoupon && !isValidatingCoupon && couponCode?.value && couponCode?.value.length >= 3"
+                                        class="action-btn apply-btn"
+                                        type="button"
+                                        (click)="applyCoupon()"
+                                        [disabled]="couponCode?.invalid"
+                                        [attr.aria-label]="'APPLY_COUPON' | translate">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Validation Messages -->
+                        <div *ngIf="couponCode?.invalid && (couponCode?.dirty || couponCode?.touched)" class="invalid-feedback">
+                            <span *ngIf="couponCode?.errors?.['pattern']">
+                                {{ 'COUPON_CODE_INVALID_FORMAT' | translate }}
+                            </span>
+                            <span *ngIf="couponCode?.errors?.['maxlength']">
+                                {{ 'COUPON_CODE_TOO_LONG' | translate }}
+                            </span>
+                        </div>
+
+                        <!-- Applied Coupon Display -->
+                        <div *ngIf="appliedCoupon" class="applied-coupon">
+                            <div class="coupon-success">
+                                <i class="fas fa-check-circle"></i>
+                                <div class="success-content">
+                                    <span class="success-text">{{ 'COUPON_APPLIED' | translate }}</span>
+                                    <strong class="coupon-code-applied">{{ appliedCoupon.code }}</strong>
+                                </div>
+                            </div>
+                            <div class="coupon-discount-info">
+                                <span *ngIf="appliedCoupon.discountType === 'PERCENTAGE'" class="discount-text">
+                                    {{ appliedCoupon.discountValue }}% {{ 'DISCOUNT_APPLIED' | translate }}
+                                </span>
+                                <span *ngIf="appliedCoupon.discountType === 'FIXED_AMOUNT'" class="discount-text">
+                                    {{ formatCurrency(appliedCoupon.discountValue) }} {{ 'DISCOUNT_APPLIED' | translate }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary" *ngIf="checkoutSummary">
+            <div class="summary-header">
+                <h3 class="summary-title">
+                    <i class="fas fa-receipt"></i>
+                    {{ 'ORDER_SUMMARY' | translate }}
+                </h3>
+                <div class="summary-total-preview">
+                    {{ formatCurrency(getFinalPrice()) }}
+                </div>
+            </div>
+
+            <div class="summary-content">
+                <div class="summary-items">
+                    <!-- Original Price -->
+                    <div class="summary-item">
+                        <span class="item-label">{{ 'COURSE_PRICE' | translate }}</span>
+                        <span class="item-value">{{ formatCurrency(getOriginalPrice()) }}</span>
+                    </div>
+
+                    <!-- Discount -->
+                    <div class="summary-item discount-item" *ngIf="getDiscountAmount() > 0">
+                        <span class="item-label">
+                            <i class="fas fa-tag"></i>
+                            {{ 'DISCOUNT' | translate }}
+                            <span class="coupon-code-small" *ngIf="appliedCoupon">({{ appliedCoupon.code }})</span>
+                        </span>
+                        <span class="item-value discount-value">-{{ formatCurrency(getDiscountAmount()) }}</span>
+                    </div>
+
+                    <!-- Subtotal -->
+                    <div class="summary-item subtotal-item">
+                        <span class="item-label">{{ 'SUBTOTAL' | translate }}</span>
+                        <span class="item-value">{{ formatCurrency(getSubtotal()) }}</span>
+                    </div>
+
+                    <!-- Tax -->
+                    <div class="summary-item tax-item">
+                        <span class="item-label">
+                            {{ 'TAX' | translate }} ({{ getTaxPercentage() }}%)
+                            <i class="fas fa-info-circle tax-info"
+                               [title]="'TAX_INFO' | translate"
+                               role="button"
+                               tabindex="0"></i>
+                        </span>
+                        <span class="item-value">{{ formatCurrency(getTaxAmount()) }}</span>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="summary-divider"></div>
+
+                    <!-- Total -->
+                    <div class="summary-item total-item">
+                        <span class="item-label">{{ 'TOTAL' | translate }}</span>
+                        <span class="item-value total-value">{{ formatCurrency(getFinalPrice()) }}</span>
+                    </div>
+                </div>
+
+                <!-- Payment Provider Info -->
+                <div class="payment-info-section">
+                    <div class="payment-provider">
+                        <div class="payment-provider-icon">
+                            <i class="fab fa-cc-visa"></i>
+                        </div>
+                        <div class="payment-provider-text">
+                            <div class="payment-provider-name">LiqPay</div>
+                            <p class="payment-provider-desc">{{ 'LIQPAY_DESCRIPTION' | translate }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms Acceptance -->
+                <div class="terms-acceptance">
+                    <form [formGroup]="paymentForm">
+                        <label class="checkbox-label">
+                            <input type="checkbox"
+                                   formControlName="acceptTerms"
+                                   class="terms-checkbox">
+                            <span class="checkmark"></span>
+                            <span class="terms-text">
+                                {{ 'I_ACCEPT' | translate }}
+                                <a routerLink="/terms" class="terms-link">{{ 'TERMS_AND_CONDITIONS' | translate }}</a>
+                                {{ 'AND' | translate }}
+                                <a routerLink="/privacy" class="terms-link">{{ 'PRIVACY_POLICY' | translate }}</a>
+                            </span>
+                        </label>
+                    </form>
+                </div>
+
+                <!-- Security Info -->
+                <div class="security-info">
+                    <div class="security-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>{{ 'SECURE_PAYMENT' | translate }}</span>
+                    </div>
+                    <div class="security-item">
+                        <i class="fas fa-lock"></i>
+                        <span>{{ 'SSL_ENCRYPTED' | translate }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Bottom Actions -->
+        <div class="checkout-actions">
+            <!-- Main Payment Button -->
+            <button
+                    class="checkout-btn primary-btn"
+                    (click)="proceedToPayment()"
+                    [disabled]="!canProceedToPayment()"
+                    type="button">
+                <div class="btn-content">
+                    <div class="btn-icon">
+                        <i class="fas fa-credit-card" *ngIf="!isProcessingPayment"></i>
+                        <i class="fas fa-spinner fa-spin" *ngIf="isProcessingPayment"></i>
+                    </div>
+                    <div class="btn-text">
+                        <span class="btn-label" *ngIf="!isProcessingPayment">
+                            {{ 'PROCEED_TO_PAYMENT' | translate }}
+                        </span>
+                        <span class="btn-label" *ngIf="isProcessingPayment">
+                            {{ 'PROCESSING_PAYMENT' | translate }}
+                        </span>
+                        <span class="btn-price" *ngIf="!isProcessingPayment">
+                            {{ formatCurrency(getFinalPrice()) }}
+                        </span>
+                    </div>
+                </div>
+            </button>
+
+            <!-- Secondary Action -->
+            <button
+                    class="checkout-btn secondary-btn"
+                    (click)="goToCourse()"
+                    [disabled]="isProcessingPayment"
+                    type="button">
+                <i class="fas fa-eye"></i>
+                <span>{{ 'VIEW_COURSE_DETAILS' | translate }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- No Course Found -->
+    <div *ngIf="!isLoading && !course && !errorMessage" class="no-course-found">
+        <div class="not-found-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>{{ 'COURSE_NOT_FOUND' | translate }}</h2>
+            <p>{{ 'CHECKOUT_COURSE_NOT_FOUND_MESSAGE' | translate }}</p>
+            <button class="checkout-btn primary-btn" routerLink="/courses" type="button">
+                <i class="fas fa-arrow-left"></i>
+                <span>{{ 'BACK_TO_COURSES' | translate }}</span>
+            </button>
+        </div>
+    </div>
+</div>
