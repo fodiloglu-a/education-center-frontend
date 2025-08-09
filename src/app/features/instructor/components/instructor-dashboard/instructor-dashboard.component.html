@@ -1,14 +1,9 @@
-<!-- instructor-dashboard.component.html -->
-
 <div class="dashboard-container">
-    <!-- Loading Spinner -->
     <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-    <!-- Alert Messages -->
     <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
     <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
 
-    <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div class="header-content">
             <div class="instructor-info">
@@ -39,7 +34,6 @@
         </div>
     </div>
 
-    <!-- Navigation Tabs -->
     <div class="tab-navigation">
         <button
                 class="tab-btn"
@@ -62,14 +56,15 @@
             <span class="material-icons">settings</span>
             {{ 'SETTINGS' | translate }}
         </button>
+        <a [routerLink]="['/instructor/coupons/new']" class="tab-btn add-coupon-btn">
+            <span class="material-icons">add_circle</span>
+            {{ 'ADD_NEW_COUPON' | translate }}
+        </a>
     </div>
 
-    <!-- Dashboard Content -->
     <div class="dashboard-content" *ngIf="!isLoading">
 
-        <!-- Dashboard Tab -->
         <div class="tab-content" *ngIf="activeTab === 'dashboard' && stats">
-            <!-- Statistics Grid -->
             <div class="stats-grid">
                 <div class="stat-card primary">
                     <span class="material-icons stat-icon">school</span>
@@ -101,7 +96,6 @@
                 </div>
             </div>
 
-            <!-- Quick Actions -->
             <div class="quick-actions-section">
                 <h3 class="section-title">{{ 'QUICK_ACTIONS' | translate }}</h3>
                 <div class="action-buttons-grid">
@@ -125,7 +119,6 @@
             </div>
         </div>
 
-        <!-- Profile Tab -->
         <div class="tab-content" *ngIf="activeTab === 'profile'">
             <div class="profile-section">
                 <div class="section-header">
@@ -136,7 +129,6 @@
                     </button>
                 </div>
 
-                <!-- Profile Display -->
                 <div class="profile-display" *ngIf="!showProfileEditor && instructorProfile">
                     <div class="profile-grid">
                         <div class="profile-item">
@@ -186,11 +178,9 @@
                     </div>
                 </div>
 
-                <!-- Profile Editor -->
                 <div class="profile-editor" *ngIf="showProfileEditor">
                     <form [formGroup]="profileForm" (ngSubmit)="onSubmitProfile()" class="profile-form">
 
-                        <!-- Basic Information -->
                         <div class="form-section">
                             <h4>{{ 'BASIC_INFORMATION' | translate }}</h4>
                             <div class="form-grid">
@@ -213,7 +203,6 @@
                             </div>
                         </div>
 
-                        <!-- Professional Information -->
                         <div class="form-section">
                             <h4>{{ 'PROFESSIONAL_INFORMATION' | translate }}</h4>
                             <div class="form-grid">
@@ -236,7 +225,6 @@
                             </div>
                         </div>
 
-                        <!-- Education -->
                         <div class="form-section">
                             <h4>{{ 'EDUCATION' | translate }}</h4>
                             <div class="form-grid">
@@ -262,7 +250,6 @@
                             </div>
                         </div>
 
-                        <!-- Specializations -->
                         <div class="form-section">
                             <h4>{{ 'SPECIALIZATIONS' | translate }}</h4>
                             <div class="dynamic-list">
@@ -278,7 +265,6 @@
                             </div>
                         </div>
 
-                        <!-- Certifications -->
                         <div class="form-section">
                             <h4>{{ 'CERTIFICATIONS' | translate }}</h4>
                             <div class="dynamic-list">
@@ -294,7 +280,6 @@
                             </div>
                         </div>
 
-                        <!-- Social Links -->
                         <div class="form-section">
                             <h4>{{ 'SOCIAL_LINKS' | translate }}</h4>
                             <div class="dynamic-list">
@@ -310,7 +295,6 @@
                             </div>
                         </div>
 
-                        <!-- Form Actions -->
                         <div class="form-actions">
                             <button type="button" class="cancel-btn" (click)="toggleProfileEditor()">
                                 {{ 'CANCEL' | translate }}
@@ -325,7 +309,6 @@
             </div>
         </div>
 
-        <!-- Settings Tab -->
         <div class="tab-content" *ngIf="activeTab === 'settings'">
             <div class="settings-section">
                 <h3>{{ 'INSTRUCTOR_SETTINGS' | translate }}</h3>
@@ -334,7 +317,6 @@
         </div>
     </div>
 
-    <!-- No Content State -->
     <div *ngIf="!isLoading && !stats && !errorMessage" class="no-content-found">
         <div class="no-content-icon">
             <span class="material-icons">dashboard</span>

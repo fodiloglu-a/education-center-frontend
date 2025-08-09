@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import {map, catchError, tap} from 'rxjs/operators';
 
 import { TokenService } from '../../../core/services/token.service';
 import {
@@ -27,7 +27,6 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class CheckoutService {
-  // `apiUrl` yerine daha belirgin isimler kullanıyoruz
   private paymentApiUrl = `${environment.apiUrl}/payment`;
   private couponApiUrl = `${environment.apiUrl}/coupons`;
 
@@ -48,7 +47,6 @@ export class CheckoutService {
 
   /**
    * Ukrainian checkout summary oluştur (%20 KDV ile)
-   * REVİZE EDİLDİ: Artık doğru backend uç noktasını çağırıyor.
    */
   createCheckoutSummary(
       courseId: number,
@@ -73,8 +71,6 @@ export class CheckoutService {
       taxRate
     });
 
-    // Hata buradaydı: Önceki kodda yanlış endpoint çağrılıyordu.
-    // Şimdi `payment` yerine `coupons` endpoint'ini çağırıyoruz.
     return this.http.post<CheckoutSummary>(
         `${this.couponApiUrl}/checkout-summary`,
         null,
@@ -120,7 +116,6 @@ export class CheckoutService {
         }),
         catchError(error => {
           console.error('❌ Ukrainian tax calculation failed:', error);
-          // Fallback to manual calculation
           return this.createManualTaxCalculation(originalPrice, discountAmount, taxRate);
         })
     );
@@ -165,7 +160,7 @@ export class CheckoutService {
     console.log('🎫 Validating coupon for Ukrainian checkout:', request);
 
     return this.http.post<CouponValidationResponse>(
-        `${this.couponApiUrl}/validate`, // Coupon validation still from coupons API
+        `${this.couponApiUrl}/validate`,
         request,
         { headers }
     ).pipe(
@@ -207,8 +202,40 @@ export class CheckoutService {
     );
   }
 
-  // =================== PAYMENT INTEGRATION ===================
+  /**
+   * YENİ METOD: Eğitmen için yeni kupon oluşturur.
+   */
+  /**
+   * YENİ METOD: Eğitmen için yeni kupon oluşturur.
+   * Verilen instructorId'ye sahip eğitmen için bir kupon oluşturmak üzere API'ye POST isteği gönderir.
+   * @param instructorId Kuponu oluşturacak eğitmenin benzersiz kimliği.
+   * @param newCoupon Kupon oluşturma isteği için gerekli verileri içeren nesne.
+   * @returns Oluşturulan kupon detaylarını içeren bir Observable<Coupon> döner.
+   */
+  createCouponForInstructor(instructorId: number, newCoupon: CouponCreateRequest): Observable<Coupon> {
+    // POST isteği için kimlik doğrulama başlıklarını (headers) alıyoruz.
+    const headers = this.getAuthHeaders();
 
+    // İstek yapılacak API URL'sini oluşturuyoruz.
+    // URL, couponApiUrl ve eğitmen kimliğini içerir.
+    const url = `${this.couponApiUrl}/instructor/${instructorId}`;
+
+    // Loglama yaparak isteğin başladığını belirtiyoruz.
+    console.log(`🎫 Eğitmen ID'si ${instructorId} için yeni kupon oluşturma isteği gönderiliyor.`, newCoupon);
+
+    // HttpClient'in post metodunu kullanarak API'ye POST isteği gönderiyoruz.
+    // Metod, newCoupon nesnesini istek gövdesi (request body) olarak gönderir.
+    return this.http.post<Coupon>(url, newCoupon, { headers }).pipe(
+        // map operatörü ile başarılı yanıtı (response) işliyoruz.
+        map(coupon => {
+          console.log('✅ Kupon başarıyla oluşturuldu:', coupon);
+          return coupon;
+        }),
+        // catchError operatörü ile hata durumlarını yönetiyoruz.
+        // Hata durumunda, genel hata işleyici metodumuzu (handleError) çağırıyoruz.
+        catchError(this.handleError('createCouponForInstructor'))
+    );
+  }
   /**
    * Ukrainian payment initiation
    */
@@ -364,5 +391,42 @@ export class CheckoutService {
     };
 
     return errorMessages[errorCode] || 'Невідома помилка';
+  }
+
+  /**
+   * Belirli bir eğitmenin kuponlarını listeler.
+   * @param instructorId Kuponları getirilecek eğitmenin kimliği.
+   * @returns Kupon listesini içeren bir Observable<Coupon[]>.
+   */
+  getCouponsByInstructor(instructorId: number): Observable<Coupon[]> {
+    const headers = this.getAuthHeaders();
+    const url = `${this.couponApiUrl}/instructor/coupons/${instructorId}`;
+
+    console.log(`🎫 Eğitmen ID'si ${instructorId} için kuponlar listeleniyor.`);
+
+    return this.http.get<Coupon[]>(url, { headers }).pipe(
+        map(coupons => {
+          console.log('✅ Kuponlar başarıyla listelendi:', coupons);
+          return coupons;
+        }),
+        catchError(this.handleError('getCouponsByInstructor'))
+    );
+  }
+
+  /**
+   * Belirli bir kuponu siler.
+   * @param id Silinecek kuponun kimliği.
+   * @returns Başarılı silme işlemini gösteren bir Observable<void>.
+   */
+  deleteCoupon(id: number): Observable<void> {
+    const headers = this.getAuthHeaders();
+    const url = `${this.couponApiUrl}/${id}`;
+
+    console.log(`❌ Kupon ID'si ${id} siliniyor.`);
+
+    return this.http.delete<void>(url, { headers }).pipe(
+        tap(() => console.log(`✅ Kupon ID'si ${id} başarıyla silindi.`)),
+        catchError(this.handleError('deleteCoupon'))
+    );
   }
 }

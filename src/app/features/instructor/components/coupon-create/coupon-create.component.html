@@ -1,0 +1,162 @@
+<div class="coupon-page-container">
+    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+    <div class="coupon-form-card">
+        <div class="form-header">
+            <h1 class="form-title">{{ 'CREATE_NEW_COUPON' | translate }}</h1>
+            <p class="form-description">{{ 'CREATE_NEW_COUPON_DESCRIPTION' | translate }}</p>
+        </div>
+
+        <form [formGroup]="couponForm" (ngSubmit)="onSubmit()" class="coupon-form">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="couponCode">{{ 'COUPON_CODE' | translate }}</label>
+                    <input id="couponCode" type="text" formControlName="code" [placeholder]="'COUPON_CODE_PLACEHOLDER' | translate">
+                    <div *ngIf="code?.invalid && (code?.dirty || code?.touched)" class="invalid-feedback">
+                        <span *ngIf="code?.errors?.['required']">{{ 'COUPON_CODE_REQUIRED' | translate }}</span>
+                        <span *ngIf="code?.errors?.['maxlength']">{{ 'COUPON_CODE_TOO_LONG' | translate }}</span>
+                        <span *ngIf="code?.errors?.['pattern']">{{ 'COUPON_CODE_INVALID_FORMAT' | translate }}</span>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="discountType">{{ 'DISCOUNT_TYPE' | translate }}</label>
+                        <select id="discountType" formControlName="discountType">
+                            <option *ngFor="let type of discountTypes" [value]="type.value">{{ type.label | translate }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="discountValue">{{ 'DISCOUNT_VALUE' | translate }}</label>
+                        <input id="discountValue" type="number" formControlName="discountValue" [placeholder]="'DISCOUNT_VALUE_PLACEHOLDER' | translate">
+                        <div *ngIf="discountValue?.invalid && (discountValue?.dirty || discountValue?.touched)" class="invalid-feedback">
+                            <span *ngIf="discountValue?.errors?.['required']">{{ 'DISCOUNT_VALUE_REQUIRED' | translate }}</span>
+                            <span *ngIf="discountValue?.errors?.['min']">{{ 'DISCOUNT_VALUE_MIN' | translate }}</span>
+                            <span *ngIf="discountValue?.errors?.['max']">{{ 'DISCOUNT_VALUE_MAX' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="minimumAmount">{{ 'MINIMUM_AMOUNT' | translate }}</label>
+                        <input id="minimumAmount" type="number" formControlName="minimumAmount" [placeholder]="'MINIMUM_AMOUNT_PLACEHOLDER' | translate">
+                        <div *ngIf="minimumAmount?.invalid && (minimumAmount?.dirty || minimumAmount?.touched)" class="invalid-feedback">
+                            <span *ngIf="minimumAmount?.errors?.['min']">{{ 'MINIMUM_AMOUNT_MIN' | translate }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maximumDiscount">{{ 'MAXIMUM_DISCOUNT' | translate }}</label>
+                        <input id="maximumDiscount" type="number" formControlName="maximumDiscount" [placeholder]="'MAXIMUM_DISCOUNT_PLACEHOLDER' | translate">
+                        <div *ngIf="maximumDiscount?.invalid && (maximumDiscount?.dirty || maximumDiscount?.touched)" class="invalid-feedback">
+                            <span *ngIf="maximumDiscount?.errors?.['min']">{{ 'MAXIMUM_DISCOUNT_MIN' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="validFrom">{{ 'VALID_FROM' | translate }}</label>
+                        <input id="validFrom" type="datetime-local" formControlName="validFrom">
+                        <div *ngIf="validFrom?.invalid && (validFrom?.dirty || validFrom?.touched)" class="invalid-feedback">
+                            <span *ngIf="validFrom?.errors?.['required']">{{ 'VALID_FROM_REQUIRED' | translate }}</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="validUntil">{{ 'VALID_UNTIL' | translate }}</label>
+                        <input id="validUntil" type="datetime-local" formControlName="validUntil">
+                        <div *ngIf="validUntil?.invalid && (validUntil?.dirty || validUntil?.touched)" class="invalid-feedback">
+                            <span *ngIf="validUntil?.errors?.['required']">{{ 'VALID_UNTIL_REQUIRED' | translate }}</span>
+                            <span *ngIf="validUntil?.errors?.['dateInvalid']">{{ 'VALID_UNTIL_AFTER_VALID_FROM' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="usageLimit">{{ 'USAGE_LIMIT' | translate }}</label>
+                    <input id="usageLimit" type="number" formControlName="usageLimit" [placeholder]="'USAGE_LIMIT_PLACEHOLDER' | translate">
+                    <div *ngIf="couponForm.get('usageLimit')?.invalid && (couponForm.get('usageLimit')?.dirty || couponForm.get('usageLimit')?.touched)" class="invalid-feedback">
+                        <span *ngIf="couponForm.get('usageLimit')?.errors?.['min']">{{ 'USAGE_LIMIT_MIN' | translate }}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">{{ 'DESCRIPTION' | translate }}</label>
+                    <textarea id="description" formControlName="description" rows="3" [placeholder]="'DESCRIPTION_PLACEHOLDER' | translate"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="applicableCourses">{{ 'APPLICABLE_COURSES' | translate }}</label>
+                    <select id="applicableCourses" formControlName="applicableCourseIds" multiple>
+                        <option value="1">Angular Course</option>
+                        <option value="2">Java Spring Boot Course</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="applicableCategories">{{ 'APPLICABLE_CATEGORIES' | translate }}</label>
+                    <select id="applicableCategories" formControlName="applicableCategories" multiple>
+                        <option value="PROGRAMMING">Programming</option>
+                        <option value="DESIGN">Design</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="cancel-btn" [routerLink]="['/instructor/dashboard']">
+                    {{ 'CANCEL' | translate }}
+                </button>
+                <button type="submit" class="save-btn" [disabled]="couponForm.invalid || isSubmitting">
+                    <app-loading-spinner *ngIf="isSubmitting"></app-loading-spinner>
+                    <span *ngIf="!isSubmitting">{{ 'CREATE_COUPON' | translate }}</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="coupons-list-container">
+        <h2 class="list-title">{{ 'YOUR_COUPONS' | translate }}</h2>
+
+        <ng-container *ngIf="coupons.length > 0">
+            <div class="coupons-table-responsive">
+                <table class="coupons-table">
+                    <thead>
+                    <tr>
+                        <th>{{ 'CODE' | translate }}</th>
+                        <th>{{ 'DISCOUNT' | translate }}</th>
+                        <th>{{ 'VALIDITY' | translate }}</th>
+                        <th>{{ 'USAGE' | translate }}</th>
+                        <th>{{ 'ACTIONS' | translate }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let coupon of coupons">
+                        <td>{{ coupon.code }}</td>
+                        <td>
+                            <ng-container *ngIf="coupon.discountType === 'PERCENTAGE'">
+                                %{{ coupon.discountValue }}
+                            </ng-container>
+                            <ng-container *ngIf="coupon.discountType === 'FIXED_AMOUNT'">
+                                {{ coupon.discountValue | currency }}
+                            </ng-container>
+                        </td>
+                        <td>
+                            {{ coupon.validFrom | date:'short' }} - {{ coupon.validUntil | date:'short' }}
+                        </td>
+                        <td>{{ coupon.usedCount }} / {{ coupon.usageLimit || '-' }}</td>
+                        <td>
+                            <button (click)="deleteCoupon(coupon.id)" class="action-btn delete-btn">{{ 'DELETE' | translate }}</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </ng-container>
+        <div *ngIf="coupons.length === 0 && !isLoading" class="no-coupons-message">
+            {{ 'NO_COUPONS_FOUND' | translate }}
+        </div>
+    </div>
+</div>

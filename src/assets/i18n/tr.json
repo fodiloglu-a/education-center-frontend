@@ -807,6 +807,40 @@
   "VIEW_COURSE_DETAILS": "Kurs Detaylarını Görüntüle",
   "COURSE_NOT_FOUND": "Kurs Bulunamadı",
   "CHECKOUT_COURSE_NOT_FOUND_MESSAGE": "Aradığınız kurs bulunamadı. Lütfen kurs listesine dönün.",
-  "BACK_TO_COURSES": "Kurslara Dön"
+  "BACK_TO_COURSES": "Kurslara Dön",
+
+
+
+  "CREATE_NEW_COUPON": "Yeni Kupon Oluştur",
+  "CREATE_NEW_COUPON_DESCRIPTION": "Öğrencileriniz için yeni bir indirim kuponu oluşturun.",
+  "COUPON_CODE": "Kupon Kodu",
+  "COUPON_CODE_PLACEHOLDER": "ÖR: YAZ2024INDIRIM",
+  "COUPON_CODE_REQUIRED": "Kupon kodu zorunludur.",
+  "COUPON_CODE_TOO_LONG": "Kupon kodu en fazla 50 karakter olmalıdır.",
+  "COUPON_CODE_INVALID_FORMAT": "Kupon kodu sadece harf, rakam ve tire (-) içerebilir.",
+  "DISCOUNT_TYPE": "İndirim Türü",
+  "PERCENTAGE": "Yüzde",
+  "FIXED_AMOUNT": "Sabit Miktar",
+  "DISCOUNT_VALUE": "İndirim Değeri",
+  "DISCOUNT_VALUE_PLACEHOLDER": "Örn: 20 veya 10.50",
+  "DISCOUNT_VALUE_REQUIRED": "İndirim değeri zorunludur.",
+  "DISCOUNT_VALUE_MIN": "İndirim değeri 0.01'den büyük olmalıdır.",
+  "DISCOUNT_VALUE_MAX": "Yüzde indirimi için değer 100'den büyük olamaz.",
+  "VALID_FROM": "Geçerlilik Başlangıcı",
+  "VALID_FROM_REQUIRED": "Başlangıç tarihi zorunludur.",
+  "VALID_UNTIL": "Geçerlilik Bitişi",
+  "VALID_UNTIL_REQUIRED": "Bitiş tarihi zorunludur.",
+  "VALID_UNTIL_AFTER_VALID_FROM": "Bitiş tarihi, başlangıç tarihinden sonra olmalıdır.",
+  "USAGE_LIMIT": "Kullanım Limiti",
+  "USAGE_LIMIT_PLACEHOLDER": "Sonsuz için boş bırakın.",
+  "USAGE_LIMIT_MIN": "Kullanım limiti 1'den büyük olmalıdır.",
+  "CREATE_COUPON": "Kuponu Oluştur",
+  "CANCEL": "İptal",
+  "Lütfen tüm gerekli alanları doldurun ve hataları düzeltin.": "Lütfen tüm gerekli alanları doldurun ve hataları düzeltin.",
+  "Kupon başarıyla oluşturuldu!": "Kupon başarıyla oluşturuldu!",
+  "Kupon oluşturma başarısız oldu. Lütfen tekrar deneyin.": "Kupon oluşturma başarısız oldu. Lütfen tekrar deneyin.",
+  "Kupon oluşturmak için eğitmen girişi yapmalısınız.": "Kupon oluşturmak için eğitmen girişi yapmalısınız.",
+  "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.": "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın."
+
 
 }
