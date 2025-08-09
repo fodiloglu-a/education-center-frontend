@@ -24,28 +24,21 @@ export class PaymentService {
    * @param courseId Satın alınacak kursun ID'si.
    * @returns data ve signature içeren PaymentResponse nesnesini içeren Observable.
    */
-  initiatePayment(courseId: number): Observable<PaymentResponse> {
-    // Oturum açmış kullanıcının JWT token'ını alıyoruz.
-    const token = this.tokenService.getAccessToken();
-
-    if (!token) {
-      return throwError(() => new Error('JWT token bulunamadı. Lütfen giriş yapın.'));
-    }
-
+  initiatePayment(courseId: number, discountAmount: number): Observable<PaymentResponse> {
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     });
 
+    const params = {
+      discountAmount: discountAmount.toString()
+    };
+
     return this.http.post<PaymentResponse>(
         `${this.apiUrl}/checkout/${courseId}`,
-        {},
-        { headers }
-    ).pipe(
-        catchError(this.handleError)
+        null,
+        { headers, params }
     );
   }
-
   /**
    * HTTP hatalarını işler
    */

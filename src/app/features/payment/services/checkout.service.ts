@@ -27,7 +27,9 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root'
 })
 export class CheckoutService {
-  private apiUrl = `${environment.apiUrl}/payment`; // Backend URL güncellendi
+  // `apiUrl` yerine daha belirgin isimler kullanıyoruz
+  private paymentApiUrl = `${environment.apiUrl}/payment`;
+  private couponApiUrl = `${environment.apiUrl}/coupons`;
 
   // Checkout state management
   private checkoutSummarySubject = new BehaviorSubject<CheckoutSummary | null>(null);
@@ -46,6 +48,7 @@ export class CheckoutService {
 
   /**
    * Ukrainian checkout summary oluştur (%20 KDV ile)
+   * REVİZE EDİLDİ: Artık doğru backend uç noktasını çağırıyor.
    */
   createCheckoutSummary(
       courseId: number,
@@ -70,8 +73,10 @@ export class CheckoutService {
       taxRate
     });
 
+    // Hata buradaydı: Önceki kodda yanlış endpoint çağrılıyordu.
+    // Şimdi `payment` yerine `coupons` endpoint'ini çağırıyoruz.
     return this.http.post<CheckoutSummary>(
-        `${this.apiUrl}/checkout-summary`,
+        `${this.couponApiUrl}/checkout-summary`,
         null,
         { headers, params }
     ).pipe(
@@ -105,7 +110,7 @@ export class CheckoutService {
     });
 
     return this.http.post<TaxCalculation>(
-        `${this.apiUrl}/calculate-tax`,
+        `${this.paymentApiUrl}/calculate-tax`,
         null,
         { headers, params }
     ).pipe(
@@ -160,7 +165,7 @@ export class CheckoutService {
     console.log('🎫 Validating coupon for Ukrainian checkout:', request);
 
     return this.http.post<CouponValidationResponse>(
-        `${environment.apiUrl}/coupons/validate`, // Coupon validation still from coupons API
+        `${this.couponApiUrl}/validate`, // Coupon validation still from coupons API
         request,
         { headers }
     ).pipe(
@@ -189,7 +194,7 @@ export class CheckoutService {
     });
 
     return this.http.post<Coupon>(
-        `${environment.apiUrl}/coupons/apply`,
+        `${this.couponApiUrl}/apply`,
         null,
         { headers, params }
     ).pipe(
@@ -217,7 +222,7 @@ export class CheckoutService {
     });
 
     return this.http.post<any>(
-        `${this.apiUrl}/checkout/${courseId}`,
+        `${this.paymentApiUrl}/checkout/${courseId}`,
         null,
         { headers, params }
     ).pipe(

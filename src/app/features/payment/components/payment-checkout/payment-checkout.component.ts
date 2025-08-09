@@ -14,7 +14,7 @@ import {
   CouponValidationRequest,
   CouponValidationResponse,
   CheckoutSummary,
-  Coupon
+  Coupon, Course
 } from '../../models/coupon.model';
 import { PaymentResponse } from '../../models/payment.models';
 import { CourseService } from "../../../courses/services/course.service";
@@ -312,7 +312,7 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
     }
 
     this.isValidatingCoupon = true;
-    this.toggleCouponInput(true); // Disable input during validation
+    this.toggleCouponInput(true);
     this.clearMessages();
     console.log('🎫 Validating coupon:', couponCode);
 
@@ -328,11 +328,36 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: CouponValidationResponse) => {
         this.isValidatingCoupon = false;
-        this.toggleCouponInput(false); // Re-enable input
+        this.toggleCouponInput(false);
 
         if (response.valid && response.coupon) {
           console.log('✅ Coupon valid:', response);
-          this.appliedCoupon = response.coupon;
+
+          // Sadece ihtiyacımız olan alanları al
+          this.appliedCoupon = {
+            id: response.coupon.id,
+            code: response.coupon.code,
+            discountType: response.coupon.discountType,
+            discountValue: response.coupon.discountValue,
+            minimumAmount: response.coupon.minimumAmount,
+            maximumDiscount: response.coupon.maximumDiscount,
+            validFrom: response.coupon.validFrom,
+            validUntil: response.coupon.validUntil,
+            usageLimit: response.coupon.usageLimit,
+            usedCount: response.coupon.usedCount,
+            isActive: response.coupon.isActive,
+            description: response.coupon.description,
+            createdAt: response.coupon.createdAt,
+            updatedAt: response.coupon.updatedAt,
+            instructor: {
+              id: response.coupon.instructor?.id || 0,
+              firstName: response.coupon.instructor?.firstName || '',
+              lastName: response.coupon.instructor?.lastName || '',
+              email: response.coupon.instructor?.email || ''
+            },
+            applicableCourses: [],
+            applicableCategories: response.coupon.applicableCategories || []
+          };
 
           const discountText = this.formatCurrency(response.discountAmount);
           this.setSuccess(`Coupon applied successfully! You save ${discountText}`);
@@ -349,7 +374,7 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('❌ Coupon validation error:', error);
         this.isValidatingCoupon = false;
-        this.toggleCouponInput(false); // Re-enable input
+        this.toggleCouponInput(false);
         this.setError(error.message || 'Coupon validation failed. Please try again.');
         this.clearCouponInput();
         this.cdr.markForCheck();
@@ -460,7 +485,142 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
     this.toggleCouponInput(false); // Ensure input is enabled
   }
 
-  // ========== PAYMENT ==========
+  // ========== CIRCULAR REFERENCE PROTECTION ==========
+
+  /**
+   * Circular reference'ları temizleyerek güvenli coupon data oluştur
+   */
+  private sanitizeCouponData(coupon: any): Coupon {
+    try {
+      const sanitized: Coupon = {
+        id: coupon.id,
+        code: coupon.code,
+        instructor: coupon.instructor ? {
+          id: coupon.instructor.id,
+          firstName: coupon.instructor.firstName || '',
+          lastName: coupon.instructor.lastName || '',
+          email: coupon.instructor.email || ''
+        } : {
+          id: 0,
+          firstName: 'Unknown',
+          lastName: 'Instructor',
+          email: ''
+        },
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        minimumAmount: coupon.minimumAmount,
+        maximumDiscount: coupon.maximumDiscount,
+        validFrom: coupon.validFrom,
+        validUntil: coupon.validUntil,
+        usageLimit: coupon.usageLimit,
+        usedCount: coupon.usedCount || 0,
+        isActive: coupon.isActive,
+        description: coupon.description,
+        createdAt: coupon.createdAt,
+        updatedAt: coupon.updatedAt,
+        applicableCourses: this.sanitizeCourseArray(coupon.applicableCourses),
+        applicableCategories: coupon.applicableCategories || []
+      };
+
+      console.log('🧹 Coupon data sanitized successfully:', {
+        id: sanitized.id,
+        code: sanitized.code,
+        discountType: sanitized.discountType,
+        discountValue: sanitized.discountValue
+      });
+
+      return sanitized;
+    } catch (error) {
+      console.error('❌ Error sanitizing coupon data:', error);
+      throw new Error('Invalid coupon data format');
+    }
+  }
+
+  /**
+   * Course array'ini circular reference'tan temizle
+   */
+  private sanitizeCourseArray(courses: any[]): Course[] {
+    if (!courses || !Array.isArray(courses)) {
+      return [];
+    }
+
+    return courses.map(course => {
+      try {
+        return {
+          id: course.id,
+          title: course.title || 'Unknown Course',
+          description: course.description || '',
+          imageUrl: course.imageUrl,
+          instructor: course.instructor ? {
+            id: course.instructor.id,
+            firstName: course.instructor.firstName || '',
+            lastName: course.instructor.lastName || ''
+          } : {
+            id: 0,
+            firstName: 'Unknown',
+            lastName: 'Instructor'
+          },
+          price: course.price || 0,
+          published: course.published || false,
+          createdAt: course.createdAt || new Date().toISOString(),
+          updatedAt: course.updatedAt,
+          category: course.category,
+          duration: course.duration || 0,
+          level: course.level,
+          language: course.language || 'uk',
+          externalPurchaseUrl: course.externalPurchaseUrl,
+          requirements: course.requirements || [],
+          whatYouWillLearn: course.whatYouWillLearn || [],
+          targetAudience: course.targetAudience || [],
+          certificateAvailable: course.certificateAvailable || false,
+          isPreview: course.isPreview || false
+        };
+      } catch (error) {
+        console.warn('⚠️ Skipping invalid course in coupon data:', error);
+        return null;
+      }
+    }).filter(course => course !== null) as Course[];
+  }
+
+  /**
+   * JSON response'unu güvenli şekilde parse et
+   */
+  private safeParseResponse(response: any): any {
+    try {
+      // Eğer response string ise parse et
+      if (typeof response === 'string') {
+        return JSON.parse(response);
+      }
+
+      // Zaten object ise direkt döndür ama deep clone yap
+      return JSON.parse(JSON.stringify(response));
+    } catch (error) {
+      console.error('❌ Error parsing response:', error);
+      return response; // Original'i döndür
+    }
+  }
+
+  /**
+   * Response validation
+   */
+  private validateCouponResponse(response: CouponValidationResponse): boolean {
+    if (!response) {
+      console.error('❌ Empty coupon response');
+      return false;
+    }
+
+    if (response.valid && !response.coupon) {
+      console.error('❌ Valid response but no coupon data');
+      return false;
+    }
+
+    if (response.valid && response.coupon && !response.coupon.code) {
+      console.error('❌ Coupon missing required code field');
+      return false;
+    }
+
+    return true;
+  }
 
   proceedToPayment(): void {
     if (!this.canProceedToPayment()) {
@@ -482,7 +642,9 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
     console.log('💳 Initiating LiqPay payment for course:', this.courseId);
 
     // LiqPay ödeme başlatma
-    this.paymentService.initiatePayment(this.courseId).pipe(
+    // BURADA YENİLEME YAPILDI: İndirim miktarını (discountAmount) ödeme servisine gönderiyoruz.
+    const discountAmount = this.getDiscountAmount(); // İndirim miktarını al
+    this.paymentService.initiatePayment(this.courseId, discountAmount).pipe(
         takeUntil(this.destroy$)
     ).subscribe({
       next: (response: PaymentResponse) => {
@@ -505,6 +667,7 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
       }
     });
   }
+
 
   private redirectToLiqPay(paymentResponse: PaymentResponse): void {
     console.log('🔄 Redirecting to LiqPay...');
@@ -699,43 +862,91 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Debug için checkout durumunu logla - Ukrainian version
+   * Debug için checkout durumunu logla - Ukrainian version with circular reference protection
    */
   private logCheckoutState(): void {
-    console.log('🇺🇦 Ukrainian Checkout State Debug:', {
-      courseId: this.courseId,
-      userId: this.currentUser?.id,
-      course: !!this.course,
-      coursePrice: this.course?.price,
-      checkoutSummary: !!this.checkoutSummary,
-      checkoutSummaryDetails: this.checkoutSummary ? {
-        originalPrice: this.checkoutSummary.originalPrice,
-        discountAmount: this.checkoutSummary.discountAmount,
-        subtotal: this.checkoutSummary.subtotal,
-        taxRate: this.checkoutSummary.taxRate,
-        taxAmount: this.checkoutSummary.taxAmount,
-        finalPrice: this.checkoutSummary.finalPrice,
-        currency: this.checkoutSummary.currency
-      } : null,
-      calculatedValues: {
-        originalPrice: `${this.getOriginalPrice()} UAH`,
-        discountAmount: `${this.getDiscountAmount()} UAH`,
-        subtotal: `${this.getSubtotal()} UAH`,
-        taxAmount: `${this.getTaxAmount()} UAH (20% VAT)`,
-        finalPrice: `${this.getFinalPrice()} UAH`
+    try {
+      const state = {
+        courseId: this.courseId,
+        userId: this.currentUser?.id,
+        course: !!this.course,
+        coursePrice: this.course?.price,
+        checkoutSummary: !!this.checkoutSummary,
+        checkoutSummaryDetails: this.checkoutSummary ? {
+          originalPrice: this.checkoutSummary.originalPrice,
+          discountAmount: this.checkoutSummary.discountAmount,
+          subtotal: this.checkoutSummary.subtotal,
+          taxRate: this.checkoutSummary.taxRate,
+          taxAmount: this.checkoutSummary.taxAmount,
+          finalPrice: this.checkoutSummary.finalPrice,
+          currency: this.checkoutSummary.currency
+        } : null,
+        calculatedValues: {
+          originalPrice: `${this.getOriginalPrice()} UAH`,
+          discountAmount: `${this.getDiscountAmount()} UAH`,
+          subtotal: `${this.getSubtotal()} UAH`,
+          taxAmount: `${this.getTaxAmount()} UAH (20% VAT)`,
+          finalPrice: `${this.getFinalPrice()} UAH`
+        },
+        appliedCoupon: this.appliedCoupon ? {
+          id: this.appliedCoupon.id,
+          code: this.appliedCoupon.code,
+          discountType: this.appliedCoupon.discountType,
+          discountValue: this.appliedCoupon.discountValue,
+          // instructor ve taughtCourses dahil edilmiyor
+        } : null,
+        isLoading: this.isLoading,
+        canProceed: this.canProceedToPayment(),
+        ukrainianVAT: '20%',
+        currency: 'UAH',
+        formStates: {
+          couponFormValid: this.couponForm?.valid,
+          paymentFormValid: this.paymentForm?.valid,
+          termsAccepted: this.acceptTerms?.value
+        }
+      };
+
+      console.log('🇺🇦 Ukrainian Checkout State Debug (Safe):', state);
+    } catch (error) {
+      console.error('❌ Error logging checkout state:', error);
+    }
+  }
+
+  /**
+   * Manual test için console'dan çağrılabilir - safe version
+   */
+  debugCheckout(): void {
+    console.log('🔍 === UKRAINIAN CHECKOUT DEBUG START ===');
+    this.logCheckoutState();
+
+    // Kupon durumu
+    if (this.appliedCoupon) {
+      console.log('🎫 Applied Coupon (Safe):', {
+        code: this.appliedCoupon.code,
+        type: this.appliedCoupon.discountType,
+        value: this.appliedCoupon.discountValue,
+        valid: this.appliedCoupon.isActive
+      });
+    }
+
+    // Form durumları
+    console.log('📝 Form States:', {
+      coupon: {
+        value: this.couponCode?.value,
+        valid: this.couponCode?.valid,
+        errors: this.couponCode?.errors
       },
-      appliedCoupon: !!this.appliedCoupon,
-      isLoading: this.isLoading,
-      canProceed: this.canProceedToPayment(),
-      ukrainianVAT: '20%',
-      currency: 'UAH'
+      payment: {
+        termsAccepted: this.acceptTerms?.value,
+        valid: this.paymentForm?.valid
+      }
     });
+
+    console.log('🔍 === UKRAINIAN CHECKOUT DEBUG END ===');
   }
 
   /**
    * Manual test için console'dan çağrılabilir
    */
-  debugCheckout(): void {
-    this.logCheckoutState();
-  }
+
 }
