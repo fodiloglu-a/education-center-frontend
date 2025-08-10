@@ -1,37 +1,60 @@
 <div class="review-list-container">
-    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <app-loading-spinner *ngIf="isLoading" class="loading-wrapper"></app-loading-spinner>
 
-    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()" class="alert-wrapper"></app-alert-dialog>
 
-    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()" class="alert-wrapper"></app-alert-dialog>
 
-    <h2 class="page-title">{{ 'REVIEWS_AND_NOTES' | translate }}</h2>
-    <p class="page-subtitle">
-        <ng-container *ngIf="courseId">{{ 'REVIEWS_FOR_COURSE' | translate }}: <strong>{{ courseId }}</strong></ng-container>
-        <ng-container *ngIf="userId">{{ 'REVIEWS_AND_NOTES_BY_USER' | translate }}: <strong>{{ userId }}</strong></ng-container>
-        <ng-container *ngIf="!courseId && !userId">{{ 'ALL_REVIEWS_AND_NOTES_SUBTITLE' | translate }}</ng-container>
-    </p>
+    <div class="page-header">
+        <h2 class="page-title">{{ 'REVIEWS_AND_NOTES' | translate }}</h2>
+        <p class="page-subtitle">
+            <ng-container *ngIf="courseId">{{ 'REVIEWS_FOR_COURSE' | translate }}: <strong>{{ courseId }}</strong></ng-container>
+            <ng-container *ngIf="userId">{{ 'REVIEWS_AND_NOTES_BY_USER' | translate }}: <strong>{{ userId }}</strong></ng-container>
+            <ng-container *ngIf="!courseId && !userId">{{ 'ALL_REVIEWS_AND_NOTES_SUBTITLE' | translate }}</ng-container>
+        </p>
+    </div>
 
     <div class="section-card reviews-section" *ngIf="!isLoading && reviews.length > 0">
-        <h3 class="section-title">{{ 'MY_REVIEWS' | translate }}</h3>
+        <div class="section-header">
+            <h3 class="section-title">{{ 'MY_REVIEWS' | translate }}</h3>
+            <div class="section-decoration"></div>
+        </div>
         <div class="review-cards-grid">
             <div class="review-card" *ngFor="let review of reviews">
+                <div class="card-top-accent"></div>
                 <div class="review-header">
                     <div class="reviewer-info">
-                        <span class="reviewer-name">{{ review.userName }}</span>
-                        <span class="review-date">{{ review.createdAt | date:'shortDate' }}</span>
+                        <span class="reviewer-name">
+                            <i class="user-icon">👤</i>
+                            {{ review.userName }}
+                        </span>
+                        <span class="review-date">
+                            <i class="date-icon">📅</i>
+                            {{ review.createdAt | date:'shortDate' }}
+                        </span>
                     </div>
                     <div class="review-stars">
                         <span class="material-icons star-icon" *ngFor="let star of [1,2,3,4,5]" [class.filled]="review.rating >= star">star</span>
                     </div>
                 </div>
-                <p class="review-course-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ review.courseTitle }}</strong></p>
-                <p class="review-comment">{{ review.comment }}</p>
+                <div class="review-course-info">
+                    <span class="course-label">{{ 'FOR_COURSE' | translate }}:</span>
+                    <strong class="course-name">{{ review.courseTitle }}</strong>
+                </div>
+                <div class="review-comment-wrapper">
+                    <p class="review-comment">{{ review.comment }}</p>
+                </div>
                 <div class="review-actions">
-                    <button class="action-button secondary-btn" (click)="goToCourseDetail(review.courseId)">{{ 'VIEW_COURSE' | translate }}</button>
+                    <button class="action-button secondary-btn" (click)="goToCourseDetail(review.courseId)">
+                        {{ 'VIEW_COURSE' | translate }}
+                    </button>
                     <ng-container *ngIf="canModifyReview(review)">
-                        <button class="action-button secondary-btn" [routerLink]="['/reviews', 'edit', review.id]">{{ 'EDIT' | translate }}</button>
-                        <button class="action-button danger-btn" (click)="deleteReview(review.id)">{{ 'DELETE' | translate }}</button>
+                        <button class="action-button secondary-btn" [routerLink]="['/reviews', 'edit', review.id]">
+                            {{ 'EDIT' | translate }}
+                        </button>
+                        <button class="action-button danger-btn" (click)="deleteReview(review.id)">
+                            {{ 'DELETE' | translate }}
+                        </button>
                     </ng-container>
                 </div>
             </div>
@@ -39,19 +62,38 @@
     </div>
 
     <div class="section-card notes-section" *ngIf="!isLoading && userNotes.length > 0">
-        <h3 class="section-title">{{ 'MY_NOTES' | translate }}</h3>
+        <div class="section-header">
+            <h3 class="section-title">{{ 'MY_NOTES' | translate }}</h3>
+            <div class="section-decoration"></div>
+        </div>
         <div class="note-cards-grid">
             <div class="note-card" *ngFor="let note of userNotes">
+                <div class="card-top-accent note-accent"></div>
                 <div class="note-header">
-                    <span class="note-lesson-title">{{ note.lessonTitle }}</span>
-                    <span class="note-date">{{ note.createdAt | date:'shortDate' }}</span>
+                    <span class="note-lesson-title">
+                        <i class="note-icon">📝</i>
+                        {{ note.lessonTitle }}
+                    </span>
+                    <span class="note-date">
+                        <i class="date-icon">📅</i>
+                        {{ note.createdAt | date:'shortDate' }}
+                    </span>
                 </div>
-                <p class="note-course-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ note.courseTitle }}</strong></p>
-                <p class="note-content">{{ note.content }}</p>
+                <div class="note-course-info">
+                    <span class="course-label">{{ 'FOR_COURSE' | translate }}:</span>
+                    <strong class="course-name">{{ note.courseTitle }}</strong>
+                </div>
+                <div class="note-content-wrapper">
+                    <p class="note-content">{{ note.content }}</p>
+                </div>
                 <div class="note-actions">
-                    <button class="action-button primary-btn" (click)="goToLessonPlayer(note.courseId, note.lessonId)">{{ 'VIEW_LESSON' | translate }}</button>
+                    <button class="action-button primary-btn" (click)="goToLessonPlayer(note.courseId, note.lessonId)">
+                        {{ 'VIEW_LESSON' | translate }}
+                    </button>
                     <ng-container *ngIf="canModifyNote(note)">
-                        <button class="action-button danger-btn" (click)="deleteNote(note.id)">{{ 'DELETE' | translate }}</button>
+                        <button class="action-button danger-btn" (click)="deleteNote(note.id)">
+                            {{ 'DELETE' | translate }}
+                        </button>
                     </ng-container>
                 </div>
             </div>
@@ -59,7 +101,11 @@
     </div>
 
     <div *ngIf="!isLoading && reviews.length === 0 && userNotes.length === 0 && !errorMessage" class="no-content-found">
-        <p>{{ 'NO_REVIEWS_AND_NOTES_FOUND' | translate }}</p>
-        <button class="action-button primary-btn" (click)="loadReviewsAndNotesForContext()">{{ 'RETRY_LOAD_REVIEWS_AND_NOTES' | translate }}</button>
+        <div class="empty-state-icon">🔍</div>
+        <h3 class="empty-state-title">{{ 'NO_REVIEWS_AND_NOTES_FOUND' | translate }}</h3>
+        <p class="empty-state-description">Start exploring courses and taking notes to see your content here.</p>
+        <button class="action-button primary-btn retry-btn" (click)="loadReviewsAndNotesForContext()">
+            {{ 'RETRY_LOAD_REVIEWS_AND_NOTES' | translate }}
+        </button>
     </div>
 </div>

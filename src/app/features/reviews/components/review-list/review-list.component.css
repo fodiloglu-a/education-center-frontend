@@ -1,271 +1,420 @@
 /* review-list.component.css */
 
 .review-list-container {
-  padding: var(--spacing-lg);
-  background-color: var(--background-color);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl);
   min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px);
+  background: linear-gradient(135deg, var(--background-color) 0%, rgba(255, 248, 238, 0.7) 100%);
   box-sizing: border-box;
+  position: relative;
+}
+
+/* Loading and Alert Wrappers */
+.loading-wrapper {
+  display: block;
+  text-align: center;
+  padding: var(--spacing-xxl);
+}
+
+.alert-wrapper {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  z-index: 1000;
+}
+
+/* Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xxl);
+  position: relative;
 }
 
 .page-title {
   color: var(--primary-color);
-  font-size: var(--font-size-xxxl);
-  text-align: center;
+  font-size: clamp(var(--font-size-xxl), 4vw, var(--font-size-xxxl));
+  font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  background: linear-gradient(135deg, var(--primary-color), var(--deep-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  position: relative;
 }
 
 .page-subtitle {
-  color: var(--text-color);
+  color: var(--accent-color);
   font-size: var(--font-size-lg);
-  text-align: center;
-  margin-bottom: var(--spacing-xxl);
-}
-
-/* Genel Kart Grid Stili (Yorumlar ve Notlar için) */
-.review-cards-grid,
-.note-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Duyarlı grid */
-  gap: var(--spacing-xl); /* Kartlar arasında boşluk */
-  justify-content: center; /* Kartları ortala */
-}
-
-/* Yorum Kartları */
-.review-card {
-  background-color: var(--card-bg);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  flex-direction: column;
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.review-card:hover {
-  transform: translateY(-3px); /* Hover'da hafif yukarı kayma */
-  box-shadow: var(--shadow-lg); /* Hover'da daha belirgin gölge */
-}
-
-.review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
-  flex-wrap: wrap; /* Küçük ekranlarda sarılma için */
-  gap: var(--spacing-xs);
-}
-
-.reviewer-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.reviewer-name {
-  font-weight: 600;
-  color: var(--primary-color);
-  font-size: var(--font-size-base);
-}
-
-.review-date {
-  font-size: var(--font-size-sm);
-  color: var(--dark-color);
-}
-
-.review-stars {
-  display: flex;
-  gap: 2px;
-  margin-left: auto; /* Sağa hizala */
-}
-
-.review-stars .star-icon {
-  font-size: var(--font-size-lg);
-  color: var(--border-color); /* Boş yıldız rengi */
-}
-
-.review-stars .star-icon.filled {
-  color: var(--highlight-color); /* Dolu yıldız rengi */
-}
-
-.review-course-info {
-  font-size: var(--font-size-sm);
-  color: var(--accent-color);
-  margin-bottom: var(--spacing-sm);
-  text-align: left;
-}
-
-.review-course-info strong {
-  color: var(--primary-color);
-}
-
-.review-comment {
-  font-size: var(--font-size-base);
-  color: var(--text-color);
+  font-weight: 500;
+  opacity: 0.9;
   line-height: 1.5;
-  margin-bottom: var(--spacing-md);
-  flex-grow: 1; /* Yorum metninin esnemesini sağlar */
 }
 
-/* Not Kartları */
-.note-card {
-  background-color: var(--card-bg);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  flex-direction: column;
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.note-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
-
-.note-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-md);
-  flex-wrap: wrap;
-  gap: var(--spacing-xs);
-}
-
-.note-lesson-title {
-  font-weight: 600;
+.page-subtitle strong {
   color: var(--primary-color);
-  font-size: var(--font-size-base);
-}
-
-.note-date {
-  font-size: var(--font-size-sm);
-  color: var(--dark-color);
-}
-
-.note-course-info {
-  font-size: var(--font-size-sm);
-  color: var(--accent-color);
-  margin-bottom: var(--spacing-sm);
-  text-align: left;
-}
-
-.note-course-info strong {
-  color: var(--primary-color);
-}
-
-.note-content {
-  font-size: var(--font-size-base);
-  color: var(--text-color);
-  line-height: 1.5;
-  margin-bottom: var(--spacing-md);
-  flex-grow: 1;
-}
-
-
-/* Genel Buton Stilleri (Yorumlar ve Notlar için de geçerli) */
-.review-actions,
-.note-actions {
-  display: flex;
-  gap: var(--spacing-sm);
-  justify-content: flex-end; /* Butonları sağa hizala */
-  margin-top: auto; /* En alta hizala */
-}
-
-.action-button {
-  padding: var(--spacing-sm) var(--spacing-md);
-  font-size: var(--font-size-base);
   font-weight: 600;
-  border: none;
-  border-radius: var(--border-radius-md);
-  cursor: pointer;
-  transition: background-color var(--transition-normal), transform var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-  text-decoration: none; /* RouterLink için */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.primary-btn {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.primary-btn:hover {
-  background-color: var(--deep-blue);
-  transform: translateY(-1px);
-}
-
-.secondary-btn {
-  background-color: var(--light-accent);
-  color: var(--accent-color);
-}
-
-.secondary-btn:hover {
-  background-color: var(--secondary-color);
-  transform: translateY(-1px);
-}
-
-.danger-btn {
-  background-color: var(--error-color);
-  color: white;
-}
-
-.danger-btn:hover {
-  background-color: #d32f2f;
-  transform: translateY(-1px);
-}
-
-/* Bölüm Başlıkları (Reviews ve Notes bölümlerini ayırmak için) */
+/* Section Cards */
 .section-card {
-  background-color: var(--surface-bg);
-  border-radius: var(--border-radius-lg); /* Daha yuvarlak kenarlar */
-  padding: var(--spacing-xl);
+  background: var(--card-bg);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-xxl);
+  margin-bottom: var(--spacing-xxl);
   box-shadow: var(--shadow-md);
-  margin-top: var(--spacing-xxl); /* Bölümler arasında daha fazla boşluk */
+  border: 1px solid rgba(67, 97, 238, 0.08);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.section-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Section Headers */
+.section-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  position: relative;
 }
 
 .section-title {
   color: var(--accent-color);
   font-size: var(--font-size-xxl);
-  margin-top: 0;
-  margin-bottom: var(--spacing-lg);
-  text-align: center;
-  border-bottom: 2px solid var(--divider-color);
-  padding-bottom: var(--spacing-sm);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  display: inline-block;
 }
 
+.section-decoration {
+  height: 3px;
+  width: 100px;
+  background: linear-gradient(90deg, var(--primary-color), var(--highlight-color));
+  margin: 0 auto;
+  border-radius: var(--border-radius-full);
+}
 
-.no-reviews-found,
-.no-content-found { /* Hem yorum hem not yoksa */
-  text-align: center;
-  padding: var(--spacing-xl);
-  background-color: var(--card-bg);
+/* Grid Layouts */
+.review-cards-grid,
+.note-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-xl);
+}
+
+/* Card Base Styles */
+.review-card,
+.note-card {
+  background: var(--card-bg);
   border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  color: var(--text-color);
-  max-width: 500px;
-  margin: var(--spacing-xxl) auto;
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
 }
 
-.no-reviews-found p,
-.no-content-found p {
-  font-size: var(--font-size-lg);
+.review-card:hover,
+.note-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(67, 97, 238, 0.2);
+}
+
+/* Card Top Accents */
+.card-top-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+  transform-origin: left;
+}
+
+.note-accent {
+  background: linear-gradient(90deg, var(--secondary-color), var(--highlight-color));
+}
+
+.review-card:hover .card-top-accent,
+.note-card:hover .card-top-accent {
+  transform: scaleX(1);
+}
+
+/* Review Card Specific Styles */
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-md);
+}
+
+.reviewer-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.reviewer-name {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: var(--font-size-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.review-date {
+  font-size: var(--font-size-sm);
+  color: var(--dark-color);
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Star Rating */
+.review-stars {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.star-icon {
+  font-size: 20px !important;
+  color: var(--border-color);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.star-icon.filled {
+  color: var(--highlight-color);
+  text-shadow: 0 0 8px rgba(255, 183, 77, 0.3);
+}
+
+.star-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Course Info */
+.review-course-info,
+.note-course-info {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--light-accent);
+  border-radius: var(--border-radius-md);
+  border-left: 3px solid var(--secondary-color);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.course-label {
+  font-size: var(--font-size-sm);
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.course-name {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+/* Content Wrappers */
+.review-comment-wrapper,
+.note-content-wrapper {
+  flex-grow: 1;
   margin-bottom: var(--spacing-lg);
 }
 
-.no-reviews-found .action-button,
-.no-content-found .action-button {
-  width: auto;
-  min-width: 180px;
-  margin-top: var(--spacing-md);
+.review-comment,
+.note-content {
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  line-height: 1.6;
+  background: rgba(255, 248, 238, 0.3);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  border-left: 3px solid rgba(67, 97, 238, 0.2);
+  margin: 0;
 }
 
-/* ========================================= */
-/* Duyarlı Tasarım (Responsive Design) */
-/* ========================================= */
+/* Note Card Specific Styles */
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-md);
+}
 
-@media (max-width: 767px) {
+.note-lesson-title {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: var(--font-size-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.note-date {
+  font-size: var(--font-size-sm);
+  color: var(--dark-color);
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Icons */
+.user-icon,
+.date-icon,
+.note-icon {
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+}
+
+/* Action Buttons */
+.review-actions,
+.note-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.action-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-width: 100px;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+.action-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+  transform: translate(-50%, -50%);
+}
+
+.action-button:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--deep-blue));
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.secondary-btn {
+  background: linear-gradient(135deg, var(--light-accent), var(--secondary-color));
+  color: var(--accent-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.secondary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--secondary-color), var(--light-accent));
+}
+
+.danger-btn {
+  background: linear-gradient(135deg, var(--error-color), #d32f2f);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.danger-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #d32f2f, var(--error-color));
+}
+
+/* No Content Found */
+.no-content-found {
+  text-align: center;
+  padding: var(--spacing-xxl);
+  background: var(--card-bg);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-md);
+  margin: var(--spacing-xxl) auto;
+  max-width: 500px;
+  border: 2px dashed var(--border-color);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-lg);
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-size: var(--font-size-xl);
+  color: var(--accent-color);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.empty-state-description {
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  margin-bottom: var(--spacing-xl);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  min-width: 200px;
+}
+
+/* Responsive Design - Mobile First */
+@media (max-width: 900px) {
+  .review-list-container {
+    padding: var(--spacing-lg);
+  }
+
   .page-title {
     font-size: var(--font-size-xxl);
   }
@@ -275,66 +424,137 @@
     margin-bottom: var(--spacing-xl);
   }
 
-  .review-cards-grid,
-  .note-cards-grid {
-    grid-template-columns: 1fr; /* Mobil cihazlarda tek sütun */
-  }
-
-  .review-card,
-  .note-card {
-    margin: 0 var(--spacing-md); /* Kartların yanlarda boşluk bırakmasını sağlar */
-  }
-
-  .review-header,
-  .note-header {
-    flex-direction: column; /* Mobil header dikey */
-    align-items: flex-start;
-    gap: var(--spacing-xs);
-  }
-
-  .reviewer-info {
-    width: 100%; /* Tam genişlik */
-  }
-
-  .review-stars {
-    margin-left: 0; /* Hizalamayı sıfırla */
-    margin-top: var(--spacing-xs); /* Üstten boşluk */
-  }
-
-  .review-comment,
-  .note-content {
-    font-size: var(--font-size-sm);
-  }
-
-  .review-actions,
-  .note-actions {
-    justify-content: center; /* Butonları ortala */
-    flex-wrap: wrap;
-  }
-
-  .action-button {
-    width: 100%; /* Mobil butonları tam genişlik */
-    max-width: 180px; /* Maksimum genişlik */
-  }
-
   .section-card {
     padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
   }
 
   .section-title {
     font-size: var(--font-size-xl);
   }
 
-  .no-reviews-found,
+  .section-decoration {
+    width: 60px;
+  }
+
+  .review-cards-grid,
+  .note-cards-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .review-card,
+  .note-card {
+    padding: var(--spacing-lg);
+  }
+
+  .review-header,
+  .note-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .review-stars {
+    align-self: flex-start;
+  }
+
+  .review-course-info,
+  .note-course-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  .review-actions,
+  .note-actions {
+    justify-content: center;
+    gap: var(--spacing-xs);
+  }
+
+  .action-button {
+    flex: 1;
+    min-width: 80px;
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-sm);
+  }
+
   .no-content-found {
     padding: var(--spacing-lg);
-    margin: var(--spacing-md) auto;
+    margin: var(--spacing-lg) auto;
+  }
+
+  .empty-state-icon {
+    font-size: 2rem;
+  }
+
+  .empty-state-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .empty-state-description {
+    font-size: var(--font-size-sm);
   }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-  .review-cards-grid,
-  .note-cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Tabletlerde 2-3 sütun */
+@media (max-width: 480px) {
+  .review-list-container {
+    padding: var(--spacing-md);
   }
+
+  .section-card {
+    padding: var(--spacing-md);
+  }
+
+  .review-card,
+  .note-card {
+    padding: var(--spacing-md);
+  }
+
+  .reviewer-name,
+  .note-lesson-title {
+    font-size: var(--font-size-base);
+  }
+
+  .action-button {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-width: 70px;
+  }
+
+  .retry-btn {
+    min-width: 150px;
+  }
+}
+
+/* Enhanced Visual Effects */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.review-card,
+.note-card {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.review-card:nth-child(even),
+.note-card:nth-child(even) {
+  animation-delay: 0.1s;
+}
+
+/* Focus Styles for Accessibility */
+.action-button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.action-button:focus:not(:hover) {
+  transform: none;
 }
