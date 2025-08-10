@@ -1,8 +1,6 @@
 <div class="lesson-player-container">
-    <!-- Loading Spinner -->
     <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
-    <!-- Error Messages -->
     <app-alert-dialog
             *ngIf="errorMessage"
             [message]="errorMessage"
@@ -11,7 +9,6 @@
             (closed)="clearMessages()">
     </app-alert-dialog>
 
-    <!-- Success Messages -->
     <app-alert-dialog
             *ngIf="successMessage"
             [message]="successMessage"
@@ -20,10 +17,8 @@
             (closed)="clearMessages()">
     </app-alert-dialog>
 
-    <!-- Main Content -->
     <div class="lesson-player-content" *ngIf="!isLoading && course && currentLesson">
 
-        <!-- Course Header -->
         <div class="course-header">
             <div class="course-breadcrumb">
                 <a [routerLink]="['/courses']" class="breadcrumb-link">
@@ -36,7 +31,6 @@
                 </a>
             </div>
 
-            <!-- Instructor Actions -->
             <div class="instructor-actions" *ngIf="isCourseOwner">
                 <button class="action-btn edit-lesson-btn" (click)="editCurrentLesson()" [title]="'EDIT_LESSON' | translate">
                     <i class="fas fa-edit"></i>
@@ -49,7 +43,6 @@
             </div>
         </div>
 
-        <!-- Lesson Title -->
         <div class="lesson-header">
             <h1 class="lesson-title">{{ currentLesson.title }}</h1>
             <div class="lesson-meta">
@@ -69,9 +62,7 @@
             </div>
         </div>
 
-        <!-- Video Player Section -->
         <div class="video-section">
-            <!-- Accessible Video -->
             <div class="video-player-wrapper" *ngIf="isCurrentLessonAccessible()">
                 <ng-container *ngIf="videoUrl">
                     <iframe [src]="videoUrl" frameborder="0" allowfullscreen class="video-iframe"></iframe>
@@ -82,7 +73,6 @@
                 </div>
             </div>
 
-            <!-- Locked Video -->
             <div class="locked-video-wrapper" *ngIf="!isCurrentLessonAccessible()">
                 <div class="locked-video-overlay">
                     <div class="lock-content">
@@ -95,20 +85,16 @@
                         </button>
                     </div>
                 </div>
-                <!-- Blurred background video preview -->
                 <div class="video-preview-blur">
                     <div class="blur-overlay"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content Grid -->
         <div class="content-grid">
 
-            <!-- Left Column: Lesson Details -->
             <div class="lesson-details-column">
 
-                <!-- Lesson Description -->
                 <div class="lesson-description-card">
                     <h2 class="card-title">
                         <i class="fas fa-info-circle"></i>
@@ -116,7 +102,6 @@
                     </h2>
                     <div class="lesson-description" [innerHTML]="currentLesson.description"></div>
 
-                    <!-- Lesson Resources -->
                     <div class="lesson-resources" *ngIf="currentLesson.resources && currentLesson.resources.length > 0 && isCurrentLessonAccessible()">
                         <h3 class="resources-title">
                             <i class="fas fa-paperclip"></i>
@@ -132,7 +117,6 @@
                         </ul>
                     </div>
 
-                    <!-- Locked Resources -->
                     <div class="locked-resources" *ngIf="currentLesson.resources && currentLesson.resources.length > 0 && !isCurrentLessonAccessible()">
                         <h3 class="resources-title">
                             <i class="fas fa-lock"></i>
@@ -145,7 +129,6 @@
                     </div>
                 </div>
 
-                <!-- User Notes Section -->
                 <div class="user-notes-section" *ngIf="isLoggedIn && isCurrentLessonAccessible()">
                     <h2 class="section-title">
                         <i class="fas fa-sticky-note"></i>
@@ -188,7 +171,6 @@
                     </div>
                 </div>
 
-                <!-- Login Required for Notes -->
                 <div class="login-required-notes" *ngIf="!isLoggedIn && isCurrentLessonAccessible()">
                     <div class="login-prompt">
                         <i class="fas fa-user-lock"></i>
@@ -202,10 +184,8 @@
                 </div>
             </div>
 
-            <!-- Right Column: Course Navigation -->
             <div class="lesson-navigation-column">
 
-                <!-- Navigation Controls -->
                 <div class="navigation-controls">
                     <button
                             class="nav-btn prev-btn"
@@ -224,7 +204,6 @@
                     </button>
                 </div>
 
-                <!-- Lessons List -->
                 <div class="lessons-navigation-card">
                     <div class="lessons-header">
                         <h2 class="card-title">
@@ -275,7 +254,6 @@
                         </ul>
                     </div>
 
-                    <!-- Course Progress -->
                     <div class="course-progress" *ngIf="needsToPurchaseCourse()">
                         <div class="progress-info">
                             <h3>{{ 'UNLOCK_FULL_COURSE' | translate }}</h3>
@@ -287,16 +265,11 @@
                         </div>
                     </div>
 
-                    <!-- Course Completed -->
                     <div class="course-completed" *ngIf="!needsToPurchaseCourse() && isCurrentLesson(course.lessons[course.lessons.length - 1])">
                         <div class="completion-info">
                             <i class="fas fa-trophy"></i>
                             <h3>{{ 'CONGRATULATIONS' | translate }}</h3>
                             <p>{{ 'COURSE_COMPLETED_MESSAGE' | translate }}</p>
-                            <button class="action-btn certificate-btn" (click)="goToCourse()">
-                                <i class="fas fa-certificate"></i>
-                                {{ 'VIEW_CERTIFICATE' | translate }}
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -304,7 +277,6 @@
         </div>
     </div>
 
-    <!-- No Content Found / Error State -->
     <div *ngIf="!isLoading && (!course || !currentLesson) && !errorMessage" class="no-content-found">
         <div class="error-content">
             <i class="fas fa-exclamation-triangle"></i>
@@ -321,7 +293,6 @@
         </div>
     </div>
 
-    <!-- Access Denied State -->
     <div *ngIf="!isLoading && course && currentLesson && !isCurrentLessonAccessible() && !currentLesson.preview" class="access-denied">
         <div class="access-denied-content">
             <i class="fas fa-lock"></i>

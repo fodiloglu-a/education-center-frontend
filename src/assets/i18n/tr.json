@@ -397,14 +397,14 @@
   "HOME_SLIDER_TEXT": "Uzman eğitmenlerden, en güncel teknolojilerle hazırlanmış kapsamlı kurslarla kendinizi geliştirin. Binlerce öğrencinin tercihi olan platformumuzda siz de yerinizi alın.",
   "HOME_SLIDER_BTN": "Kursları Keşfet",
 
-  "HOME_FEATURE_TITLE_1": "Güvenilir Platform",
-  "HOME_FEATURE_TEXT_1": "SSL sertifikalı güvenli ödeme sistemi ve 256-bit şifreleme ile verileriniz tamamen korunur.",
+  "HOME_FEATURE_TITLE_1": "Satın Al veya Yayınla",
+  "HOME_FEATURE_TEXT_1": "Platformumuzda hem yeni eğitimler keşfedebilir hem de kendi kurslarınızı kolayca yayınlayabilirsiniz.",
 
-  "HOME_FEATURE_TITLE_2": "Hızlı Başlangıç",
-  "HOME_FEATURE_TEXT_2": "Satın aldığınız kurslara anında erişim sağlayın, kaldığınız yerden devam edin.",
+  "HOME_FEATURE_TITLE_2": "Güçlü Topluluk",
+  "HOME_FEATURE_TEXT_2": "Binlerce öğrenci ve eğitmenin bir araya geldiği dinamik bir öğrenme ortamına katılın.",
 
-  "HOME_FEATURE_TITLE_3": "Kaliteli İçerik",
-  "HOME_FEATURE_TEXT_3": "Sektör uzmanları tarafından hazırlanan, güncel ve uygulamalı eğitim içerikleri.",
+  "HOME_FEATURE_TITLE_3": "Esnek ve Hızlı Erişim",
+  "HOME_FEATURE_TEXT_3": "İster öğrenci ister eğitmen olun, kurslarınıza 7/24 istediğiniz cihazdan ulaşın.",
 
   "HOME_BESTSELLERS_TITLE": "En Çok Satan Eğitimler",
   "HOME_BESTSELLERS_SUBTITLE": "Binlerce öğrencinin tercihi olan, en popüler ve başarı oranı yüksek kurslarımız",
@@ -904,7 +904,11 @@
   "COURSES_LOAD_ERROR": "Kurslar yüklenemedi",
   "REFRESH_ERROR": "Yenileme hatası",
   "RETRY_ERROR": "Yeniden deneme hatası",
-  "GO_TO_INS_PROFILE": "Eğitmen profiline git"
+  "GO_TO_INS_PROFILE": "Eğitmen profiline git",
+  "APP_TITLE": "Eğitim Merkezi",
+  "FOOTER_COPYRIGHT": "Tüm hakları saklıdır.",
+  "FOOTER_PRIVACY": "Gizlilik Politikası",
+  "FOOTER_TERMS": "Kullanım Şartları"
 
 
 

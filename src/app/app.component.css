@@ -530,3 +530,108 @@ body.mobile-menu-open {
     gap: 15px;
   }
 }
+/* ========= Footer (revized) ========= */
+:root{
+  --footer-bg: var(--secondary-color);
+  --footer-fg: var(--card-bg);
+  --footer-accent: var(--accent-color);
+  --footer-text-muted: rgba(255,255,255,.75);
+}
+
+/* Base */
+.app-footer{
+  background: var(--footer-bg);
+  color: var(--footer-fg);
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-block: 16px;
+  padding-inline: max(16px, env(safe-area-inset-left));
+  line-height: 1.4;
+  font-size: 14px;
+}
+
+/* Container */
+.app-footer .container{
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  box-sizing: border-box;
+}
+
+/* Layout */
+.footer-content{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;                  /* küçük ekranda satır değiştirir */
+  overflow-wrap: anywhere;          /* uzun içerik taşmasını engeller */
+}
+
+/* Logo */
+.footer-logo img{
+  display: block;
+  max-height: 40px;
+  max-width: 180px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Info area */
+.footer-info{
+  margin-left: auto;
+  text-align: right;
+  min-width: 260px;                 /* aşırı daralmayı önle */
+}
+.footer-info p{
+  margin: 0;
+  color: var(--footer-text-muted);
+}
+
+/* Policies (links) */
+.footer-policies{
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.footer-policies a{
+  color: var(--footer-fg);
+  text-decoration: none;
+  opacity: .9;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.footer-policies a:hover{
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.footer-policies a:focus-visible{
+  outline: 2px solid var(--footer-fg);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px){
+  .footer-content{
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .footer-info{
+    text-align: center;
+    margin-left: 0;
+    min-width: 0;
+  }
+  .footer-policies{
+    justify-content: center;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .footer-policies a{
+    transition: none;
+  }
+}
