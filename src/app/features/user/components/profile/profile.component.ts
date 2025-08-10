@@ -577,6 +577,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
     const count = this.userCertificates?.length || 0;
     return this.translate.instant('CERTIFICATES_COUNT_ARIA', { count });
   }
+  getCertificateCount(): number {
+    return this.userCertificates?.length || 0;
+  }
+  getPurshCertificateCount(): number {
+    return this.purchasedCourses?.length || 0;
+  }
 
   /**
    * Kurs kartı için ARIA label

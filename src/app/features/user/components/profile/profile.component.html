@@ -166,7 +166,7 @@
                 <div class="section-info">
                     <span class="courses-count"
                           [attr.aria-label]="getCoursesCountAriaLabel()">
-                        {{ purchasedCourses?.length || 0 }} {{ 'COURSES' | translate }}
+                        {{ getPurshCertificateCount()|| 0 }} {{ 'COURSES' | translate }}
                     </span>
                     <button *ngIf="getRemainingCoursesCount() > 0"
                             class="view-all-btn"
@@ -290,7 +290,7 @@
                 <div class="section-info">
                     <span class="certificates-count"
                           [attr.aria-label]="getCertificatesCountAriaLabel()">
-                        {{ userCertificates?.length || 0 }} {{ 'CERTIFICATES' | translate }}
+                        {{ getCertificateCount() || 0 }} {{ 'CERTIFICATES' | translate }}
                     </span>
                     <button *ngIf="getRemainingCertificatesCount() > 0"
                             class="view-all-btn"
