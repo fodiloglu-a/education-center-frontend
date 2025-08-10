@@ -25,6 +25,8 @@ export class AlertDialogComponent implements OnInit {
   @Input() isError!: boolean;
     @Input() dismissible!: boolean;
   @Output() dismissed = new EventEmitter<unknown>();
+    @Input() showRetry!: boolean;
+  @Output() retry = new EventEmitter<unknown>();
 
   ngOnInit(): void {
     if (this.autoClose) {

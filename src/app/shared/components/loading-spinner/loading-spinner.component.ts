@@ -1,6 +1,6 @@
 // loading-spinner.component.ts
 
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 import { CommonModule } from '@angular/common'; // ngIf gibi direktifler için
 
 @Component({
@@ -13,4 +13,5 @@ import { CommonModule } from '@angular/common'; // ngIf gibi direktifler için
 export class LoadingSpinnerComponent {
   // Bu bileşen basit bir yükleme animasyonu göstereceği için özel bir TypeScript mantığına ihtiyaç duymaz.
   // Sadece CSS ile görselleştirilecektir.
+  @Input() message!: any;
 }

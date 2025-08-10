@@ -1,212 +1,423 @@
-<div class="profile-container">
-    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<!-- profile.component.html - Angular Template Syntax Uyumlu Production Ready Version -->
 
-    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" (closed)="clearMessages()"></app-alert-dialog>
+<div class="profile-container" role="main" [attr.aria-busy]="isComponentLoading">
+    <!-- Loading Spinner -->
+    <app-loading-spinner
+            *ngIf="isLoading"
+            [message]="'LOADING_PROFILE' | translate"
+            [attr.aria-label]="'LOADING_PROFILE' | translate">
+    </app-loading-spinner>
 
-    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Error Alert -->
+    <app-alert-dialog
+            *ngIf="errorMessage"
+            [message]="errorMessage"
+            type="error"
+            [showRetry]="showRetryOption"
+            (closed)="clearMessages()"
+            (retry)="retryLoadProfile()"
+            role="alert"
+            aria-live="assertive">
+    </app-alert-dialog>
 
-    <div class="profile-card" *ngIf="!isLoading && user">
+    <!-- Success Alert -->
+    <app-alert-dialog
+            *ngIf="successMessage"
+            [message]="successMessage"
+            type="success"
+            (closed)="clearMessages()"
+            role="status"
+            aria-live="polite">
+    </app-alert-dialog>
+
+    <!-- Main Profile Card -->
+    <article class="profile-card" *ngIf="!isLoading && user" itemscope itemtype="https://schema.org/Person">
         <!-- Profile Header -->
-        <div class="profile-header">
-            <h2 class="card-title">{{ 'PROFILE' | translate }}</h2>
+        <header class="profile-header">
+            <h1 class="card-title" [attr.aria-label]="'PROFILE_PAGE_TITLE' | translate">
+                {{ 'PROFILE' | translate }}
+            </h1>
             <p class="card-subtitle">{{ 'PROFILE_SUBTITLE' | translate }}</p>
-        </div>
+
+            <!-- User Badge (if applicable) -->
+            <div class="user-badge" *ngIf="getUserBadge() as badge" [attr.title]="badge | translate">
+                <span class="material-icons">emoji_events</span>
+                <span class="badge-text">{{ badge | translate }}</span>
+            </div>
+        </header>
 
         <!-- User Info Grid -->
-        <div class="profile-details-grid">
-            <div class="detail-item">
-                <span class="detail-icon material-icons">person</span>
+        <section class="profile-details-grid"
+                 aria-labelledby="user-details-heading"
+                 role="region">
+            <h2 id="user-details-heading" class="sr-only">{{ 'USER_DETAILS' | translate }}</h2>
+
+            <div class="detail-item" role="group" [attr.aria-label]="'FIRST_NAME' | translate">
+                <span class="detail-icon material-icons" aria-hidden="true">person</span>
                 <div class="detail-content">
-                    <span class="detail-label">{{ 'FIRST_NAME' | translate }}:</span>
-                    <span class="detail-value">{{ user.firstName }}</span>
+                    <span class="detail-label" id="firstName-label">{{ 'FIRST_NAME' | translate }}:</span>
+                    <span class="detail-value"
+                          [attr.aria-labelledby]="'firstName-label'"
+                          itemprop="givenName">
+                        {{ user.firstName || ('NOT_SPECIFIED' | translate) }}
+                    </span>
                 </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-icon material-icons">person_outline</span>
+
+            <div class="detail-item" role="group" [attr.aria-label]="'LAST_NAME' | translate">
+                <span class="detail-icon material-icons" aria-hidden="true">person_outline</span>
                 <div class="detail-content">
-                    <span class="detail-label">{{ 'LAST_NAME' | translate }}:</span>
-                    <span class="detail-value">{{ user.lastName }}</span>
+                    <span class="detail-label" id="lastName-label">{{ 'LAST_NAME' | translate }}:</span>
+                    <span class="detail-value"
+                          [attr.aria-labelledby]="'lastName-label'"
+                          itemprop="familyName">
+                        {{ user.lastName || ('NOT_SPECIFIED' | translate) }}
+                    </span>
                 </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-icon material-icons">email</span>
+
+            <div class="detail-item" role="group" [attr.aria-label]="'EMAIL' | translate">
+                <span class="detail-icon material-icons" aria-hidden="true">email</span>
                 <div class="detail-content">
-                    <span class="detail-label">{{ 'EMAIL' | translate }}:</span>
-                    <span class="detail-value">{{ user.email }}</span>
+                    <span class="detail-label" id="email-label">{{ 'EMAIL' | translate }}:</span>
+                    <span class="detail-value"
+                          [attr.aria-labelledby]="'email-label'"
+                          itemprop="email">
+                        {{ user.email }}
+                    </span>
                 </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-icon material-icons">assignment_ind</span>
+
+            <div class="detail-item" role="group" [attr.aria-label]="'ROLE' | translate">
+                <span class="detail-icon material-icons" aria-hidden="true">assignment_ind</span>
                 <div class="detail-content">
-                    <span class="detail-label">{{ 'ROLE' | translate }}:</span>
-                    <span class="detail-value">{{ getTranslatedRole(user.role) }}</span>
+                    <span class="detail-label" id="role-label">{{ 'ROLE' | translate }}:</span>
+                    <span class="detail-value"
+                          [attr.aria-labelledby]="'role-label'"
+                          itemprop="jobTitle">
+                        {{ getTranslatedRole(user.role) }}
+                    </span>
                 </div>
             </div>
-            <div class="detail-item">
-                <span class="detail-icon material-icons">event</span>
+
+            <div class="detail-item" role="group" [attr.aria-label]="'MEMBER_SINCE' | translate">
+                <span class="detail-icon material-icons" aria-hidden="true">event</span>
                 <div class="detail-content">
-                    <span class="detail-label">{{ 'MEMBER_SINCE' | translate }}:</span>
-                    <span class="detail-value">{{ user.createdAt | date:'shortDate' }}</span>
+                    <span class="detail-label" id="memberSince-label">{{ 'MEMBER_SINCE' | translate }}:</span>
+                    <span class="detail-value"
+                          [attr.aria-labelledby]="'memberSince-label'">
+                        <time [dateTime]="user.createdAt" itemprop="dateCreated">
+                            {{ user.createdAt | date:'shortDate' }}
+                        </time>
+                    </span>
                 </div>
             </div>
-        </div>
+
+            <!-- Learning Stats (if courses exist) -->
+            <div class="detail-item"
+                 *ngIf="purchasedCourses && purchasedCourses.length > 0"
+                 role="group"
+                 [attr.aria-label]="'TOTAL_LEARNING_TIME' | translate">
+                <span class="detail-icon material-icons" aria-hidden="true">schedule</span>
+                <div class="detail-content">
+                    <span class="detail-label" id="learningTime-label">{{ 'TOTAL_LEARNING_TIME' | translate }}:</span>
+                    <span class="detail-value" [attr.aria-labelledby]="'learningTime-label'">
+                        {{ formatDuration(getTotalLearningHours()) }}
+                    </span>
+                </div>
+            </div>
+        </section>
 
         <!-- Account Actions -->
-        <div class="profile-actions-section">
-            <h3 class="section-title">{{ 'ACCOUNT_ACTIONS' | translate }}</h3>
-            <div class="profile-actions">
-                <button class="action-button primary-btn" routerLink="/profile/edit">
-                    <span class="material-icons">edit</span> {{ 'EDIT_PROFILE' | translate }}
-                </button>
-                <button class="action-button secondary-btn" routerLink="/profile/change-password">
-                    <span class="material-icons">vpn_key</span> {{ 'CHANGE_PASSWORD' | translate }}
-                </button>
-            </div>
-        </div>
+        <section class="profile-actions-section"
+                 aria-labelledby="account-actions-heading"
+                 role="region">
+            <h2 id="account-actions-heading" class="section-title">
+                <span class="material-icons section-icon" aria-hidden="true">settings</span>
+                {{ 'ACCOUNT_ACTIONS' | translate }}
+            </h2>
+            <nav class="profile-actions" role="navigation" [attr.aria-label]="'ACCOUNT_ACTIONS' | translate">
+                <a class="action-button primary-btn"
+                   routerLink="/profile/edit"
+                   [attr.aria-label]="'EDIT_PROFILE' | translate"
+                   role="button">
+                    <span class="material-icons" aria-hidden="true">edit</span>
+                    <span>{{ 'EDIT_PROFILE' | translate }}</span>
+                </a>
+                <a class="action-button secondary-btn"
+                   routerLink="/profile/change-password"
+                   [attr.aria-label]="'CHANGE_PASSWORD' | translate"
+                   role="button">
+                    <span class="material-icons" aria-hidden="true">vpn_key</span>
+                    <span>{{ 'CHANGE_PASSWORD' | translate }}</span>
+                </a>
+            </nav>
+        </section>
 
         <!-- My Courses Section -->
-        <div class="my-courses-section">
-            <div class="section-header">
-                <h3 class="section-title">
-                    <span class="material-icons section-icon">school</span>
+        <section class="my-courses-section"
+                 aria-labelledby="my-courses-heading"
+                 role="region">
+            <header class="section-header">
+                <h2 id="my-courses-heading" class="section-title">
+                    <span class="material-icons section-icon" aria-hidden="true">school</span>
                     {{ 'MY_COURSES' | translate }}
-                </h3>
+                </h2>
                 <div class="section-info">
-                    <span class="courses-count">{{ purchasedCourses.length }} {{ 'COURSES' | translate }}</span>
-                    <button *ngIf="purchasedCourses.length > 6"
+                    <span class="courses-count"
+                          [attr.aria-label]="getCoursesCountAriaLabel()">
+                        {{ purchasedCourses?.length || 0 }} {{ 'COURSES' | translate }}
+                    </span>
+                    <button *ngIf="getRemainingCoursesCount() > 0"
                             class="view-all-btn"
-                            (click)="viewAllCourses()">
-                        {{ 'VIEW_ALL' | translate }} (+{{ getRemainingCoursesCount() }})
+                            (click)="viewAllCourses()"
+                            [attr.aria-label]="'SHOW_ALL_COURSES' | translate"
+                            [attr.aria-expanded]="showAllCourses">
+                        <span *ngIf="!showAllCourses">
+                            {{ 'VIEW_ALL' | translate }} (+{{ getRemainingCoursesCount() }})
+                        </span>
+                        <span *ngIf="showAllCourses">
+                            {{ 'SHOW_LESS' | translate }}
+                        </span>
                     </button>
                 </div>
-            </div>
+            </header>
 
             <!-- Loading Courses -->
-            <div *ngIf="isLoadingCourses" class="loading-section">
+            <div *ngIf="isLoadingCourses"
+                 class="loading-section"
+                 role="status"
+                 [attr.aria-label]="'LOADING_COURSES' | translate">
                 <div class="loading-message">
-                    <span class="material-icons loading-icon">hourglass_empty</span>
-                    {{ 'LOADING_COURSES' | translate }}
+                    <span class="material-icons loading-icon" aria-hidden="true">hourglass_empty</span>
+                    <span>{{ 'LOADING_COURSES' | translate }}</span>
                 </div>
             </div>
 
             <!-- Courses Grid -->
-            <div *ngIf="!isLoadingCourses && purchasedCourses.length > 0" class="courses-grid">
-                <div *ngFor="let course of getDisplayedCourses(); trackBy: trackByCourseId"
-                     class="course-card"
-                     (click)="navigateToCourse(course.id)">
-                    <div class="course-image">
-                        <img [src]="course.imageUrl"
+            <div *ngIf="!isLoadingCourses && getDisplayedCourses().length > 0"
+                 class="courses-grid"
+                 role="grid"
+                 [attr.aria-label]="'MY_COURSES_GRID' | translate"
+                 [attr.aria-rowcount]="getDisplayedCourses().length">
+
+                <article *ngFor="let course of getDisplayedCourses(); trackBy: trackByCourseId; let i = index"
+                         class="course-card"
+                         role="gridcell"
+                         [attr.aria-rowindex]="i + 1"
+                         [attr.aria-label]="getCourseCardAriaLabel(course.title)"
+                         (click)="navigateToCourse(course.id)"
+                         (keydown.enter)="navigateToCourse(course.id)"
+                         (keydown.space)="navigateToCourse(course.id)"
+                         tabindex="0"
+                         itemscope
+                         itemtype="https://schema.org/Course">
+
+                    <div class="course-image" role="img" [attr.aria-label]="course.title">
+                        <img [src]="sanitizeUrl(course.imageUrl)"
                              [alt]="course.title"
-                             onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
-                        <div class="course-overlay">
+                             loading="lazy"
+                             class="course-image-element"
+                             (error)="onImageError($event)"
+                             itemprop="image"
+                             [style.content-visibility]="'auto'"
+                             [style.contain-intrinsic-size]="'300px 180px'" />
+                        <div class="course-overlay" aria-hidden="true">
                             <span class="material-icons play-icon">play_circle_filled</span>
                         </div>
                     </div>
+
                     <div class="course-info">
-                        <h4 class="course-title">{{ course.title }}</h4>
-                        <p class="course-instructor">{{ course.instructorName }}</p>
+                        <h3 class="course-title" itemprop="name">{{ course.title }}</h3>
+                        <p class="course-instructor" itemprop="instructor">
+                            {{ course.instructorName || ('INSTRUCTOR_NOT_SPECIFIED' | translate) }}
+                        </p>
+
                         <div class="course-meta">
-                            <span class="course-category">{{ getCategoryTranslation(course.category) }}</span>
-                            <span *ngIf="course.duration > 0" class="course-duration">
-                                <span class="material-icons">schedule</span>
-                                {{ formatDuration(course.duration) }}
+                            <span class="course-category"
+                                  [attr.aria-label]="getCategoryAriaLabel(course.category)"
+                                  itemprop="category">
+                                {{ getCategoryTranslation(course.category) }}
+                            </span>
+                            <span *ngIf="course.duration && course.duration > 0"
+                                  class="course-duration"
+                                  [attr.aria-label]="getDurationAriaLabel(course.duration)"
+                                  itemprop="timeRequired">
+                                <span class="material-icons" aria-hidden="true">schedule</span>
+                                <span>{{ formatDuration(course.duration) }}</span>
                             </span>
                         </div>
-                        <div class="course-price">
-                            <span class="price-value">{{ formatPrice(course.price) }}</span>
+
+                        <div class="course-price"
+                             [attr.aria-label]="getPriceAriaLabel(course.price)">
+                            <span class="price-value" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                                <meta itemprop="price" [content]="course.price">
+                                <meta itemprop="priceCurrency" [content]="getCurrencyForLanguage(translate.currentLang)">
+                                {{ formatPrice(course.price) }}
+                            </span>
                         </div>
                     </div>
-                </div>
+                </article>
             </div>
 
-            <!-- No Courses -->
-            <div *ngIf="!isLoadingCourses && purchasedCourses.length === 0" class="no-content">
-                <span class="material-icons no-content-icon">school</span>
-                <h4>{{ 'NO_COURSES_YET' | translate }}</h4>
+            <!-- No Courses State -->
+            <div *ngIf="!isLoadingCourses && (!purchasedCourses || purchasedCourses.length === 0)"
+                 class="no-content"
+                 role="region"
+                 [attr.aria-label]="'NO_COURSES_MESSAGE' | translate">
+                <span class="material-icons no-content-icon" aria-hidden="true">school</span>
+                <h3>{{ 'NO_COURSES_YET' | translate }}</h3>
                 <p>{{ 'NO_COURSES_DESCRIPTION' | translate }}</p>
-                <button class="action-button primary-btn" routerLink="/courses">
-                    <span class="material-icons">explore</span>
-                    {{ 'BROWSE_COURSES' | translate }}
-                </button>
+                <a class="action-button primary-btn"
+                   routerLink="/courses"
+                   [attr.aria-label]="'BROWSE_COURSES' | translate"
+                   role="button">
+                    <span class="material-icons" aria-hidden="true">explore</span>
+                    <span>{{ 'BROWSE_COURSES' | translate }}</span>
+                </a>
             </div>
-        </div>
+        </section>
 
         <!-- My Certificates Section -->
-        <div class="my-certificates-section">
-            <div class="section-header">
-                <h3 class="section-title">
-                    <span class="material-icons section-icon">workspace_premium</span>
+        <section class="my-certificates-section"
+                 aria-labelledby="my-certificates-heading"
+                 role="region">
+            <header class="section-header">
+                <h2 id="my-certificates-heading" class="section-title">
+                    <span class="material-icons section-icon" aria-hidden="true">workspace_premium</span>
                     {{ 'MY_CERTIFICATES' | translate }}
-                </h3>
+                </h2>
                 <div class="section-info">
-                    <span class="certificates-count">{{ userCertificates.length }} {{ 'CERTIFICATES' | translate }}</span>
-                    <button *ngIf="userCertificates.length > 4"
+                    <span class="certificates-count"
+                          [attr.aria-label]="getCertificatesCountAriaLabel()">
+                        {{ userCertificates?.length || 0 }} {{ 'CERTIFICATES' | translate }}
+                    </span>
+                    <button *ngIf="getRemainingCertificatesCount() > 0"
                             class="view-all-btn"
-                            (click)="viewAllCertificates()">
-                        {{ 'VIEW_ALL' | translate }} (+{{ getRemainingCertificatesCount() }})
+                            (click)="viewAllCertificates()"
+                            [attr.aria-label]="'SHOW_ALL_CERTIFICATES' | translate"
+                            [attr.aria-expanded]="showAllCertificates">
+                        <span *ngIf="!showAllCertificates">
+                            {{ 'VIEW_ALL' | translate }} (+{{ getRemainingCertificatesCount() }})
+                        </span>
+                        <span *ngIf="showAllCertificates">
+                            {{ 'SHOW_LESS' | translate }}
+                        </span>
                     </button>
                 </div>
-            </div>
+            </header>
 
             <!-- Loading Certificates -->
-            <div *ngIf="isLoadingCertificates" class="loading-section">
+            <div *ngIf="isLoadingCertificates"
+                 class="loading-section"
+                 role="status"
+                 [attr.aria-label]="'LOADING_CERTIFICATES' | translate">
                 <div class="loading-message">
-                    <span class="material-icons loading-icon">hourglass_empty</span>
-                    {{ 'LOADING_CERTIFICATES' | translate }}
+                    <span class="material-icons loading-icon" aria-hidden="true">hourglass_empty</span>
+                    <span>{{ 'LOADING_CERTIFICATES' | translate }}</span>
                 </div>
             </div>
 
             <!-- Certificates Grid -->
-            <div *ngIf="!isLoadingCertificates && userCertificates.length > 0" class="certificates-grid">
-                <div *ngFor="let certificate of getDisplayedCertificates(); trackBy: trackByCertificateId"
-                     class="certificate-card"
-                     (click)="navigateToCertificate(certificate.id)">
-                    <div class="certificate-header">
-                        <span class="material-icons certificate-icon">workspace_premium</span>
-                        <div class="certificate-date">{{ certificate.issueDate | date:'shortDate' }}</div>
-                    </div>
+            <div *ngIf="!isLoadingCertificates && getDisplayedCertificates().length > 0"
+                 class="certificates-grid"
+                 role="grid"
+                 [attr.aria-label]="'MY_CERTIFICATES_GRID' | translate"
+                 [attr.aria-rowcount]="getDisplayedCertificates().length">
+
+                <article *ngFor="let certificate of getDisplayedCertificates(); trackBy: trackByCertificateId; let i = index"
+                         class="certificate-card"
+                         role="gridcell"
+                         [attr.aria-rowindex]="i + 1"
+                         [attr.aria-label]="getCertificateCardAriaLabel(certificate.courseTitle)"
+                         (click)="navigateToCertificate(certificate.id)"
+                         (keydown.enter)="navigateToCertificate(certificate.id)"
+                         (keydown.space)="navigateToCertificate(certificate.id)"
+                         tabindex="0"
+                         itemscope
+                         itemtype="https://schema.org/Certificate">
+
+                    <header class="certificate-header">
+                        <span class="material-icons certificate-icon" aria-hidden="true">workspace_premium</span>
+                        <div class="certificate-date"
+                             [attr.aria-label]="getIssueDateAriaLabel(certificate.issueDate)">
+                            <time [dateTime]="certificate.issueDate" itemprop="dateCreated">
+                                {{ certificate.issueDate | date:'shortDate' }}
+                            </time>
+                        </div>
+                    </header>
+
                     <div class="certificate-content">
-                        <h4 class="certificate-course">{{ certificate.courseTitle }}</h4>
-                        <p class="certificate-code">{{ 'CODE' | translate }}: {{ certificate.uniqueCode }}</p>
+                        <h3 class="certificate-course" itemprop="name">{{ certificate.courseTitle }}</h3>
+                        <p class="certificate-code"
+                           [attr.aria-label]="getCertificateCodeAriaLabel(certificate.uniqueCode)"
+                           itemprop="identifier">
+                            {{ 'CODE' | translate }}: {{ certificate.uniqueCode }}
+                        </p>
                     </div>
-                    <div class="certificate-actions">
-                        <button class="cert-action-btn view-btn">
-                            <span class="material-icons">visibility</span>
-                            {{ 'VIEW' | translate }}
+
+                    <footer class="certificate-actions">
+                        <button class="cert-action-btn view-btn"
+                                [attr.aria-label]="getViewCertificateAriaLabel(certificate.courseTitle)"
+                                (click)="$event.stopPropagation(); navigateToCertificate(certificate.id)">
+                            <span class="material-icons" aria-hidden="true">visibility</span>
+                            <span>{{ 'VIEW' | translate }}</span>
                         </button>
                         <a *ngIf="certificate.certificateUrl"
-                           [href]="certificate.certificateUrl"
+                           [href]="sanitizeUrl(certificate.certificateUrl)"
                            target="_blank"
+                           rel="noopener noreferrer"
                            class="cert-action-btn download-btn"
+                           [attr.aria-label]="getDownloadCertificateAriaLabel(certificate.courseTitle)"
+                           [attr.download]="certificate.courseTitle + '_certificate.pdf'"
                            (click)="$event.stopPropagation()">
-                            <span class="material-icons">download</span>
-                            {{ 'DOWNLOAD' | translate }}
+                            <span class="material-icons" aria-hidden="true">download</span>
+                            <span>{{ 'DOWNLOAD' | translate }}</span>
                         </a>
-                    </div>
-                </div>
+                    </footer>
+                </article>
             </div>
 
-            <!-- No Certificates -->
-            <div *ngIf="!isLoadingCertificates && userCertificates.length === 0" class="no-content">
-                <span class="material-icons no-content-icon">workspace_premium</span>
-                <h4>{{ 'NO_CERTIFICATES_YET' | translate }}</h4>
+            <!-- No Certificates State -->
+            <div *ngIf="!isLoadingCertificates && (!userCertificates || userCertificates.length === 0)"
+                 class="no-content"
+                 role="region"
+                 [attr.aria-label]="'NO_CERTIFICATES_MESSAGE' | translate">
+                <span class="material-icons no-content-icon" aria-hidden="true">workspace_premium</span>
+                <h3>{{ 'NO_CERTIFICATES_YET' | translate }}</h3>
                 <p>{{ 'NO_CERTIFICATES_DESCRIPTION' | translate }}</p>
-                <button class="action-button secondary-btn" routerLink="/courses">
-                    <span class="material-icons">school</span>
-                    {{ 'START_LEARNING' | translate }}
-                </button>
+                <a class="action-button secondary-btn"
+                   routerLink="/courses"
+                   [attr.aria-label]="'START_LEARNING' | translate"
+                   role="button">
+                    <span class="material-icons" aria-hidden="true">school</span>
+                    <span>{{ 'START_LEARNING' | translate }}</span>
+                </a>
             </div>
-        </div>
-    </div>
+        </section>
+    </article>
 
-    <!-- User Not Found -->
-    <div *ngIf="!isLoading && !user && !errorMessage" class="no-user-found">
-        <span class="material-icons error-icon">person_off</span>
-        <h3>{{ 'USER_NOT_LOADED' | translate }}</h3>
+    <!-- User Not Found State -->
+    <div *ngIf="!isLoading && !user && !errorMessage"
+         class="no-user-found"
+         role="alert"
+         aria-live="assertive">
+        <span class="material-icons error-icon" aria-hidden="true">person_off</span>
+        <h2>{{ 'USER_NOT_LOADED' | translate }}</h2>
         <p>{{ 'USER_LOAD_ERROR_DESCRIPTION' | translate }}</p>
-        <button class="action-button primary-btn" (click)="loadUserProfile()">
-            <span class="material-icons">refresh</span>
-            {{ 'RETRY_LOAD_PROFILE' | translate }}
+        <button class="action-button primary-btn"
+                (click)="retryLoadProfile()"
+                [attr.aria-label]="'RETRY_LOAD_PROFILE' | translate"
+                [disabled]="isLoading">
+            <span class="material-icons" aria-hidden="true">refresh</span>
+            <span>{{ 'RETRY_LOAD_PROFILE' | translate }}</span>
         </button>
+    </div>
+</div>
+
+<!-- Screen Reader Only Content -->
+<div class="sr-only">
+    <div id="profile-instructions">
+        {{ 'PROFILE_SCREEN_READER_INSTRUCTIONS' | translate }}
     </div>
 </div>
