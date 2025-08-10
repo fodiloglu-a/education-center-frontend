@@ -1,76 +1,123 @@
-<div class="course-list-container">
+<div class="course-list-container"
+     role="main"
+     aria-label="Kurs listesi sayfası">
+
     <!-- Loading Spinner -->
-    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+    <div *ngIf="isLoading()"
+         class="loading-container"
+         role="status"
+         aria-live="polite"
+         aria-label="Kurslar yükleniyor">
+        <app-loading-spinner></app-loading-spinner>
+        <p class="loading-text sr-only">Kurslar yükleniyor, lütfen bekleyiniz...</p>
+    </div>
 
     <!-- Error Messages -->
     <app-alert-dialog
-            *ngIf="errorMessage"
-            [message]="errorMessage"
+            *ngIf="errorMessage()"
+            [message]="errorMessage()!"
             type="error"
             [autoClose]="true"
-            (closed)="clearMessages()">
+            (closed)="clearMessages()"
+            role="alert"
+            aria-live="assertive">
     </app-alert-dialog>
 
     <!-- Success Messages -->
     <app-alert-dialog
-            *ngIf="successMessage"
-            [message]="successMessage"
+            *ngIf="successMessage()"
+            [message]="successMessage()!"
             type="success"
             [autoClose]="true"
-            (closed)="clearMessages()">
+            (closed)="clearMessages()"
+            role="status"
+            aria-live="polite">
     </app-alert-dialog>
 
     <!-- Header Section -->
-    <div class="header-section" *ngIf="!isLoading">
+    <header class="header-section"
+            *ngIf="!isLoading()"
+            role="banner">
         <div class="page-title-area">
-            <h1 class="page-title">{{ 'ALL_COURSES' | translate }}</h1>
-            <p class="page-subtitle">{{ 'DISCOVER_LEARN_GROW' | translate }}</p>
+            <h1 id="page-title" class="page-title">
+                {{ 'ALL_COURSES' | translate }}
+            </h1>
+            <p class="page-subtitle" role="text">
+                {{ 'DISCOVER_LEARN_GROW' | translate }}
+            </p>
         </div>
 
         <!-- Search Bar -->
-        <!-- <div class="search-section">
-           <div class="search-input-wrapper">
-               <i class="fas fa-search search-icon"></i>
-               <input
-                       type="text"
-                       class="search-input"
-                       [placeholder]="'SEARCH_COURSES' | translate"
-                       [value]="searchTerm"
-                       (input)="onSearchInput($event)"
-                       autocomplete="off">
-               <button
-                       *ngIf="searchTerm"
-                       class="clear-search-btn"
-                       (click)="updateSearch('')"
-                       [title]="'CLEAR_SEARCH' | translate">
-                   <i class="fas fa-times"></i>
-               </button>
-           </div>
-       </div> -->
+        <section class="search-section"
+                 role="search"
+                 aria-labelledby="search-heading">
+            <h2 id="search-heading" class="sr-only">Kurs arama</h2>
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"
+                   aria-hidden="true"
+                   role="img"></i>
+                <input
+                        type="search"
+                        id="course-search"
+                        class="search-input"
+                        [placeholder]="'SEARCH_COURSES' | translate"
+                        [value]="searchTerm()"
+                        (input)="onSearchInput($event)"
+                        autocomplete="off"
+                        spellcheck="false"
+                        [attr.aria-label]="'SEARCH_COURSES' | translate"
+                        aria-describedby="search-help">
+                <small id="search-help" class="sr-only">
+                    Kurs adı, açıklama veya eğitmen adı ile arama yapabilirsiniz
+                </small>
+                <button
+                        *ngIf="searchTerm()"
+                        class="clear-search-btn"
+                        (click)="updateSearch('')"
+                        type="button"
+                        [attr.aria-label]="'CLEAR_SEARCH' | translate"
+                        [attr.title]="'CLEAR_SEARCH' | translate">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+        </section>
 
         <!-- Filter and View Controls -->
-        <div class="controls-section">
+        <section class="controls-section"
+                 role="region"
+                 aria-labelledby="controls-heading">
+            <h2 id="controls-heading" class="sr-only">Filtreleme ve görünüm kontrolleri</h2>
+
             <div class="filter-controls">
                 <button
+                        type="button"
                         class="filter-toggle-btn"
                         (click)="toggleFilters()"
-                        [class.active]="showFilters">
-                    <i class="fas fa-filter"></i>
+                        [class.active]="showFilters()"
+                        [attr.aria-expanded]="showFilters()"
+                        aria-controls="advanced-filters"
+                        [attr.aria-label]="'TOGGLE_FILTERS' | translate">
+                    <i class="fas fa-filter" aria-hidden="true"></i>
                     {{ 'FILTERS' | translate }}
-                    <span class="filter-count" *ngIf="currentFilters.category !== 'ALL' || currentFilters.level !== 'ALL'">
-            {{ (currentFilters.category !== 'ALL' ? 1 : 0) + (currentFilters.level !== 'ALL' ? 1 : 0) }}
-          </span>
+                    <span class="filter-count"
+                          *ngIf="activeFilterCount() > 0"
+                          [attr.aria-label]="activeFilterCount() + ' aktif filtre'">
+                        {{ activeFilterCount() }}
+                    </span>
                 </button>
 
                 <div class="sort-controls">
-                    <label for="sortSelect" class="sort-label">{{ 'SORT_BY' | translate }}:</label>
+                    <label for="sortSelect" class="sort-label">
+                        {{ 'SORT_BY' | translate }}:
+                    </label>
                     <select
                             id="sortSelect"
                             class="sort-select"
-                            [value]="currentFilters.sortBy"
-                            (change)="onSortChange($event)">>
+                            [value]="currentFilters().sortBy"
+                            (change)="onSortChange($event)"
+                            [attr.aria-label]="'SORT_BY' | translate">
                         <option
-                                *ngFor="let option of getSortOptions()"
+                                *ngFor="let option of getSortOptions(); trackBy: trackBySortValue"
                                 [value]="option.value">
                             {{ option.label }}
                         </option>
@@ -78,36 +125,56 @@
                 </div>
             </div>
 
-            <div class="view-controls">
+            <div class="view-controls"
+                 role="group"
+                 aria-label="Görünüm modu seçimi">
                 <button
+                        type="button"
                         class="view-mode-btn"
-                        [class.active]="viewMode === 'grid'"
+                        [class.active]="viewMode() === 'grid'"
                         (click)="toggleViewMode()"
-                        [title]="'GRID_VIEW' | translate">
-                    <i class="fas fa-th"></i>
+                        [attr.aria-pressed]="viewMode() === 'grid'"
+                        [attr.aria-label]="'GRID_VIEW' | translate"
+                        [attr.title]="'GRID_VIEW' | translate">
+                    <i class="fas fa-th" aria-hidden="true"></i>
                 </button>
                 <button
+                        type="button"
                         class="view-mode-btn"
-                        [class.active]="viewMode === 'list'"
+                        [class.active]="viewMode() === 'list'"
                         (click)="toggleViewMode()"
-                        [title]="'LIST_VIEW' | translate">
-                    <i class="fas fa-list"></i>
+                        [attr.aria-pressed]="viewMode() === 'list'"
+                        [attr.aria-label]="'LIST_VIEW' | translate"
+                        [attr.title]="'LIST_VIEW' | translate">
+                    <i class="fas fa-list" aria-hidden="true"></i>
                 </button>
             </div>
-        </div>
+        </section>
 
         <!-- Advanced Filters Panel -->
-        <div class="advanced-filters" *ngIf="showFilters" [@slideDown]>
+        <section id="advanced-filters"
+                 class="advanced-filters"
+                 *ngIf="showFilters()"
+                 role="region"
+                 aria-labelledby="filters-heading"
+                 [@slideDown]>
+            <h3 id="filters-heading" class="filters-heading sr-only">
+                Gelişmiş filtreleme seçenekleri
+            </h3>
+
             <div class="filter-row">
                 <div class="filter-group">
-                    <label for="categorySelect" class="filter-label">{{ 'CATEGORY' | translate }}</label>
+                    <label for="categorySelect" class="filter-label">
+                        {{ 'CATEGORY' | translate }}
+                    </label>
                     <select
                             id="categorySelect"
                             class="filter-select"
-                            [value]="currentFilters.category"
-                            (change)="onCategoryChange($event)">>
+                            [value]="currentFilters().category"
+                            (change)="onCategoryChange($event)"
+                            [attr.aria-label]="'CATEGORY' | translate">
                         <option
-                                *ngFor="let option of getCategoryOptions()"
+                                *ngFor="let option of getCategoryOptions(); trackBy: trackByCategoryValue"
                                 [value]="option.value">
                             {{ option.label }}
                         </option>
@@ -115,163 +182,316 @@
                 </div>
 
                 <div class="filter-group">
-                    <label for="levelSelect" class="filter-label">{{ 'LEVEL' | translate }}</label>
+                    <label for="levelSelect" class="filter-label">
+                        {{ 'LEVEL' | translate }}
+                    </label>
                     <select
                             id="levelSelect"
                             class="filter-select"
-                            [value]="currentFilters.level"
-                            (change)="onLevelChange($event)">>
+                            [value]="currentFilters().level"
+                            (change)="onLevelChange($event)"
+                            [attr.aria-label]="'LEVEL' | translate">
                         <option
-                                *ngFor="let option of getLevelOptions()"
+                                *ngFor="let option of getLevelOptions(); trackBy: trackByLevelValue"
                                 [value]="option.value">
                             {{ option.label }}
                         </option>
                     </select>
                 </div>
 
-                <div class="filter-group">
-                    <label class="filter-label">{{ 'PRICE_RANGE' | translate }}</label>
+                <fieldset class="filter-group price-filter-group">
+                    <legend class="filter-label">
+                        {{ 'PRICE_RANGE' | translate }}
+                    </legend>
                     <div class="price-inputs">
                         <input
                                 type="number"
+                                id="minPrice"
                                 class="price-input"
                                 [placeholder]="'MIN_PRICE' | translate"
-                                [value]="currentFilters.minPrice || ''"
-                                (input)="onMinPriceInput($event)">
-                        <span class="price-separator">-</span>
+                                [value]="currentFilters().minPrice || ''"
+                                (input)="onMinPriceInput($event)"
+                                min="0"
+                                step="1"
+                                [attr.aria-label]="'MIN_PRICE' | translate">
+                        <span class="price-separator" aria-hidden="true">-</span>
                         <input
                                 type="number"
+                                id="maxPrice"
                                 class="price-input"
                                 [placeholder]="'MAX_PRICE' | translate"
-                                [value]="currentFilters.maxPrice || ''"
-                                (input)="onMaxPriceInput($event)">>
+                                [value]="currentFilters().maxPrice || ''"
+                                (input)="onMaxPriceInput($event)"
+                                min="0"
+                                step="1"
+                                [attr.aria-label]="'MAX_PRICE' | translate">
                     </div>
-                </div>
+                </fieldset>
 
                 <div class="filter-actions">
-                    <button class="reset-filters-btn" (click)="resetFilters()">
-                        <i class="fas fa-undo"></i>
+                    <button
+                            type="button"
+                            class="reset-filters-btn"
+                            (click)="resetFilters()"
+                            [disabled]="!hasActiveFilters()"
+                            [attr.aria-label]="'RESET_FILTERS' | translate">
+                        <i class="fas fa-undo" aria-hidden="true"></i>
                         {{ 'RESET_FILTERS' | translate }}
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Results Info -->
-        <div class="results-info">
-      <span class="results-count">
-        {{ 'SHOWING_RESULTS' | translate: { count: filteredCourses.length, total: allCourses.length } }}
-      </span>
-            <button class="refresh-btn" (click)="refreshCourses()" [disabled]="isLoading">
-                <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
-                {{ 'REFRESH' | translate }}
-            </button>
+        <div class="results-info"
+             role="status"
+             aria-live="polite"
+             aria-atomic="true">
+            <span class="results-count">
+                {{ 'SHOWING_RESULTS' | translate: { count: resultsCount(), total: totalCount() } }}
+            </span>
+            <div class="info-actions">
+                <span *ngIf="lastUpdated()" class="last-updated">
+                    {{ 'LAST_UPDATED' | translate }}: {{ lastUpdated() | date:'short' }}
+                </span>
+                <button
+                        type="button"
+                        class="refresh-btn"
+                        (click)="refreshCourses(false)"
+                        [disabled]="isLoading() || isRefreshing()"
+                        [attr.aria-label]="'REFRESH_COURSES' | translate">
+                    <i class="fas fa-sync-alt"
+                       [class.fa-spin]="isRefreshing()"
+                       aria-hidden="true"></i>
+                    {{ 'REFRESH' | translate }}
+                </button>
+            </div>
         </div>
-    </div>
+    </header>
 
     <!-- Courses Section -->
-    <div class="courses-section" *ngIf="!isLoading">
-        <!-- Courses Grid/List -->
-        <div
-                class="courses-container"
-                [class.grid-view]="viewMode === 'grid'"
-                [class.list-view]="viewMode === 'list'">
+    <main class="courses-section"
+          *ngIf="!isLoading()"
+          role="main"
+          aria-labelledby="courses-heading">
 
-            <div
-                    class="course-card"
-                    *ngFor="let course of filteredCourses; trackBy: trackByCourseId"
-                    [routerLink]="['/courses', course.id]"
-                    (click)="onCourseClick(course.id)">
+        <h2 id="courses-heading" class="sr-only">
+            Kurs listesi ({{ resultsCount() }} kurs)
+        </h2>
+
+        <!-- Loading Skeleton for Refresh -->
+        <div *ngIf="isRefreshing()"
+             class="refresh-loading"
+             role="status"
+             aria-live="polite"
+             aria-label="Kurslar güncelleniyor">
+            <div class="loading-overlay">
+                <div class="loading-spinner-small"></div>
+                <span class="loading-text">{{ 'UPDATING_COURSES' | translate }}</span>
+            </div>
+        </div>
+
+        <!-- Courses Grid/List -->
+        <div *ngIf="hasData() && !isEmptyState()"
+             class="courses-container"
+             [class.grid-view]="viewMode() === 'grid'"
+             [class.list-view]="viewMode() === 'list'"
+             role="list"
+             [attr.aria-label]="'COURSE_LIST_ARIA' | translate: { count: resultsCount(), mode: viewMode() }">
+
+            <article *ngFor="let course of filteredCourses(); trackBy: trackByCourseId"
+                     class="course-card"
+                     role="listitem"
+                     [attr.aria-labelledby]="'course-title-' + course.id"
+                     [attr.aria-describedby]="'course-desc-' + course.id"
+                     tabindex="0"
+                     [routerLink]="['/courses', course.id]"
+                     (click)="onCourseClick(course.id)"
+                     (keydown.enter)="onCourseClick(course.id)"
+                     (keydown.space)="$event.preventDefault(); onCourseClick(course.id)">
 
                 <div class="course-image-wrapper">
                     <img
                             [src]="course.imageUrl"
-                            [alt]="course.title"
+                            [alt]="'COURSE_IMAGE_ALT' | translate: { title: course.title }"
                             class="course-image"
-                            onerror="this.onerror=null;this.src='assets/logo/Logo.png';" />
+                            loading="lazy"
+                            decoding="async"
+                            width="320"
+                            height="220"
+                            (error)="onImageError($event)" />
 
                     <!-- Badges -->
-                    <div class="course-badges">
-            <span class="category-badge">
-              {{ getCategoryTranslation(course.category) }}
-            </span>
-                        <span class="level-badge" [class]="'level-' + course.level.toLowerCase()">
-              {{ getLevelTranslation(course.level) }}
-            </span>
+                    <div class="course-badges" aria-hidden="true">
+                        <span class="category-badge">
+                            {{ getCategoryTranslation(course.category) }}
+                        </span>
+                        <span class="level-badge"
+                              [class]="'level-' + course.level.toLowerCase()">
+                            {{ getLevelTranslation(course.level) }}
+                        </span>
                     </div>
 
                     <!-- Hover Overlay -->
-                    <div class="course-overlay">
-                        <button class="preview-btn">
-                            <i class="fas fa-play"></i>
+                    <div class="course-overlay" aria-hidden="true">
+                        <button type="button"
+                                class="preview-btn"
+                                (click)="$event.stopPropagation(); onCourseClick(course.id)"
+                                [attr.aria-label]="'PREVIEW_COURSE' | translate: { title: course.title }">
+                            <i class="fas fa-play" aria-hidden="true"></i>
                             {{ 'PREVIEW' | translate }}
                         </button>
                     </div>
                 </div>
 
                 <div class="course-content">
-                    <div class="course-header">
-                        <h3 class="course-title">{{ course.title }}</h3>
-                        <div class="course-rating" *ngIf="course.averageRating > 0">
-                            <div class="stars">
-                <span
-                        *ngFor="let star of getStarArray(course.averageRating)"
-                        class="star"
-                        [class.filled]="star.filled"
-                        [class.half]="star.half">
-                  <i class="fas fa-star"></i>
-                </span>
+                    <header class="course-header">
+                        <h3 [id]="'course-title-' + course.id"
+                            class="course-title">
+                            {{ course.title }}
+                        </h3>
+                        <div class="course-rating"
+                             *ngIf="course.averageRating > 0"
+                             role="img"
+                             [attr.aria-label]="'COURSE_RATING_ARIA' | translate: {
+                                rating: course.averageRating | number:'1.1-1',
+                                reviews: course.totalReviews
+                             }">
+                            <div class="stars" aria-hidden="true">
+                                <span *ngFor="let star of getStarArray(course.averageRating); let i = index"
+                                      class="star"
+                                      [class.filled]="star.filled"
+                                      [class.half]="star.half"
+                                      [attr.title]="(i + 1) + '. yıldız' + (star.filled ? ' dolu' : star.half ? ' yarım' : ' boş')">
+                                    <i class="fas fa-star"></i>
+                                </span>
                             </div>
                             <span class="rating-text">{{ course.averageRating | number:'1.1-1' }}</span>
                             <span class="review-count">({{ course.totalReviews }})</span>
                         </div>
-                    </div>
+                    </header>
 
-                    <p class="course-description">{{ course.description }}</p>
+                    <p [id]="'course-desc-' + course.id"
+                       class="course-description">
+                        {{ course.description }}
+                    </p>
 
                     <div class="course-meta">
                         <div class="instructor-info">
-                            <i class="fas fa-user-tie"></i>
+                            <i class="fas fa-user-tie" aria-hidden="true"></i>
                             <span class="instructor-name">{{ course.instructorName }}</span>
                         </div>
 
                         <div class="course-stats">
-              <span class="duration">
-                <i class="fas fa-clock"></i>
-                  {{ formatDuration(course.duration) }}
-              </span>
-                            <span class="students">
-                <i class="fas fa-users"></i>
+                            <span class="duration"
+                                  [attr.aria-label]="'DURATION_ARIA' | translate: { duration: formatDuration(course.duration) }">
+                                <i class="fas fa-clock" aria-hidden="true"></i>
+                                {{ formatDuration(course.duration) }}
+                            </span>
+                            <span class="students"
+                                  [attr.aria-label]="'STUDENTS_ARIA' | translate: { count: course.enrollmentCount }">
+                                <i class="fas fa-users" aria-hidden="true"></i>
                                 {{ course.enrollmentCount }} {{ 'STUDENTS' | translate }}
-              </span>
+                            </span>
                         </div>
                     </div>
 
-                    <div class="course-footer">
+                    <footer class="course-footer">
                         <div class="price-section">
-                            <span class="current-price">{{ formatPrice(course.price) }}</span>
+                            <span class="current-price"
+                                  [attr.aria-label]="'PRICE_ARIA' | translate: { price: formatPrice(course.price) }">
+                                {{ formatPrice(course.price) }}
+                            </span>
                         </div>
 
-                        <button class="enroll-btn">
-                            <i class="fas fa-shopping-cart"></i>
+                        <button type="button"
+                                class="enroll-btn"
+                                (click)="$event.stopPropagation(); onCourseClick(course.id)"
+                                [attr.aria-label]="'ENROLL_COURSE_ARIA' | translate: { title: course.title }">
+                            <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                             {{ 'ENROLL_NOW' | translate }}
                         </button>
-                    </div>
+                    </footer>
+                </div>
+            </article>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state"
+             *ngIf="isEmptyState()"
+             role="status"
+             aria-live="polite">
+            <div class="empty-content">
+                <div class="empty-icon" aria-hidden="true">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="empty-title">{{ 'NO_COURSES_FOUND' | translate }}</h3>
+                <p class="empty-text">{{ 'NO_COURSES_FOUND_MESSAGE' | translate }}</p>
+
+                <div class="empty-actions">
+                    <button type="button"
+                            class="reset-filters-btn"
+                            (click)="resetFilters()"
+                            *ngIf="hasActiveFilters()">
+                        <i class="fas fa-undo" aria-hidden="true"></i>
+                        {{ 'CLEAR_ALL_FILTERS' | translate }}
+                    </button>
+
+                    <button type="button"
+                            class="retry-btn"
+                            (click)="retryLoadCourses()"
+                            *ngIf="canRetry() && !hasActiveFilters()">
+                        <i class="fas fa-redo" aria-hidden="true"></i>
+                        {{ 'RETRY_LOAD' | translate }}
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="filteredCourses.length === 0 && !isLoading">
-            <div class="empty-icon">
-                <i class="fas fa-search"></i>
+        <!-- Error State with Retry -->
+        <div class="error-state"
+             *ngIf="errorMessage() && !isLoading()"
+             role="alert"
+             aria-live="assertive">
+            <div class="error-content">
+                <div class="error-icon" aria-hidden="true">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="error-title">{{ 'LOADING_ERROR' | translate }}</h3>
+                <p class="error-text">{{ errorMessage() }}</p>
+
+                <div class="error-actions">
+                    <button type="button"
+                            class="retry-btn"
+                            (click)="retryLoadCourses()"
+                            *ngIf="canRetry()">
+                        <i class="fas fa-redo" aria-hidden="true"></i>
+                        {{ 'RETRY_LOAD' | translate }}
+                    </button>
+
+                    <button type="button"
+                            class="refresh-btn"
+                            (click)="refreshCourses(false)">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        {{ 'REFRESH' | translate }}
+                    </button>
+                </div>
             </div>
-            <h3>{{ 'NO_COURSES_FOUND' | translate }}</h3>
-            <p>{{ 'NO_COURSES_FOUND_MESSAGE' | translate }}</p>
-            <button class="reset-filters-btn" (click)="resetFilters()">
-                <i class="fas fa-undo"></i>
-                {{ 'CLEAR_ALL_FILTERS' | translate }}
-            </button>
         </div>
+    </main>
+
+    <!-- Skip Links for Screen Readers -->
+    <nav class="skip-links" aria-label="Hızlı erişim linkleri">
+        <a href="#page-title" class="skip-link">Ana başlığa git</a>
+        <a href="#course-search" class="skip-link">Arama kutusuna git</a>
+        <a href="#courses-heading" class="skip-link">Kurs listesine git</a>
+    </nav>
+
+    <!-- Announcement for Screen Readers -->
+    <div aria-live="polite"
+         aria-atomic="true"
+         class="sr-only"
+         id="search-announcements">
+        <!-- Dynamic search/filter result announcements will be inserted here -->
     </div>
 </div>

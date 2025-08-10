@@ -902,7 +902,31 @@
   "YEARLY_PREMIUM_PLAN": "Преміум річний план",
   "CUSTOM_PLAN": "Користувацький план",
   "UNKNOWN_PLAN": "Невідомий план",
-  "ACTIVATION": "Активність"
+  "ACTIVATION": "Активність",
+  "TOGGLE_FILTERS": "Увімкнути/вимкнути фільтри",
+  "LAST_UPDATED": "Останнє оновлення",
+  "REFRESH_COURSES": "Оновити курси",
+  "UPDATING_COURSES": "Оновлення курсів...",
+  "COURSE_LIST_ARIA": "{{count}} курсів, у {{mode}} режимі",
+  "COURSE_IMAGE_ALT": "Зображення курсу {{title}}",
+  "PREVIEW_COURSE": "Переглянути курс {{title}}",
+  "COURSE_RATING_ARIA": "{{rating}} зірок з 5, {{reviews}} відгуків",
+  "DURATION_ARIA": "Тривалість: {{duration}}",
+  "STUDENTS_ARIA": "{{count}} студентів зареєстровано",
+  "PRICE_ARIA": "Ціна: {{price}}",
+  "ENROLL_COURSE_ARIA": "Записатися на курс {{title}}",
+  "RETRY_LOAD": "Спробувати знову",
+  "LOADING_ERROR": "Помилка завантаження",
+  "DURATION_HOURS_MINUTES": "{{hours}} годин {{minutes}} хвилин",
+  "DURATION_HOURS": "{{hours}} годин",
+  "DURATION_MINUTES": "{{minutes}} хвилин",
+  "FILTERS_RESET": "Фільтри скинуто",
+  "DATA_REFRESHED": "Дані оновлено",
+  "GENERIC_ERROR": "Сталася помилка",
+  "AUTH_ERROR": "Помилка автентифікації",
+  "COURSES_LOAD_ERROR": "Не вдалося завантажити курси",
+  "REFRESH_ERROR": "Помилка оновлення",
+  "RETRY_ERROR": "Помилка повторної спроби"
 
 
 }

@@ -879,7 +879,31 @@
   "FOOTER_COPYRIGHT": "Tüm hakları saklıdır.",
   "FOOTER_PRIVACY": "Gizlilik",
   "FOOTER_TERMS": "Şartlar",
-  "ACTIVATION": "Aktivite"
+  "ACTIVATION": "Aktivite",
+  "TOGGLE_FILTERS": "Filtreleri aç/kapat",
+  "LAST_UPDATED": "Son güncelleme",
+  "REFRESH_COURSES": "Kursları yenile",
+  "UPDATING_COURSES": "Kurslar güncelleniyor...",
+  "COURSE_LIST_ARIA": "{{count}} kurs, {{mode}} görünümünde",
+  "COURSE_IMAGE_ALT": "{{title}} kurs görseli",
+  "PREVIEW_COURSE": "{{title}} kursunu önizle",
+  "COURSE_RATING_ARIA": "{{rating}} yıldız üzerinden 5, {{reviews}} değerlendirme",
+  "DURATION_ARIA": "Süre: {{duration}}",
+  "STUDENTS_ARIA": "{{count}} öğrenci kayıtlı",
+  "PRICE_ARIA": "Fiyat: {{price}}",
+  "ENROLL_COURSE_ARIA": "{{title}} kursuna kayıt ol",
+  "RETRY_LOAD": "Yeniden Dene",
+  "LOADING_ERROR": "Yükleme Hatası",
+  "DURATION_HOURS_MINUTES": "{{hours}} saat {{minutes}} dakika",
+  "DURATION_HOURS": "{{hours}} saat",
+  "DURATION_MINUTES": "{{minutes}} dakika",
+  "FILTERS_RESET": "Filtreler sıfırlandı",
+  "DATA_REFRESHED": "Veriler yenilendi",
+  "GENERIC_ERROR": "Bir hata oluştu",
+  "AUTH_ERROR": "Kimlik doğrulama hatası",
+  "COURSES_LOAD_ERROR": "Kurslar yüklenemedi",
+  "REFRESH_ERROR": "Yenileme hatası",
+  "RETRY_ERROR": "Yeniden deneme hatası"
 
 
 
