@@ -1,0 +1,378 @@
+<!-- teacher-subscription.component.html -->
+
+<div class="teacher-subscription-container">
+    <!-- Header Section -->
+    <div class="subscription-header">
+        <div class="container">
+            <h1 class="subscription-title">{{ 'BECOME_INSTRUCTOR' | translate }}</h1>
+            <p class="subscription-subtitle">{{ 'INSTRUCTOR_SUBSCRIPTION_DESCRIPTION' | translate }}</p>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step" [class.active]="activeStep === 'plans'" [class.completed]="activeStep !== 'plans'">
+                    <span class="step-number">1</span>
+                    <span class="step-label">{{ 'SELECT_PLAN' | translate }}</span>
+                </div>
+                <div class="step" [class.active]="activeStep === 'checkout'" [class.completed]="activeStep === 'payment'">
+                    <span class="step-number">2</span>
+                    <span class="step-label">{{ 'CHECKOUT' | translate }}</span>
+                </div>
+                <div class="step" [class.active]="activeStep === 'payment'">
+                    <span class="step-number">3</span>
+                    <span class="step-label">{{ 'PAYMENT' | translate }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+        <app-loading-spinner></app-loading-spinner>
+        <p>{{ 'LOADING_SUBSCRIPTION_DATA' | translate }}</p>
+    </div>
+
+    <!-- Already Subscribed Warning -->
+    <div *ngIf="isAlreadySubscribed && !isLoading" class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <h4>{{ 'ALREADY_SUBSCRIBED_TITLE' | translate }}</h4>
+            <p>{{ 'ALREADY_SUBSCRIBED_MESSAGE' | translate }}</p>
+            <button routerLink="/instructor/dashboard" class="btn btn-primary">
+                {{ 'GO_TO_DASHBOARD' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content with Form Wrapper -->
+    <form [formGroup]="subscriptionForm" *ngIf="!isLoading && !isAlreadySubscribed" class="subscription-content">
+
+        <!-- Step 1: Plan Selection -->
+        <div *ngIf="activeStep === 'plans'" class="plans-section">
+            <div class="container">
+
+                <!-- Messages -->
+                <app-alert-dialog
+                        *ngIf="errorMessage"
+                        [message]="errorMessage"
+                        type="error"
+                        [dismissible]="true"
+                        (dismissed)="clearMessages()">
+                </app-alert-dialog>
+
+                <app-alert-dialog
+                        *ngIf="warningMessage"
+                        [message]="warningMessage"
+                        type="warning"
+                        [dismissible]="true"
+                        (dismissed)="clearMessages()">
+                </app-alert-dialog>
+
+                <!-- Plans Grid -->
+                <div class="plans-grid" *ngIf="planCards.length > 0">
+                    <div
+                            *ngFor="let planCard of planCards"
+                            [class]="getPlanCardClass(planCard)"
+                            (click)="selectPlan(planCard)">
+
+                        <!-- Popular Badge -->
+                        <div *ngIf="planCard.plan.popular" class="plan-badge popular">
+                            {{ 'MOST_POPULAR' | translate }}
+                        </div>
+
+                        <!-- Recommended Badge -->
+                        <div *ngIf="planCard.plan.recommended" class="plan-badge recommended">
+                            {{ 'RECOMMENDED' | translate }}
+                        </div>
+
+                        <div class="plan-header">
+                            <h3 class="plan-name">{{ planCard.plan.name }}</h3>
+                            <p class="plan-description">{{ planCard.plan.description }}</p>
+                        </div>
+
+                        <div class="plan-pricing">
+                            <span class="plan-price">{{ formatPrice(planCard.plan.price) }}</span>
+                            <span class="plan-duration">/ {{ planCard.plan.duration }}</span>
+
+                            <!-- Savings for yearly plans -->
+                            <div *ngIf="planCard.plan.savings" class="plan-savings">
+                                {{ 'SAVE' | translate }} {{ formatSavings(planCard.plan.savings) }}
+                            </div>
+                        </div>
+
+                        <!-- Custom Plan Price Range -->
+                        <div *ngIf="planCard.plan.type === PlanType.CUSTOM" class="custom-price-range">
+                            <span>{{ formatPrice(planCard.plan.minPrice!) }} - {{ formatPrice(planCard.plan.maxPrice!) }}</span>
+                        </div>
+
+                        <div class="plan-features">
+                            <ul>
+                                <li *ngFor="let feature of planCard.plan.features">
+                                    <i class="fas fa-check"></i>
+                                    {{ feature }}
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="plan-footer">
+                            <button
+                                    [class]="'btn ' + planCard.buttonClass"
+                                    [disabled]="planCard.isLoading"
+                                    (click)="$event.stopPropagation(); selectPlan(planCard)">
+
+                                <span *ngIf="!planCard.isLoading">{{ planCard.buttonText }}</span>
+                                <span *ngIf="planCard.isLoading">
+                  <i class="fas fa-spinner fa-spin"></i> {{ 'SELECTING' | translate }}
+                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Amount Input -->
+                <div *ngIf="showCustomAmountInput" class="custom-amount-section">
+                    <div class="custom-amount-card">
+                        <h4>{{ 'CUSTOM_AMOUNT_TITLE' | translate }}</h4>
+                        <p>{{ 'CUSTOM_AMOUNT_DESCRIPTION' | translate }}</p>
+
+                        <div class="form-group">
+                            <label for="customAmount">{{ 'AMOUNT_UAH' | translate }}</label>
+                            <input
+                                    type="number"
+                                    id="customAmount"
+                                    formControlName="customAmount"
+                                    class="form-control"
+                                    [placeholder]="'ENTER_AMOUNT' | translate"
+                                    min="100"
+                                    max="10000"
+                                    (input)="onCustomAmountChange()">
+
+                            <div class="input-help">
+                                {{ 'AMOUNT_RANGE_HELP' | translate: {min: '100', max: '10,000'} }}
+                            </div>
+
+                            <!-- Custom Amount Validation Errors -->
+                            <div *ngIf="subscriptionForm.get('customAmount')?.invalid && subscriptionForm.get('customAmount')?.touched"
+                                 class="form-error">
+                <span *ngIf="subscriptionForm.get('customAmount')?.errors?.['required']">
+                  {{ 'AMOUNT_REQUIRED' | translate }}
+                </span>
+                                <span *ngIf="subscriptionForm.get('customAmount')?.errors?.['min']">
+                  {{ 'AMOUNT_TOO_LOW' | translate }}
+                </span>
+                                <span *ngIf="subscriptionForm.get('customAmount')?.errors?.['max']">
+                  {{ 'AMOUNT_TOO_HIGH' | translate }}
+                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terms Agreement -->
+                <div *ngIf="selectedPlan" class="terms-section">
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input
+                                    type="checkbox"
+                                    formControlName="agreedToTerms"
+                                    class="form-checkbox">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                {{ 'AGREE_TO_TERMS' | translate }}
+                                <a href="/terms" target="_blank">{{ 'TERMS_OF_SERVICE' | translate }}</a>
+                                {{ 'AND' | translate }}
+                                <a href="/privacy" target="_blank">{{ 'PRIVACY_POLICY' | translate }}</a>
+              </span>
+                        </label>
+
+                        <div *ngIf="subscriptionForm.get('agreedToTerms')?.invalid && subscriptionForm.get('agreedToTerms')?.touched"
+                             class="form-error">
+                            {{ 'TERMS_AGREEMENT_REQUIRED' | translate }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proceed to Checkout Button -->
+                <div *ngIf="selectedPlan" class="checkout-actions">
+                    <button
+                            type="button"
+                            class="btn btn-primary btn-lg"
+                            [disabled]="!canProceedToCheckout() || isLoadingCheckout"
+                            (click)="proceedToCheckout()">
+
+            <span *ngIf="!isLoadingCheckout">
+              {{ 'PROCEED_TO_CHECKOUT' | translate }}
+            </span>
+                        <span *ngIf="isLoadingCheckout">
+              <i class="fas fa-spinner fa-spin"></i> {{ 'LOADING' | translate }}
+            </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Checkout Summary -->
+        <div *ngIf="activeStep === 'checkout'" class="checkout-section">
+            <div class="container">
+
+                <!-- Messages -->
+                <app-alert-dialog
+                        *ngIf="errorMessage"
+                        [message]="errorMessage"
+                        type="error"
+                        [dismissible]="true"
+                        (dismissed)="clearMessages()">
+                </app-alert-dialog>
+
+                <div class="checkout-content">
+                    <div class="checkout-summary-card">
+                        <h3>{{ 'ORDER_SUMMARY' | translate }}</h3>
+
+                        <div *ngIf="checkoutSummary" class="summary-details">
+                            <div class="summary-item">
+                                <span class="label">{{ 'PLAN' | translate }}:</span>
+                                <span class="value">{{ checkoutSummary.planName }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">{{ 'DURATION' | translate }}:</span>
+                                <span class="value">{{ checkoutSummary.planDuration }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">{{ 'CUSTOMER' | translate }}:</span>
+                                <span class="value">{{ checkoutSummary.userName }}</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <span class="label">{{ 'EMAIL' | translate }}:</span>
+                                <span class="value">{{ checkoutSummary.userEmail }}</span>
+                            </div>
+
+                            <hr>
+
+                            <div class="summary-item price-item">
+                                <span class="label">{{ 'PLAN_PRICE' | translate }}:</span>
+                                <span class="value">{{ formatPrice(checkoutSummary.originalPrice) }}</span>
+                            </div>
+
+                            <div class="summary-item total-item">
+                                <span class="label">{{ 'TOTAL' | translate }}:</span>
+                                <span class="value total-price">{{ formatPrice(checkoutSummary.finalPrice) }}</span>
+                            </div>
+
+                            <div class="vat-info">
+                                <small>{{ 'NO_VAT_INSTRUCTOR_SUBSCRIPTION' | translate }}</small>
+                            </div>
+                        </div>
+
+                        <div class="checkout-actions">
+                            <button
+                                    type="button"
+                                    class="btn btn-outline btn-lg"
+                                    (click)="goBackToPlans()">
+                                {{ 'BACK_TO_PLANS' | translate }}
+                            </button>
+
+                            <button
+                                    type="button"
+                                    class="btn btn-primary btn-lg"
+                                    [disabled]="isProcessingPayment"
+                                    (click)="confirmPayment()">
+
+                <span *ngIf="!isProcessingPayment">
+                  {{ 'CONFIRM_PAYMENT' | translate }}
+                </span>
+                                <span *ngIf="isProcessingPayment">
+                  <i class="fas fa-spinner fa-spin"></i> {{ 'PROCESSING' | translate }}
+                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Payment Processing -->
+        <div *ngIf="activeStep === 'payment'" class="payment-section">
+            <div class="container">
+                <div class="payment-processing-card">
+                    <div class="payment-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+
+                    <h3>{{ 'PAYMENT_PROCESSING' | translate }}</h3>
+                    <p>{{ 'PAYMENT_REDIRECT_MESSAGE' | translate }}</p>
+
+                    <div class="payment-spinner">
+                        <app-loading-spinner></app-loading-spinner>
+                    </div>
+
+                    <div class="payment-help">
+                        <p>{{ 'PAYMENT_HELP_MESSAGE' | translate }}</p>
+                        <button
+                                type="button"
+                                class="btn btn-outline"
+                                (click)="goBackToCheckout()">
+                            {{ 'BACK_TO_CHECKOUT' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Benefits Section -->
+    <div *ngIf="!isLoading && activeStep === 'plans'" class="benefits-section">
+        <div class="container">
+            <h2>{{ 'INSTRUCTOR_BENEFITS_TITLE' | translate }}</h2>
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <i class="fas fa-upload"></i>
+                    <h4>{{ 'UNLIMITED_COURSES' | translate }}</h4>
+                    <p>{{ 'UNLIMITED_COURSES_DESC' | translate }}</p>
+                </div>
+
+                <div class="benefit-item">
+                    <i class="fas fa-chart-line"></i>
+                    <h4>{{ 'ANALYTICS_REPORTS' | translate }}</h4>
+                    <p>{{ 'ANALYTICS_REPORTS_DESC' | translate }}</p>
+                </div>
+
+                <div class="benefit-item">
+                    <i class="fas fa-headset"></i>
+                    <h4>{{ 'PRIORITY_SUPPORT' | translate }}</h4>
+                    <p>{{ 'PRIORITY_SUPPORT_DESC' | translate }}</p>
+                </div>
+
+                <div class="benefit-item">
+                    <i class="fas fa-certificate"></i>
+                    <h4>{{ 'CUSTOM_CERTIFICATES' | translate }}</h4>
+                    <p>{{ 'CUSTOM_CERTIFICATES_DESC' | translate }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div *ngIf="!isLoading && activeStep === 'plans'" class="faq-section">
+        <div class="container">
+            <h2>{{ 'FREQUENTLY_ASKED_QUESTIONS' | translate }}</h2>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h4>{{ 'FAQ_SUBSCRIPTION_CANCEL' | translate }}</h4>
+                    <p>{{ 'FAQ_SUBSCRIPTION_CANCEL_ANSWER' | translate }}</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>{{ 'FAQ_PLAN_CHANGE' | translate }}</h4>
+                    <p>{{ 'FAQ_PLAN_CHANGE_ANSWER' | translate }}</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>{{ 'FAQ_PAYMENT_METHODS' | translate }}</h4>
+                    <p>{{ 'FAQ_PAYMENT_METHODS_ANSWER' | translate }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

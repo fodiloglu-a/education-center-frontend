@@ -1,8 +1,75 @@
+<!-- instructor-dashboard.component.html - Teacher Subscription Integration -->
+
 <div class="dashboard-container">
     <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
 
     <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
     <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+
+    <!-- Teacher Subscription Warning -->
+    <div *ngIf="!isLoading && instructorProfile && !instructorProfile.isTeacher" class="subscription-warning">
+        <div class="warning-content">
+            <div class="warning-icon">
+                <span class="material-icons">warning_amber</span>
+            </div>
+            <div class="warning-info">
+                <h3>{{ 'SUBSCRIPTION_REQUIRED_TITLE' | translate }}</h3>
+                <p>{{ 'SUBSCRIPTION_REQUIRED_MESSAGE' | translate }}</p>
+                <div class="warning-actions">
+                    <a [routerLink]="['/instructor/subscription']" class="subscription-btn">
+                        <span class="material-icons">upgrade</span>
+                        {{ 'PURCHASE_SUBSCRIPTION' | translate }}
+                    </a>
+                    <button class="learn-more-btn" (click)="showSubscriptionInfo = !showSubscriptionInfo">
+                        {{ 'LEARN_MORE' | translate }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expandable subscription info -->
+        <div class="subscription-info" *ngIf="showSubscriptionInfo">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="material-icons">upload</span>
+                    <span>{{ 'UNLIMITED_COURSE_PUBLISHING' | translate }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="material-icons">analytics</span>
+                    <span>{{ 'DETAILED_ANALYTICS' | translate }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="material-icons">support_agent</span>
+                    <span>{{ 'PRIORITY_SUPPORT' | translate }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="material-icons">certificate</span>
+                    <span>{{ 'CUSTOM_CERTIFICATES' | translate }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Subscription Info -->
+    <div *ngIf="!isLoading && instructorProfile?.isTeacher && instructorProfile?.subscriptionPlanType" class="subscription-active">
+        <div class="active-content">
+            <div class="active-icon">
+                <span class="material-icons">verified</span>
+            </div>
+            <div class="active-info">
+                <h4>{{ 'ACTIVE_SUBSCRIPTION' | translate }}</h4>
+                <p>{{ getSubscriptionPlanDisplayName(instructorProfile?.subscriptionPlanType) }}</p>
+                <span class="expiry-date" *ngIf="instructorProfile?.subscriptionEndDate">
+                    {{ 'EXPIRES_ON' | translate }}: {{ instructorProfile?.subscriptionEndDate | date:'dd/MM/yyyy' }}
+                </span>
+            </div>
+            <div class="manage-subscription">
+                <a [routerLink]="['/instructor/subscription']" class="manage-btn">
+                    {{ 'MANAGE_SUBSCRIPTION' | translate }}
+                </a>
+            </div>
+        </div>
+    </div>
 
     <div class="dashboard-header">
         <div class="header-content">
@@ -12,6 +79,10 @@
                     <div *ngIf="!instructorProfile?.profileImageUrl" class="avatar-placeholder">
                         <span class="material-icons">person</span>
                     </div>
+                    <!-- Subscription Status Badge -->
+                    <div class="subscription-badge" [class.active]="instructorProfile?.isTeacher" [class.inactive]="!instructorProfile?.isTeacher">
+                        <span class="material-icons">{{ instructorProfile?.isTeacher ? 'verified' : 'lock' }}</span>
+                    </div>
                 </div>
                 <div class="info">
                     <h1 class="instructor-name">
@@ -19,12 +90,18 @@
                     </h1>
                     <p class="instructor-title">{{ instructorProfile?.jobTitle || ('INSTRUCTOR' | translate) }}</p>
                     <div class="badges" *ngIf="instructorProfile">
-            <span class="badge verified" *ngIf="instructorProfile.isVerified">
-              <span class="material-icons">verified</span> {{ 'VERIFIED' | translate }}
-            </span>
+                        <span class="badge verified" *ngIf="instructorProfile.isVerified">
+                            <span class="material-icons">verified</span> {{ 'VERIFIED' | translate }}
+                        </span>
                         <span class="badge featured" *ngIf="instructorProfile.isFeatured">
-              <span class="material-icons">star</span> {{ 'FEATURED' | translate }}
-            </span>
+                            <span class="material-icons">star</span> {{ 'FEATURED' | translate }}
+                        </span>
+                        <span class="badge teacher" *ngIf="instructorProfile.isTeacher">
+                            <span class="material-icons">school</span> {{ 'ACTIVE_TEACHER' | translate }}
+                        </span>
+                        <span class="badge inactive-teacher" *ngIf="!instructorProfile.isTeacher">
+                            <span class="material-icons">lock</span> {{ 'INACTIVE_TEACHER' | translate }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -56,49 +133,69 @@
             <span class="material-icons">settings</span>
             {{ 'SETTINGS' | translate }}
         </button>
-        <a [routerLink]="['/instructor/coupons/new']" class="tab-btn add-coupon-btn">
-            <span class="material-icons">add_circle</span>
-            {{ 'ADD_NEW_COUPON' | translate }}
-        </a>
+
+        <!-- Subscription-dependent Actions -->
+        <div class="subscription-dependent-actions">
+            <a *ngIf="instructorProfile?.isTeacher"
+               [routerLink]="['/instructor/coupons/new']"
+               class="tab-btn add-coupon-btn">
+                <span class="material-icons">add_circle</span>
+                {{ 'ADD_NEW_COUPON' | translate }}
+            </a>
+
+            <button *ngIf="!instructorProfile?.isTeacher"
+                    class="tab-btn disabled-btn"
+                    disabled
+                    title="{{ 'SUBSCRIPTION_REQUIRED_TOOLTIP' | translate }}">
+                <span class="material-icons">lock</span>
+                {{ 'ADD_NEW_COUPON' | translate }}
+            </button>
+        </div>
     </div>
 
     <div class="dashboard-content" *ngIf="!isLoading">
 
         <div class="tab-content" *ngIf="activeTab === 'dashboard' && stats">
             <div class="stats-grid">
-                <div class="stat-card primary">
+                <div class="stat-card primary" [class.disabled]="!instructorProfile?.isTeacher">
                     <span class="material-icons stat-icon">school</span>
                     <div class="stat-content">
                         <h3>{{ 'TOTAL_COURSES' | translate }}</h3>
-                        <p class="stat-value">{{ stats.totalCourses }}</p>
+                        <p class="stat-value">{{ instructorProfile?.isTeacher ? stats.totalCourses : '--' }}</p>
+                        <span class="stat-note" *ngIf="!instructorProfile?.isTeacher">{{ 'SUBSCRIPTION_REQUIRED' | translate }}</span>
                     </div>
                 </div>
-                <div class="stat-card success">
+                <div class="stat-card success" [class.disabled]="!instructorProfile?.isTeacher">
                     <span class="material-icons stat-icon">group</span>
                     <div class="stat-content">
                         <h3>{{ 'TOTAL_STUDENTS' | translate }}</h3>
-                        <p class="stat-value">{{ stats.totalStudents }}</p>
+                        <p class="stat-value">{{ instructorProfile?.isTeacher ? stats.totalStudents : '--' }}</p>
+                        <span class="stat-note" *ngIf="!instructorProfile?.isTeacher">{{ 'SUBSCRIPTION_REQUIRED' | translate }}</span>
                     </div>
                 </div>
-                <div class="stat-card warning">
+                <div class="stat-card warning" [class.disabled]="!instructorProfile?.isTeacher">
                     <span class="material-icons stat-icon">star_half</span>
                     <div class="stat-content">
                         <h3>{{ 'AVERAGE_RATING' | translate }}</h3>
-                        <p class="stat-value">{{ stats.averageRating | number:'1.1-1' }}</p>
+                        <p class="stat-value">{{ instructorProfile?.isTeacher ? (stats.averageRating | number:'1.1-1') : '--' }}</p>
+                        <span class="stat-note" *ngIf="!instructorProfile?.isTeacher">{{ 'SUBSCRIPTION_REQUIRED' | translate }}</span>
                     </div>
                 </div>
-                <div class="stat-card info">
+                <div class="stat-card info" [class.disabled]="!instructorProfile?.isTeacher">
                     <span class="material-icons stat-icon">reviews</span>
                     <div class="stat-content">
                         <h3>{{ 'TOTAL_REVIEWS' | translate }}</h3>
-                        <p class="stat-value">{{ stats.totalReviews }}</p>
+                        <p class="stat-value">{{ instructorProfile?.isTeacher ? stats.totalReviews : '--' }}</p>
+                        <span class="stat-note" *ngIf="!instructorProfile?.isTeacher">{{ 'SUBSCRIPTION_REQUIRED' | translate }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="quick-actions-section">
                 <h3 class="section-title">{{ 'QUICK_ACTIONS' | translate }}</h3>
-                <div class="action-buttons-grid">
+
+                <!-- Actions for subscribed teachers -->
+                <div *ngIf="instructorProfile?.isTeacher" class="action-buttons-grid">
                     <a [routerLink]="['/courses', 'new']" class="action-button primary-btn">
                         <span class="material-icons">add_circle</span>
                         <span>{{ 'CREATE_NEW_COURSE' | translate }}</span>
@@ -115,6 +212,49 @@
                         <span class="material-icons">library_add</span>
                         <span>{{ 'ADD_MATERIAL' | translate }}</span>
                     </a>
+                </div>
+
+                <!-- Actions for non-subscribed users -->
+                <div *ngIf="!instructorProfile?.isTeacher" class="subscription-required-actions">
+                    <div class="locked-actions-grid">
+                        <div class="action-button locked-btn">
+                            <span class="material-icons">lock</span>
+                            <span>{{ 'CREATE_NEW_COURSE' | translate }}</span>
+                            <div class="lock-overlay">
+                                <span class="material-icons">lock</span>
+                            </div>
+                        </div>
+                        <div class="action-button locked-btn">
+                            <span class="material-icons">lock</span>
+                            <span>{{ 'MY_COURSES' | translate }}</span>
+                            <div class="lock-overlay">
+                                <span class="material-icons">lock</span>
+                            </div>
+                        </div>
+                        <div class="action-button locked-btn">
+                            <span class="material-icons">lock</span>
+                            <span>{{ 'MY_REVIEWS' | translate }}</span>
+                            <div class="lock-overlay">
+                                <span class="material-icons">lock</span>
+                            </div>
+                        </div>
+                        <div class="action-button locked-btn">
+                            <span class="material-icons">lock</span>
+                            <span>{{ 'ADD_MATERIAL' | translate }}</span>
+                            <div class="lock-overlay">
+                                <span class="material-icons">lock</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subscription-call-to-action">
+                        <h4>{{ 'UNLOCK_INSTRUCTOR_FEATURES' | translate }}</h4>
+                        <p>{{ 'SUBSCRIPTION_BENEFITS_SHORT' | translate }}</p>
+                        <a [routerLink]="['/instructor/subscription']" class="cta-button">
+                            <span class="material-icons">upgrade</span>
+                            {{ 'GET_INSTRUCTOR_ACCESS' | translate }}
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -155,6 +295,29 @@
                             <label>{{ 'UNIVERSITY' | translate }}</label>
                             <p>{{ instructorProfile.university || ('NOT_PROVIDED' | translate) }}</p>
                         </div>
+
+                        <!-- Subscription Information -->
+                        <div class="profile-item subscription-info-item" *ngIf="instructorProfile.isTeacher">
+                            <label>{{ 'SUBSCRIPTION_STATUS' | translate }}</label>
+                            <div class="subscription-details">
+                                <span class="status active">{{ 'ACTIVE' | translate }}</span>
+                                <span class="plan-type">{{ getSubscriptionPlanDisplayName(instructorProfile.subscriptionPlanType) }}</span>
+                                <span class="subscription-dates" *ngIf="instructorProfile.subscriptionStartDate && instructorProfile.subscriptionEndDate">
+                                    {{ instructorProfile.subscriptionStartDate | date:'dd/MM/yyyy' }} - {{ instructorProfile.subscriptionEndDate | date:'dd/MM/yyyy' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="profile-item subscription-info-item" *ngIf="!instructorProfile.isTeacher">
+                            <label>{{ 'SUBSCRIPTION_STATUS' | translate }}</label>
+                            <div class="subscription-details">
+                                <span class="status inactive">{{ 'INACTIVE' | translate }}</span>
+                                <a [routerLink]="['/instructor/subscription']" class="upgrade-link">
+                                    {{ 'UPGRADE_NOW' | translate }}
+                                </a>
+                            </div>
+                        </div>
+
                         <div class="profile-item full-width" *ngIf="instructorProfile.specializations?.length">
                             <label>{{ 'SPECIALIZATIONS' | translate }}</label>
                             <div class="tag-list">

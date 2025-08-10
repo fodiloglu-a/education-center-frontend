@@ -1,21 +1,27 @@
-// instructor-dashboard.component.ts
+// instructor-dashboard.component.ts - Teacher Subscription Integration
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { InstructorService } from '../../services/instructor.service';
-
+import { TeacherSubscriptionService } from '../../services/teacher-subscription.service';
 import { TokenService } from '../../../../core/services/token.service';
-import { InstructorDashboardStats } from '../../models/instructor.models';
+import { UserService } from "../../../user/services/user.service";
 
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import {
+  InstructorDashboardStats,
+  TeacherSubscriptionStatus,
+  TeacherSubscriptionStatusType
+} from '../../models/instructor.models';
+import { InstructorProfileDTO } from "../../../user/models/user.models";
+
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
-import {InstructorProfileDTO} from "../../../user/models/user.models";
-import {UserService} from "../../../user/services/user.service";
 
 @Component({
   selector: 'app-instructor-dashboard',
@@ -32,7 +38,10 @@ import {UserService} from "../../../user/services/user.service";
   templateUrl: './instructor-dashboard.component.html',
   styleUrl: './instructor-dashboard.component.css'
 })
-export class InstructorDashboardComponent implements OnInit {
+export class InstructorDashboardComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  // Original properties
   stats: InstructorDashboardStats | null = null;
   instructorProfile: InstructorProfileDTO | null = null;
   isLoading: boolean = true;
@@ -46,12 +55,23 @@ export class InstructorDashboardComponent implements OnInit {
   showProfileEditor: boolean = false;
   activeTab: 'dashboard' | 'profile' | 'settings' = 'dashboard';
 
+  // Teacher Subscription properties
+  subscriptionStatus: TeacherSubscriptionStatus | null = null;
+  isLoadingSubscription: boolean = false;
+  showSubscriptionInfo: boolean = false;
+  subscriptionWarningMessage: string | null = null;
+
+  // UI states for subscription
+  readonly SubscriptionStatusType = TeacherSubscriptionStatusType;
+
   constructor(
       private instructorService: InstructorService,
+      private teacherSubscriptionService: TeacherSubscriptionService,
       private userService: UserService,
       private tokenService: TokenService,
       private translate: TranslateService,
-      private formBuilder: FormBuilder
+      private formBuilder: FormBuilder,
+      private router: Router
   ) {
     this.profileForm = this.initializeForm();
   }
@@ -66,6 +86,12 @@ export class InstructorDashboardComponent implements OnInit {
     }
 
     this.loadDashboardData(this.instructorId);
+    this.setupSubscriptionStatusListener();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private initializeForm(): FormGroup {
@@ -89,14 +115,41 @@ export class InstructorDashboardComponent implements OnInit {
     });
   }
 
+  private setupSubscriptionStatusListener(): void {
+    this.teacherSubscriptionService.subscriptionStatus$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(status => {
+          this.subscriptionStatus = status;
+          this.handleSubscriptionStatusChange(status);
+        });
+  }
+
+  private handleSubscriptionStatusChange(status: TeacherSubscriptionStatus | null): void {
+    if (status) {
+      if (!status.isTeacher && status.needsSubscription) {
+        this.subscriptionWarningMessage = status.message;
+      } else {
+        this.subscriptionWarningMessage = null;
+      }
+
+      // Stats'ı güncelle - subscription durumuna göre
+      if (this.stats) {
+        this.stats.isTeacher = status.isTeacher;
+        this.stats.canPublishCourses = status.canPublishCourses;
+        this.stats.subscriptionStatus = status;
+      }
+    }
+  }
+
   loadDashboardData(id: number): void {
     this.isLoading = true;
     this.errorMessage = null;
 
-    // Load both dashboard stats and profile data
+    // Load dashboard stats, profile data, and subscription status
     Promise.all([
       this.loadDashboardStats(id),
-      this.loadInstructorProfile(id)
+      this.loadInstructorProfile(id),
+      this.loadSubscriptionStatus()
     ]).finally(() => {
       this.isLoading = false;
     });
@@ -128,6 +181,26 @@ export class InstructorDashboardComponent implements OnInit {
         if (profile) {
           this.populateForm(profile);
         }
+        resolve();
+      });
+    });
+  }
+
+  private loadSubscriptionStatus(): Promise<void> {
+    return new Promise((resolve) => {
+      this.isLoadingSubscription = true;
+
+      this.teacherSubscriptionService.checkSubscriptionStatus().pipe(
+          catchError(error => {
+            console.error('Error loading subscription status:', error);
+            return of(null);
+          }),
+          finalize(() => {
+            this.isLoadingSubscription = false;
+          })
+      ).subscribe(status => {
+        this.subscriptionStatus = status;
+        this.handleSubscriptionStatusChange(status);
         resolve();
       });
     });
@@ -192,6 +265,7 @@ export class InstructorDashboardComponent implements OnInit {
     }
   }
 
+  // Specialization methods
   addSpecialization(): void {
     const specializations = this.profileForm.get('specializations')?.value || [];
     specializations.push('');
@@ -210,6 +284,7 @@ export class InstructorDashboardComponent implements OnInit {
     this.profileForm.patchValue({ specializations });
   }
 
+  // Certification methods
   addCertification(): void {
     const certifications = this.profileForm.get('certifications')?.value || [];
     certifications.push('');
@@ -228,6 +303,7 @@ export class InstructorDashboardComponent implements OnInit {
     this.profileForm.patchValue({ certifications });
   }
 
+  // Social Link methods
   addSocialLink(): void {
     const socialLinks = this.profileForm.get('socialLinks')?.value || [];
     socialLinks.push('');
@@ -249,6 +325,108 @@ export class InstructorDashboardComponent implements OnInit {
   clearMessages(): void {
     this.errorMessage = null;
     this.successMessage = null;
+    this.subscriptionWarningMessage = null;
+  }
+
+  // Teacher Subscription Methods
+  navigateToSubscription(): void {
+    this.router.navigate(['/instructor/subscription']);
+  }
+
+  toggleSubscriptionInfo(): void {
+    this.showSubscriptionInfo = !this.showSubscriptionInfo;
+  }
+
+  refreshSubscriptionStatus(): void {
+    this.loadSubscriptionStatus();
+  }
+
+  getSubscriptionPlanDisplayName(planType: string | null | undefined): string {
+    if (!planType) return this.translate.instant('UNKNOWN_PLAN');
+
+    const planNames: { [key: string]: string } = {
+      'MONTHLY_BASIC': this.translate.instant('MONTHLY_BASIC_PLAN'),
+      'MONTHLY_PREMIUM': this.translate.instant('MONTHLY_PREMIUM_PLAN'),
+      'YEARLY_BASIC': this.translate.instant('YEARLY_BASIC_PLAN'),
+      'YEARLY_PREMIUM': this.translate.instant('YEARLY_PREMIUM_PLAN'),
+      'CUSTOM': this.translate.instant('CUSTOM_PLAN')
+    };
+
+    return planNames[planType] || planType;
+  }
+
+  getSubscriptionStatusType(): TeacherSubscriptionStatusType {
+    return this.teacherSubscriptionService.getSubscriptionStatusType();
+  }
+
+  getDaysUntilExpiry(): number {
+    if (!this.instructorProfile?.subscriptionEndDate) {
+      return 0;
+    }
+
+    const endDate = new Date(this.instructorProfile.subscriptionEndDate);
+    const today = new Date();
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return Math.max(0, diffDays);
+  }
+
+  isSubscriptionExpiringSoon(): boolean {
+    const daysUntilExpiry = this.getDaysUntilExpiry();
+    return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+  }
+
+  isSubscriptionExpired(): boolean {
+    const daysUntilExpiry = this.getDaysUntilExpiry();
+    return daysUntilExpiry <= 0 && this.instructorProfile?.subscriptionEndDate != null;
+  }
+
+  // Subscription-dependent feature checks
+  canCreateCourse(): boolean {
+    return this.instructorProfile?.isTeacher || false;
+  }
+
+  canAccessCourses(): boolean {
+    return this.instructorProfile?.isTeacher || false;
+  }
+
+  canAccessReviews(): boolean {
+    return this.instructorProfile?.isTeacher || false;
+  }
+
+  canAddMaterial(): boolean {
+    return this.instructorProfile?.isTeacher || false;
+  }
+
+  canCreateCoupons(): boolean {
+    return this.instructorProfile?.isTeacher || false;
+  }
+
+  // Subscription warning methods
+  shouldShowSubscriptionWarning(): boolean {
+    return !this.instructorProfile?.isTeacher && !this.isLoading;
+  }
+
+  shouldShowSubscriptionExpiredWarning(): boolean {
+    return this.isSubscriptionExpired();
+  }
+
+  shouldShowSubscriptionExpiringSoonWarning(): boolean {
+    return this.isSubscriptionExpiringSoon();
+  }
+
+  getSubscriptionWarningMessage(): string {
+    if (this.isSubscriptionExpired()) {
+      return this.translate.instant('SUBSCRIPTION_EXPIRED_MESSAGE');
+    } else if (this.isSubscriptionExpiringSoon()) {
+      return this.translate.instant('SUBSCRIPTION_EXPIRING_SOON_MESSAGE', {
+        days: this.getDaysUntilExpiry()
+      });
+    } else if (!this.instructorProfile?.isTeacher) {
+      return this.translate.instant('SUBSCRIPTION_REQUIRED_MESSAGE');
+    }
+    return '';
   }
 
   // Utility methods
@@ -256,9 +434,50 @@ export class InstructorDashboardComponent implements OnInit {
     return new Date().getFullYear();
   }
 
+  get isTeacher(): boolean {
+    return this.instructorProfile?.isTeacher || false;
+  }
+
+  get hasActiveSubscription(): boolean {
+    return this.isTeacher && !this.isSubscriptionExpired();
+  }
+
   refreshDashboard(): void {
     if (this.instructorId) {
       this.loadDashboardData(this.instructorId);
+    }
+  }
+
+  // Navigation helpers
+  navigateToCreateCourse(): void {
+    if (this.canCreateCourse()) {
+      this.router.navigate(['/courses', 'new']);
+    } else {
+      this.navigateToSubscription();
+    }
+  }
+
+  navigateToMyCourses(): void {
+    if (this.canAccessCourses()) {
+      this.router.navigate(['/instructor', 'courses']);
+    } else {
+      this.navigateToSubscription();
+    }
+  }
+
+  navigateToMyReviews(): void {
+    if (this.canAccessReviews()) {
+      this.router.navigate(['/instructor', 'reviews']);
+    } else {
+      this.navigateToSubscription();
+    }
+  }
+
+  navigateToAddMaterial(): void {
+    if (this.canAddMaterial()) {
+      this.router.navigate(['/instructor', 'add-material']);
+    } else {
+      this.navigateToSubscription();
     }
   }
 }

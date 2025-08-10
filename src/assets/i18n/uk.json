@@ -872,6 +872,36 @@
   "Kupon başarıyla oluşturuldu!": "Купон успішно створено!",
   "Kupon oluşturma başarısız oldu. Lütfen tekrar deneyin.": "Не вдалося створити купон. Спробуйте ще раз.",
   "Kupon oluşturmak için eğitmen girişi yapmalısınız.": "Ви повинні увійти як інструктор, щоб створити купон.",
-  "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.": "Ідентифікатор інструктора не знайдено. Будь ласка, увійдіть ще раз."
+  "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.": "Ідентифікатор інструктора не знайдено. Будь ласка, увійдіть ще раз.",
+
+  "SUBSCRIPTION_REQUIRED_TITLE": "Потрібна підписка викладача",
+  "SUBSCRIPTION_REQUIRED_MESSAGE": "Для публікації курсів та використання функцій викладача вам потрібно придбати підписку викладача.",
+  "PURCHASE_SUBSCRIPTION": "Придбати підписку",
+  "LEARN_MORE": "Дізнатися більше",
+  "UNLIMITED_COURSE_PUBLISHING": "Необмежена публікація курсів",
+  "DETAILED_ANALYTICS": "Детальна аналітика",
+  "PRIORITY_SUPPORT": "Пріоритетна підтримка",
+  "CUSTOM_CERTIFICATES": "Користувацькі сертифікати",
+  "ACTIVE_SUBSCRIPTION": "Активна підписка",
+  "EXPIRES_ON": "Закінчується",
+  "MANAGE_SUBSCRIPTION": "Керувати підпискою",
+  "ACTIVE_TEACHER": "Активний викладач",
+  "INACTIVE_TEACHER": "Неактивний викладач",
+  "SUBSCRIPTION_REQUIRED": "Потрібна підписка",
+  "SUBSCRIPTION_REQUIRED_TOOLTIP": "Для використання цієї функції потрібна підписка викладача",
+  "UNLOCK_INSTRUCTOR_FEATURES": "Розблокувати функції викладача",
+  "SUBSCRIPTION_BENEFITS_SHORT": "Покращте свій досвід викладача з необмеженою публікацією курсів, розширеною аналітикою та пріоритетною підтримкою.",
+  "GET_INSTRUCTOR_ACCESS": "Отримати доступ викладача",
+  "SUBSCRIPTION_STATUS": "Статус підписки",
+  "ACTIVE": "Активна",
+  "INACTIVE": "Неактивна",
+  "UPGRADE_NOW": "Оновити зараз",
+  "MONTHLY_BASIC_PLAN": "Базовий місячний план",
+  "MONTHLY_PREMIUM_PLAN": "Преміум місячний план",
+  "YEARLY_BASIC_PLAN": "Базовий річний план",
+  "YEARLY_PREMIUM_PLAN": "Преміум річний план",
+  "CUSTOM_PLAN": "Користувацький план",
+  "UNKNOWN_PLAN": "Невідомий план"
+
 
 }

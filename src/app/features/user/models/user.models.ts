@@ -82,6 +82,11 @@ export interface InstructorProfileDTO {
   responseTimeHours?: number;
   studentCompletionRate?: number;
   lastActiveDate?: string;
+  isTeacher?: boolean;
+  subscriptionPlanType?:string;
+  subscriptionOrderId?:string;
+  subscriptionEndDate?:Date;
+  subscriptionStartDate?:Date;
 
   // Medya Dosyaları
   mediaFiles?: string[];

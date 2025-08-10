@@ -23,6 +23,8 @@ export class AlertDialogComponent implements OnInit {
 
   private timeoutId: any; // Otomatik kapanma zamanlayıcısı için
   @Input() isError!: boolean;
+    @Input() dismissible!: boolean;
+  @Output() dismissed = new EventEmitter<unknown>();
 
   ngOnInit(): void {
     if (this.autoClose) {

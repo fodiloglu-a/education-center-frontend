@@ -840,7 +840,38 @@
   "Kupon başarıyla oluşturuldu!": "Kupon başarıyla oluşturuldu!",
   "Kupon oluşturma başarısız oldu. Lütfen tekrar deneyin.": "Kupon oluşturma başarısız oldu. Lütfen tekrar deneyin.",
   "Kupon oluşturmak için eğitmen girişi yapmalısınız.": "Kupon oluşturmak için eğitmen girişi yapmalısınız.",
-  "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.": "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın."
+  "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.": "Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.",
+
+
+  "SUBSCRIPTION_REQUIRED_TITLE": "Eğitmen Aboneliği Gerekli",
+  "SUBSCRIPTION_REQUIRED_MESSAGE": "Kurs yayınlamak ve eğitmen özelliklerini kullanabilmek için eğitmen aboneliği satın almanız gerekmektedir.",
+  "PURCHASE_SUBSCRIPTION": "Abonelik Satın Al",
+  "LEARN_MORE": "Daha Fazla Bilgi",
+  "UNLIMITED_COURSE_PUBLISHING": "Sınırsız Kurs Yayınlama",
+  "DETAILED_ANALYTICS": "Detaylı Analitik Raporlar",
+  "PRIORITY_SUPPORT": "Öncelikli Destek",
+  "CUSTOM_CERTIFICATES": "Özel Sertifika Tasarımı",
+  "ACTIVE_SUBSCRIPTION": "Aktif Abonelik",
+  "EXPIRES_ON": "Bitiş Tarihi",
+  "MANAGE_SUBSCRIPTION": "Aboneliği Yönet",
+  "ACTIVE_TEACHER": "Aktif Eğitmen",
+  "INACTIVE_TEACHER": "İnaktif Eğitmen",
+  "SUBSCRIPTION_REQUIRED": "Abonelik Gerekli",
+  "SUBSCRIPTION_REQUIRED_TOOLTIP": "Bu özelliği kullanmak için eğitmen aboneliği gereklidir",
+  "UNLOCK_INSTRUCTOR_FEATURES": "Eğitmen Özelliklerini Aç",
+  "SUBSCRIPTION_BENEFITS_SHORT": "Sınırsız kurs yayınlama, gelişmiş analitikler ve öncelikli destek ile eğitmen deneyiminizi geliştirin.",
+  "GET_INSTRUCTOR_ACCESS": "Eğitmen Erişimi Al",
+  "SUBSCRIPTION_STATUS": "Abonelik Durumu",
+  "ACTIVE": "Aktif",
+  "INACTIVE": "İnaktif",
+  "UPGRADE_NOW": "Şimdi Yükselt",
+  "MONTHLY_BASIC_PLAN": "Temel Aylık Plan",
+  "MONTHLY_PREMIUM_PLAN": "Premium Aylık Plan",
+  "YEARLY_BASIC_PLAN": "Temel Yıllık Plan",
+  "YEARLY_PREMIUM_PLAN": "Premium Yıllık Plan",
+  "CUSTOM_PLAN": "Özel Plan",
+  "UNKNOWN_PLAN": "Bilinmeyen Plan"
+
 
 
 }

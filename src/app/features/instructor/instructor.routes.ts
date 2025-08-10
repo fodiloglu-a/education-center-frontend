@@ -6,6 +6,7 @@ import { InstructorCourseListComponent } from './components/instructor-course-li
 import { InstructorReviewListComponent } from './components/instructor-review-list/instructor-review-list.component';
 import { AddMaterialComponent } from "./components/add-material/add-material.component";
 import { CouponCreateComponent } from './components/coupon-create/coupon-create.component';
+import {TeacherSubscriptionComponent} from "./components/teacher-subscription/teacher-subscription.component";
 
 // Eğitmen modülüne (instructor) özel yönlendirme tanımları.
 // Bu rotalar, '/instructor' ana yolu altında çalışacaktır (app.routes.ts'deki tanıma göre).
@@ -16,9 +17,9 @@ export const INSTRUCTOR_ROUTES: Routes = [
     title: 'Eğitmen Paneli' // Sayfa başlığı
   },
   {
-    path: 'add-material', //
+    path: 'add-material', // '/instructor/add-material' yolu
     component: AddMaterialComponent,
-    title: 'Eğitmen Kurslarım'
+    title: 'Materyal Ekle'
   },
   {
     path: 'courses', // '/instructor/courses' yolu (eğitmen kurs listesi)
@@ -35,5 +36,35 @@ export const INSTRUCTOR_ROUTES: Routes = [
     component: CouponCreateComponent,
     title: 'Kupon Oluştur'
   },
-  // İleride eklenebilecek diğer eğitmen rotaları (örn. kazançlar, öğrenci istatistikleri)
+  {
+    path: 'subscription', // '/instructor/subscription' yolu (eğitmen abonelik satın alma)
+    component: TeacherSubscriptionComponent,
+    title: 'Eğitmen Aboneliği'
+  },
+  // {
+  //  path: 'subscription/result', // '/instructor/subscription/result' yolu (ödeme sonucu)
+  //   component: TeacherSubscriptionResultComponent,
+//  title: 'Ödeme Sonucu'
+  // },
+  // İleride eklenebilecek diğer eğitmen rotaları
+  // {
+  //   path: 'earnings', // '/instructor/earnings' yolu (kazançlar)
+  //   component: InstructorEarningsComponent,
+  //   title: 'Kazançlarım'
+  // },
+  // {
+  //   path: 'students', // '/instructor/students' yolu (öğrenci istatistikleri)
+  //   component: InstructorStudentsComponent,
+  //   title: 'Öğrencilerim'
+  // },
+  // {
+  //   path: 'settings', // '/instructor/settings' yolu (eğitmen ayarları)
+  //   component: InstructorSettingsComponent,
+  //   title: 'Eğitmen Ayarları'
+  // },
+  // {
+  //   path: 'subscription/manage', // '/instructor/subscription/manage' yolu (abonelik yönetimi)
+  //   component: TeacherSubscriptionManageComponent,
+  //   title: 'Abonelik Yönetimi'
+  // }
 ];
