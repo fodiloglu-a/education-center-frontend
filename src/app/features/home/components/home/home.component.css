@@ -1,4 +1,59 @@
-/* Premium Home Component Styles */
+/* Premium Home Component Styles - Professional Edition */
+
+/* Performance & GPU Acceleration */
+* {
+    box-sizing: border-box;
+}
+
+/* Component will-change declarations for better performance */
+.course-card:nth-child(1) { animation: fadeInScale 0.6s ease-out 0.1s both; }
+.course-card:nth-child(2) { animation: fadeInScale 0.6s ease-out 0.2s both; }
+.course-card:nth-child(3) { animation: fadeInScale 0.6s ease-out 0.3s both; }
+.course-card:nth-child(4) { animation: fadeInScale 0.6s ease-out 0.4s both; }
+.course-card:nth-child(5) { animation: fadeInScale 0.6s ease-out 0.5s both; }
+
+/* PERFORMANCE OPTIMIZATIONS */
+.course-card,
+.feature-item {
+    contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: 400px;
+}
+
+/* Focus visible for better keyboard navigation */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-retry:focus-visible,
+.feature-item:focus-visible,
+.course-card:focus-visible {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 3px;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--deep-blue);
+}card,
+ .feature-item,
+ .btn-primary,
+ .btn-secondary {
+     will-change: transform;
+     backface-visibility: hidden;
+     transform: translateZ(0);
+ }
 
 /* Genel Container */
 .home-container {
@@ -7,6 +62,47 @@
     background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-bg) 100%);
     position: relative;
     overflow-x: hidden;
+    isolation: isolate; /* Create new stacking context */
+}
+
+/* Accessibility - Screen Reader Only Content */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Skip Links for Accessibility */
+.skip-links {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    z-index: 9999;
+}
+
+.skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    font-weight: 600;
+    transition: top var(--transition-normal);
+}
+
+.skip-link:focus {
+    top: 100px;
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 2px;
 }
 
 /* 1. SLIDER SECTION - Hero Banner */
@@ -19,6 +115,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    contain: layout style paint;
 }
 
 .slider-section::before {
@@ -31,6 +128,7 @@
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300"><path d="M0,300 Q500,50 1000,150 L1000,300 Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat center bottom;
     background-size: cover;
     z-index: 1;
+    pointer-events: none;
 }
 
 .slider-section::after {
@@ -44,11 +142,16 @@
     opacity: 0.1;
     z-index: 1;
     animation: float 20s ease-in-out infinite;
+    pointer-events: none;
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-30px) rotate(180deg); }
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-30px) rotate(180deg);
+    }
 }
 
 .slider-wrapper {
@@ -66,6 +169,7 @@
     justify-content: space-between;
     min-height: 500px;
     position: relative;
+    gap: 2rem;
 }
 
 .slide img {
@@ -76,7 +180,7 @@
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 31, 131, 0.3);
     transform: perspective(1000px) rotateY(-15deg);
-    transition: all var(--transition-normal);
+    transition: transform var(--transition-normal);
 }
 
 .slide:hover img {
@@ -90,7 +194,7 @@
 }
 
 .slide-title {
-    font-size: 3.5rem;
+    font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 800;
     line-height: 1.2;
     margin-bottom: 1.5rem;
@@ -102,7 +206,7 @@
 }
 
 .slide-text {
-    font-size: 1.3rem;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
     line-height: 1.6;
     margin-bottom: 2.5rem;
     opacity: 0.95;
@@ -110,24 +214,63 @@
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-.btn-primary {
+/* Button Styles with Enhanced Accessibility */
+.btn-primary,
+.btn-secondary,
+.btn-retry {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
     padding: 1rem 2.5rem;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--highlight-color) 100%);
-    color: var(--dark-color);
     text-decoration: none;
     border-radius: 50px;
     font-weight: 600;
     font-size: 1.1rem;
-    box-shadow: 0 8px 30px rgba(195, 173, 144, 0.4);
     transition: all var(--transition-normal);
     position: relative;
     overflow: hidden;
+    border: none;
+    cursor: pointer;
+    min-height: 48px; /* WCAG touch target size */
+    font-family: inherit;
 }
 
-.btn-primary::before {
+.btn-primary {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--highlight-color) 100%);
+    color: var(--dark-color);
+    box-shadow: 0 8px 30px rgba(195, 173, 144, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+}
+
+.btn-retry {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+    margin-top: 1rem;
+}
+
+/* Button Focus States for Accessibility */
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-retry:focus {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 3px;
+}
+
+.btn-primary:focus {
+    outline-color: var(--primary-color);
+}
+
+/* Button Hover Effects */
+.btn-primary::before,
+.btn-secondary::before,
+.btn-retry::before {
     content: '';
     position: absolute;
     top: 0;
@@ -138,25 +281,41 @@
     transition: left 0.6s;
 }
 
-.btn-primary:hover::before {
+.btn-primary:hover::before,
+.btn-secondary:hover::before,
+.btn-retry:hover::before {
     left: 100%;
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-retry:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(195, 173, 144, 0.6);
-    color: var(--dark-color);
     text-decoration: none;
 }
 
-.btn-primary::after {
-    content: '→';
-    margin-left: 0.5rem;
-    transition: transform var(--transition-normal);
+.btn-primary:hover {
+    box-shadow: 0 15px 40px rgba(195, 173, 144, 0.6);
+    color: var(--dark-color);
 }
 
-.btn-primary:hover::after {
-    transform: translateX(5px);
+.btn-secondary:hover {
+    box-shadow: 0 12px 35px rgba(67, 97, 238, 0.4);
+    color: white;
+}
+
+.btn-retry:hover {
+    box-shadow: 0 12px 35px rgba(220, 38, 38, 0.4);
+}
+
+/* Button Disabled State */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-retry:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    pointer-events: none;
 }
 
 /* 2. FEATURES SECTION - Güven Şeridi */
@@ -177,6 +336,7 @@
     background: linear-gradient(180deg, var(--primary-color) 0%, transparent 100%);
     opacity: 0.1;
     z-index: -1;
+    pointer-events: none;
 }
 
 .container {
@@ -187,7 +347,7 @@
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 3rem;
     margin-top: 2rem;
 }
@@ -198,10 +358,18 @@
     background: linear-gradient(135deg, var(--card-bg) 0%, var(--surface-bg) 100%);
     border-radius: 24px;
     box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     transition: all var(--transition-normal);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+}
+
+/* Focus states for feature items */
+.feature-item:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 3px;
+    border-color: var(--primary-color);
 }
 
 .feature-item::before {
@@ -216,11 +384,13 @@
     transition: transform var(--transition-normal);
 }
 
-.feature-item:hover::before {
+.feature-item:hover::before,
+.feature-item:focus::before {
     transform: scaleX(1);
 }
 
-.feature-item:hover {
+.feature-item:hover,
+.feature-item:focus {
     transform: translateY(-10px);
     box-shadow: 0 20px 60px var(--shadow-color);
     border-color: var(--primary-color);
@@ -237,7 +407,8 @@
     transition: all var(--transition-normal);
 }
 
-.feature-item:hover .feature-icon {
+.feature-item:hover .feature-icon,
+.feature-item:focus .feature-icon {
     transform: scale(1.1) rotateY(360deg);
 }
 
@@ -272,10 +443,11 @@
     bottom: 0;
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100"><path d="M0,0 Q500,100 1000,50 L1000,0 Z" fill="rgba(67,97,238,0.05)"/></svg>') no-repeat center top;
     background-size: cover;
+    pointer-events: none;
 }
 
 .section-title {
-    font-size: 3rem;
+    font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
     text-align: center;
     color: var(--dark-color);
@@ -297,7 +469,7 @@
 
 .section-subtitle {
     text-align: center;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     color: var(--text-color);
     margin-bottom: 4rem;
     opacity: 0.8;
@@ -306,9 +478,154 @@
     margin-right: auto;
 }
 
+/* LOADING STATES */
+.loading-container {
+    position: relative;
+    min-height: 400px;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-top: 2rem;
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg,
+    var(--border-color) 25%,
+    var(--surface-bg) 50%,
+    var(--border-color) 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite ease-in-out;
+    border: 2px solid var(--border-color);
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-image {
+    height: 220px;
+    background: var(--border-color);
+}
+
+.skeleton-title,
+.skeleton-instructor,
+.skeleton-rating,
+.skeleton-price,
+.skeleton-button {
+    height: 1rem;
+    background: var(--border-color);
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 80%;
+}
+
+.skeleton-instructor {
+    width: 60%;
+}
+
+.skeleton-rating {
+    width: 50%;
+}
+
+.skeleton-price {
+    height: 2rem;
+    width: 40%;
+}
+
+.skeleton-button {
+    height: 3rem;
+    width: 100%;
+    border-radius: 50px;
+}
+
+/* ERROR STATES */
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+}
+
+.error-message {
+    text-align: center;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    color: #dc2626;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dc2626;
+}
+
+.error-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #dc2626;
+}
+
+.error-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: #b91c1c;
+}
+
+/* EMPTY STATE */
+.empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+}
+
+.empty-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: var(--text-color);
+    opacity: 0.5;
+    margin-bottom: 1.5rem;
+}
+
+.empty-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+}
+
+.empty-text {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+/* COURSES GRID */
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2.5rem;
     margin-top: 3rem;
 }
@@ -318,11 +635,19 @@
     border-radius: 20px;
     overflow: hidden;
     box-shadow: var(--shadow-md);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     transition: all var(--transition-normal);
     position: relative;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
+}
+
+/* Course Card Focus State */
+.course-card:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 3px;
+    border-color: var(--primary-color);
 }
 
 .course-card::before {
@@ -336,27 +661,35 @@
     opacity: 0;
     transition: opacity var(--transition-normal);
     z-index: -1;
+    pointer-events: none;
 }
 
-.course-card:hover {
+.course-card:hover,
+.course-card:focus {
     transform: translateY(-10px) scale(1.02);
     box-shadow: 0 25px 80px rgba(67, 97, 238, 0.2);
     border-color: var(--primary-color);
 }
 
-.course-card:hover::before {
+.course-card:hover::before,
+.course-card:focus::before {
     opacity: 0.05;
+}
+
+.course-image-container {
+    position: relative;
+    overflow: hidden;
 }
 
 .course-image {
     width: 100%;
     height: 220px;
     object-fit: cover;
-    transition: all var(--transition-normal);
-    position: relative;
+    transition: transform var(--transition-normal);
 }
 
-.course-card:hover .course-image {
+.course-card:hover .course-image,
+.course-card:focus .course-image {
     transform: scale(1.05);
 }
 
@@ -399,6 +732,11 @@
     margin-bottom: 1.5rem;
 }
 
+.rating-stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
 .course-rating .fa-star {
     color: var(--border-color);
     font-size: 1rem;
@@ -410,7 +748,7 @@
     transform: scale(1.1);
 }
 
-.course-rating span {
+.rating-value {
     color: var(--text-color);
     font-weight: 600;
     font-size: 0.9rem;
@@ -436,53 +774,8 @@
 }
 
 .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.875rem 2rem;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1rem;
-    transition: all var(--transition-normal);
     margin-top: auto;
-    box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-secondary::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.6s;
-}
-
-.btn-secondary:hover::before {
-    left: 100%;
-}
-
-.btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(67, 97, 238, 0.4);
-    color: white;
-    text-decoration: none;
-}
-
-.btn-secondary::after {
-    content: '→';
-    transition: transform var(--transition-normal);
-}
-
-.btn-secondary:hover::after {
-    transform: translateX(3px);
 }
 
 /* RESPONSIVE DESIGN */
@@ -503,8 +796,8 @@
         max-width: 500px;
     }
 
-    .slide-title {
-        font-size: 2.8rem;
+    .courses-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
 }
 
@@ -535,17 +828,9 @@
         margin: 0 auto;
     }
 
-    .slide-title {
-        font-size: 2.2rem;
-        margin-bottom: 1rem;
-    }
-
-    .slide-text {
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
-    }
-
-    .btn-primary {
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
         padding: 0.875rem 2rem;
         font-size: 1rem;
     }
@@ -563,14 +848,11 @@
 
     .feature-item {
         padding: 2rem 1.5rem;
-        flex-direction: column;
-        text-align: center;
     }
 
     .feature-icon {
         font-size: 3.5rem;
         margin-bottom: 1rem;
-        margin-right: 0;
     }
 
     .feature-title {
@@ -587,13 +869,7 @@
         padding: 4rem 0;
     }
 
-    .section-title {
-        font-size: 2.2rem;
-        margin-bottom: 0.75rem;
-    }
-
     .section-subtitle {
-        font-size: 1.1rem;
         margin-bottom: 3rem;
         padding: 0 1rem;
     }
@@ -638,13 +914,6 @@
         text-align: center;
     }
 
-    .btn-secondary {
-        width: 100%;
-        padding: 1rem 2rem;
-        font-size: 1rem;
-        justify-content: center;
-    }
-
     /* CONTAINER - Mobile */
     .container {
         padding: 0 1rem;
@@ -659,17 +928,9 @@
         padding: 2rem 0;
     }
 
-    .slide-title {
-        font-size: 1.8rem;
-        line-height: 1.3;
-    }
-
-    .slide-text {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .btn-primary {
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
         padding: 0.75rem 1.5rem;
         font-size: 0.95rem;
     }
@@ -690,12 +951,7 @@
         font-size: 1.2rem;
     }
 
-    .section-title {
-        font-size: 1.8rem;
-    }
-
     .section-subtitle {
-        font-size: 1rem;
         margin-bottom: 2rem;
     }
 
@@ -714,6 +970,10 @@
     .container {
         padding: 0 0.75rem;
     }
+
+    .error-message {
+        padding: 2rem 1rem;
+    }
 }
 
 /* Very Small Mobile - 480px altı */
@@ -723,16 +983,9 @@
         padding: 1.5rem 0;
     }
 
-    .slide-title {
-        font-size: 1.6rem;
-    }
-
-    .slide-text {
-        font-size: 0.95rem;
-    }
-
     .btn-primary,
-    .btn-secondary {
+    .btn-secondary,
+    .btn-retry {
         padding: 0.625rem 1.25rem;
         font-size: 0.9rem;
     }
@@ -745,10 +998,6 @@
         font-size: 2.5rem;
     }
 
-    .section-title {
-        font-size: 1.6rem;
-    }
-
     .course-image {
         height: 180px;
     }
@@ -759,6 +1008,74 @@
 
     .container {
         padding: 0 0.5rem;
+    }
+}
+
+/* ACCESSIBILITY - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .float {
+        animation: none !important;
+    }
+}
+
+/* HIGH CONTRAST MODE */
+@media (prefers-contrast: high) {
+    .course-card,
+    .feature-item {
+        border-width: 3px;
+        border-color: currentColor;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
+        border: 2px solid currentColor;
+    }
+}
+
+/* DARK MODE UYUMLULUĞU */
+@media (prefers-color-scheme: dark) {
+    .course-card,
+    .feature-item {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .loading-skeleton {
+        background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.1) 25%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 75%);
+    }
+}
+
+/* PRINT STYLES */
+@media print {
+    .slider-section,
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry,
+    .skip-links {
+        display: none !important;
+    }
+
+    .home-container {
+        background: white !important;
+    }
+
+    .course-card,
+    .feature-item {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
     }
 }
 
@@ -785,23 +1102,1055 @@
     }
 }
 
-.feature-item {
-    animation: slideInUp 0.6s ease-out forwards;
+/* Animation delays for staggered entrance */
+.feature-item:nth-child(1) { animation: slideInUp 0.6s ease-out 0.1s both; }
+.feature-item:nth-child(2) { animation: slideInUp 0.6s ease-out 0.2s both; }
+.feature-item:nth-child(3) { animation: slideInUp 0.6s ease-out 0.3s both; }
+
+.course-
+    /* Premium Home Component Styles - Professional Edition */
+
+    /* Performance & GPU Acceleration */
+* {
+    box-sizing: border-box;
 }
 
-.feature-item:nth-child(1) { animation-delay: 0.1s; }
-.feature-item:nth-child(2) { animation-delay: 0.2s; }
-.feature-item:nth-child(3) { animation-delay: 0.3s; }
+/* Component will-change declarations for better performance */
+.course-card:nth-child(1) { animation: fadeInScale 0.6s ease-out 0.1s both; }
+.course-card:nth-child(2) { animation: fadeInScale 0.6s ease-out 0.2s both; }
+.course-card:nth-child(3) { animation: fadeInScale 0.6s ease-out 0.3s both; }
+.course-card:nth-child(4) { animation: fadeInScale 0.6s ease-out 0.4s both; }
+.course-card:nth-child(5) { animation: fadeInScale 0.6s ease-out 0.5s both; }
+
+/* PERFORMANCE OPTIMIZATIONS */
+.course-card,
+.feature-item {
+    contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: 400px;
+}
+
+/* Focus visible for better keyboard navigation */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-retry:focus-visible,
+.feature-item:focus-visible,
+.course-card:focus-visible {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 3px;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--deep-blue);
+}card,
+ .feature-item,
+ .btn-primary,
+ .btn-secondary {
+     will-change: transform;
+     backface-visibility: hidden;
+     transform: translateZ(0);
+ }
+
+/* Genel Container */
+.home-container {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-bg) 100%);
+    position: relative;
+    overflow-x: hidden;
+    isolation: isolate; /* Create new stacking context */
+}
+
+/* Accessibility - Screen Reader Only Content */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Skip Links for Accessibility */
+.skip-links {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    z-index: 9999;
+}
+
+.skip-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+    font-weight: 600;
+    transition: top var(--transition-normal);
+}
+
+.skip-link:focus {
+    top: 100px;
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 2px;
+}
+
+/* 1. SLIDER SECTION - Hero Banner */
+.slider-section {
+    position: relative;
+    height: 70vh;
+    min-height: 600px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    contain: layout style paint;
+}
+
+.slider-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300"><path d="M0,300 Q500,50 1000,150 L1000,300 Z" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat center bottom;
+    background-size: cover;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.slider-section::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, var(--secondary-color) 0%, transparent 70%);
+    opacity: 0.1;
+    z-index: 1;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-30px) rotate(180deg);
+    }
+}
+
+.slider-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.slide {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 500px;
+    position: relative;
+    gap: 2rem;
+}
+
+.slide img {
+    width: 50%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 31, 131, 0.3);
+    transform: perspective(1000px) rotateY(-15deg);
+    transition: transform var(--transition-normal);
+}
+
+.slide:hover img {
+    transform: perspective(1000px) rotateY(-10deg) scale(1.05);
+}
+
+.slide-content {
+    width: 45%;
+    color: white;
+    z-index: 3;
+}
+
+.slide-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, var(--secondary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.slide-text {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    line-height: 1.6;
+    margin-bottom: 2.5rem;
+    opacity: 0.95;
+    color: var(--light-accent);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styles with Enhanced Accessibility */
+.btn-primary,
+.btn-secondary,
+.btn-retry {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2.5rem;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    min-height: 48px; /* WCAG touch target size */
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--highlight-color) 100%);
+    color: var(--dark-color);
+    box-shadow: 0 8px 30px rgba(195, 173, 144, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(67, 97, 238, 0.3);
+}
+
+.btn-retry {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+    margin-top: 1rem;
+}
+
+/* Button Focus States for Accessibility */
+.btn-primary:focus,
+.btn-secondary:focus,
+.btn-retry:focus {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 3px;
+}
+
+.btn-primary:focus {
+    outline-color: var(--primary-color);
+}
+
+/* Button Hover Effects */
+.btn-primary::before,
+.btn-secondary::before,
+.btn-retry::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.btn-primary:hover::before,
+.btn-secondary:hover::before,
+.btn-retry:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+.btn-retry:hover {
+    transform: translateY(-3px) scale(1.05);
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 15px 40px rgba(195, 173, 144, 0.6);
+    color: var(--dark-color);
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 12px 35px rgba(67, 97, 238, 0.4);
+    color: white;
+}
+
+.btn-retry:hover {
+    box-shadow: 0 12px 35px rgba(220, 38, 38, 0.4);
+}
+
+/* Button Disabled State */
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-retry:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    pointer-events: none;
+}
+
+/* 2. FEATURES SECTION - Güven Şeridi */
+.features-section {
+    padding: 6rem 0;
+    background: var(--card-bg);
+    position: relative;
+    z-index: 2;
+}
+
+.features-section::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(180deg, var(--primary-color) 0%, transparent 100%);
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+    margin-top: 2rem;
+}
+
+.feature-item {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, var(--card-bg) 0%, var(--surface-bg) 100%);
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border-color);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* Focus states for feature items */
+.feature-item:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 3px;
+    border-color: var(--primary-color);
+}
+
+.feature-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.feature-item:hover::before,
+.feature-item:focus::before {
+    transform: scaleX(1);
+}
+
+.feature-item:hover,
+.feature-item:focus {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px var(--shadow-color);
+    border-color: var(--primary-color);
+}
+
+.feature-icon {
+    font-size: 4rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+    display: block;
+    transition: all var(--transition-normal);
+}
+
+.feature-item:hover .feature-icon,
+.feature-item:focus .feature-icon {
+    transform: scale(1.1) rotateY(360deg);
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.feature-text {
+    color: var(--text-color);
+    line-height: 1.6;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* 3. BEST SELLERS SECTION */
+.best-sellers-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--surface-bg) 0%, var(--background-color) 100%);
+    position: relative;
+}
+
+.best-sellers-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100"><path d="M0,0 Q500,100 1000,50 L1000,0 Z" fill="rgba(67,97,238,0.05)"/></svg>') no-repeat center top;
+    background-size: cover;
+    pointer-events: none;
+}
+
+.section-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    text-align: center;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: var(--text-color);
+    margin-bottom: 4rem;
+    opacity: 0.8;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* LOADING STATES */
+.loading-container {
+    position: relative;
+    min-height: 400px;
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-top: 2rem;
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg,
+    var(--border-color) 25%,
+    var(--surface-bg) 50%,
+    var(--border-color) 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite ease-in-out;
+    border: 2px solid var(--border-color);
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-image {
+    height: 220px;
+    background: var(--border-color);
+}
+
+.skeleton-title,
+.skeleton-instructor,
+.skeleton-rating,
+.skeleton-price,
+.skeleton-button {
+    height: 1rem;
+    background: var(--border-color);
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 80%;
+}
+
+.skeleton-instructor {
+    width: 60%;
+}
+
+.skeleton-rating {
+    width: 50%;
+}
+
+.skeleton-price {
+    height: 2rem;
+    width: 40%;
+}
+
+.skeleton-button {
+    height: 3rem;
+    width: 100%;
+    border-radius: 50px;
+}
+
+/* ERROR STATES */
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+}
+
+.error-message {
+    text-align: center;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    color: #dc2626;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #dc2626;
+}
+
+.error-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #dc2626;
+}
+
+.error-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: #b91c1c;
+}
+
+/* EMPTY STATE */
+.empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    padding: 2rem;
+}
+
+.empty-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: var(--text-color);
+    opacity: 0.5;
+    margin-bottom: 1.5rem;
+}
+
+.empty-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+}
+
+.empty-text {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+/* COURSES GRID */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+}
 
 .course-card {
-    animation: fadeInScale 0.6s ease-out forwards;
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border-color);
+    transition: all var(--transition-normal);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
 }
 
-.course-card:nth-child(1) { animation-delay: 0.1s; }
-.course-card:nth-child(2) { animation-delay: 0.2s; }
-.course-card:nth-child(3) { animation-delay: 0.3s; }
-.course-card:nth-child(4) { animation-delay: 0.4s; }
-.course-card:nth-child(5) { animation-delay: 0.5s; }
+/* Course Card Focus State */
+.course-card:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 3px;
+    border-color: var(--primary-color);
+}
+
+.course-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--deep-blue) 100%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.course-card:hover,
+.course-card:focus {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 80px rgba(67, 97, 238, 0.2);
+    border-color: var(--primary-color);
+}
+
+.course-card:hover::before,
+.course-card:focus::before {
+    opacity: 0.05;
+}
+
+.course-image-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.course-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.course-card:hover .course-image,
+.course-card:focus .course-image {
+    transform: scale(1.05);
+}
+
+.course-content {
+    padding: 2rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.course-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.course-instructor {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+.course-instructor::before {
+    content: '👨‍🏫 ';
+    margin-right: 0.25rem;
+}
+
+.course-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.course-rating .fa-star {
+    color: var(--border-color);
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+}
+
+.course-rating .fa-star.filled {
+    color: var(--highlight-color);
+    transform: scale(1.1);
+}
+
+.rating-value {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.course-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.course-price::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, transparent 100%);
+    border-radius: 1px;
+}
+
+.btn-secondary {
+    margin-top: auto;
+    width: 100%;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+    .slide {
+        flex-direction: column;
+        text-align: center;
+        gap: 3rem;
+    }
+
+    .slide img,
+    .slide-content {
+        width: 100%;
+    }
+
+    .slide img {
+        transform: none;
+        max-width: 500px;
+    }
+
+    .courses-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* Mobile Responsive Design - 900px altı */
+@media (max-width: 900px) {
+    /* SLIDER SECTION - Mobile */
+    .slider-section {
+        height: auto;
+        min-height: 500px;
+        padding: 3rem 0;
+    }
+
+    .slide {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+        padding: 2rem 0;
+    }
+
+    .slide img,
+    .slide-content {
+        width: 100%;
+    }
+
+    .slide img {
+        transform: none;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
+        padding: 0.875rem 2rem;
+        font-size: 1rem;
+    }
+
+    /* FEATURES SECTION - Mobile */
+    .features-section {
+        padding: 4rem 0;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .feature-item {
+        padding: 2rem 1.5rem;
+    }
+
+    .feature-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .feature-title {
+        font-size: 1.3rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .feature-text {
+        font-size: 0.95rem;
+    }
+
+    /* BEST SELLERS SECTION - Mobile */
+    .best-sellers-section {
+        padding: 4rem 0;
+    }
+
+    .section-subtitle {
+        margin-bottom: 3rem;
+        padding: 0 1rem;
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .course-card {
+        margin: 0 auto;
+        max-width: 400px;
+    }
+
+    .course-image {
+        height: 200px;
+    }
+
+    .course-content {
+        padding: 1.5rem;
+    }
+
+    .course-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .course-instructor {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .course-rating {
+        margin-bottom: 1rem;
+        justify-content: center;
+    }
+
+    .course-price {
+        font-size: 1.6rem;
+        margin-bottom: 1.25rem;
+        text-align: center;
+    }
+
+    /* CONTAINER - Mobile */
+    .container {
+        padding: 0 1rem;
+        max-width: 100%;
+    }
+}
+
+/* Extra Mobile - 600px altı */
+@media (max-width: 600px) {
+    .slider-section {
+        min-height: 450px;
+        padding: 2rem 0;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .features-section {
+        padding: 3rem 0;
+    }
+
+    .feature-item {
+        padding: 1.5rem 1rem;
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+    }
+
+    .feature-title {
+        font-size: 1.2rem;
+    }
+
+    .section-subtitle {
+        margin-bottom: 2rem;
+    }
+
+    .course-content {
+        padding: 1.25rem;
+    }
+
+    .course-title {
+        font-size: 1.1rem;
+    }
+
+    .course-price {
+        font-size: 1.4rem;
+    }
+
+    .container {
+        padding: 0 0.75rem;
+    }
+
+    .error-message {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Very Small Mobile - 480px altı */
+@media (max-width: 480px) {
+    .slider-section {
+        min-height: 400px;
+        padding: 1.5rem 0;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    .feature-item {
+        padding: 1.25rem 0.75rem;
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+    }
+
+    .course-image {
+        height: 180px;
+    }
+
+    .course-content {
+        padding: 1rem;
+    }
+
+    .container {
+        padding: 0 0.5rem;
+    }
+}
+
+/* ACCESSIBILITY - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .float {
+        animation: none !important;
+    }
+}
+
+/* HIGH CONTRAST MODE */
+@media (prefers-contrast: high) {
+    .course-card,
+    .feature-item {
+        border-width: 3px;
+        border-color: currentColor;
+    }
+
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry {
+        border: 2px solid currentColor;
+    }
+}
 
 /* DARK MODE UYUMLULUĞU */
 @media (prefers-color-scheme: dark) {
@@ -809,4 +2158,103 @@
     .feature-item {
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
+
+    .loading-skeleton {
+        background: linear-gradient(90deg,
+        rgba(255, 255, 255, 0.1) 25%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 75%);
+    }
+}
+
+/* PRINT STYLES */
+@media print {
+    .slider-section,
+    .btn-primary,
+    .btn-secondary,
+    .btn-retry,
+    .skip-links {
+        display: none !important;
+    }
+
+    .home-container {
+        background: white !important;
+    }
+
+    .course-card,
+    .feature-item {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+}
+
+/* ANIMATIONS */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animation delays for staggered entrance */
+.feature-item:nth-child(1) { animation: slideInUp 0.6s ease-out 0.1s both; }
+.feature-item:nth-child(2) { animation: slideInUp 0.6s ease-out 0.2s both; }
+.feature-item:nth-child(3) { animation: slideInUp 0.6s ease-out 0.3s both; }
+
+.course-card:nth-child(1) { animation: fadeInScale 0.6s ease-out 0.1s both; }
+.course-card:nth-child(2) { animation: fadeInScale 0.6s ease-out 0.2s both; }
+.course-card:nth-child(3) { animation: fadeInScale 0.6s ease-out 0.3s both; }
+.course-card:nth-child(4) { animation: fadeInScale 0.6s ease-out 0.4s both; }
+.course-card:nth-child(5) { animation: fadeInScale 0.6s ease-out 0.5s both; }
+
+/* PERFORMANCE OPTIMIZATIONS */
+.course-card,
+.feature-item {
+    contain: content;
+    content-visibility: auto;
+    contain-intrinsic-size: 400px;
+}
+
+/* Focus visible for better keyboard navigation */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-retry:focus-visible,
+.feature-item:focus-visible,
+.course-card:focus-visible {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 3px;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--surface-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--deep-blue);
 }

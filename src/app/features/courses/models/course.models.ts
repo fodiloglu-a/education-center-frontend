@@ -8,7 +8,7 @@ export interface CourseResponse {
   id: number;                  // Eğitimin benzersiz ID'si
   title: string;               // Eğitimin başlığı
   description: string;         // Eğitimin kısa açıklaması
-  imageUrl:'assets/logo/Logo.png';
+  imageUrl:string;
   instructorName: string;      // Eğitmenin adı ve soyadı
   instructorId: number;
   price: number;               // Eğitimin fiyatı

@@ -1,64 +1,239 @@
-<div class="home-container">
+<div class="home-container" role="main" aria-label="Ana sayfa içeriği">
     <!-- 1. Kampanyalar için Slider Alanı -->
-    <section class="slider-section">
+    <section class="slider-section"
+             role="banner"
+             aria-labelledby="slider-title"
+             [attr.aria-busy]="isLoading()">
         <div class="slider-wrapper">
             <div class="slide active">
-                <img src="assets/logo/logo_light.png" alt="Kampanya 1">
+                <img src="assets/logo/logo_light.png"
+                     alt="Eğitim platformu logosu - Premium online kurslar"
+                     loading="eager"
+                     decoding="async"
+                     width="500"
+                     height="300">
                 <div class="slide-content">
-                    <h2 class="slide-title">{{ 'HOME_SLIDER_TITLE' | translate }}</h2>
-                    <p class="slide-text">{{ 'HOME_SLIDER_TEXT' | translate }}</p>
-                    <a href="/courses" class="btn-primary">{{ 'HOME_SLIDER_BTN' | translate }}</a>
+                    <h1 id="slider-title" class="slide-title">
+                        {{ 'HOME_SLIDER_TITLE' | translate }}
+                    </h1>
+                    <p class="slide-text" role="text">
+                        {{ 'HOME_SLIDER_TEXT' | translate }}
+                    </p>
+                    <a href="/courses"
+                       class="btn-primary"
+                       role="button"
+                       [attr.aria-label]="('HOME_SLIDER_BTN' | translate) + ' - Kurs kataloguna git'"
+                       tabindex="0">
+                        {{ 'HOME_SLIDER_BTN' | translate }}
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 2. Güven ve Değer Şeridi -->
-    <section class="features-section">
+    <section class="features-section"
+             role="region"
+             aria-labelledby="features-heading">
         <div class="container">
-            <div class="features-grid">
-                <div class="feature-item">
-                    <i class="fas fa-shield-alt feature-icon"></i>
-                    <h3 class="feature-title">{{ 'HOME_FEATURE_TITLE_1' | translate }}</h3>
-                    <p class="feature-text">{{ 'HOME_FEATURE_TEXT_1' | translate }}</p>
+            <h2 id="features-heading" class="sr-only">Platform özellikleri</h2>
+            <div class="features-grid"
+                 role="list"
+                 aria-label="Platform özellik listesi">
+                <div class="feature-item"
+                     role="listitem"
+                     tabindex="0">
+                    <i class="fas fa-shield-alt feature-icon"
+                       aria-hidden="true"
+                       role="img"></i>
+                    <h3 class="feature-title">
+                        {{ 'HOME_FEATURE_TITLE_1' | translate }}
+                    </h3>
+                    <p class="feature-text">
+                        {{ 'HOME_FEATURE_TEXT_1' | translate }}
+                    </p>
                 </div>
-                <div class="feature-item">
-                    <i class="fas fa-rocket feature-icon"></i>
-                    <h3 class="feature-title">{{ 'HOME_FEATURE_TITLE_2' | translate }}</h3>
-                    <p class="feature-text">{{ 'HOME_FEATURE_TEXT_2' | translate }}</p>
+                <div class="feature-item"
+                     role="listitem"
+                     tabindex="0">
+                    <i class="fas fa-rocket feature-icon"
+                       aria-hidden="true"
+                       role="img"></i>
+                    <h3 class="feature-title">
+                        {{ 'HOME_FEATURE_TITLE_2' | translate }}
+                    </h3>
+                    <p class="feature-text">
+                        {{ 'HOME_FEATURE_TEXT_2' | translate }}
+                    </p>
                 </div>
-                <div class="feature-item">
-                    <i class="fas fa-award feature-icon"></i>
-                    <h3 class="feature-title">{{ 'HOME_FEATURE_TITLE_3' | translate }}</h3>
-                    <p class="feature-text">{{ 'HOME_FEATURE_TEXT_3' | translate }}</p>
+                <div class="feature-item"
+                     role="listitem"
+                     tabindex="0">
+                    <i class="fas fa-award feature-icon"
+                       aria-hidden="true"
+                       role="img"></i>
+                    <h3 class="feature-title">
+                        {{ 'HOME_FEATURE_TITLE_3' | translate }}
+                    </h3>
+                    <p class="feature-text">
+                        {{ 'HOME_FEATURE_TEXT_3' | translate }}
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- 3. En Çok Satan Eğitimler Bölümü -->
-    <section class="best-sellers-section section">
+    <section class="best-sellers-section section"
+             role="region"
+             aria-labelledby="bestsellers-title"
+             [attr.aria-busy]="isLoading()">
         <div class="container">
-            <h2 class="section-title">{{ 'HOME_BESTSELLERS_TITLE' | translate }}</h2>
-            <p class="section-subtitle">{{ 'HOME_BESTSELLERS_SUBTITLE' | translate }}</p>
+            <h2 id="bestsellers-title" class="section-title">
+                {{ 'HOME_BESTSELLERS_TITLE' | translate }}
+            </h2>
+            <p class="section-subtitle" role="text">
+                {{ 'HOME_BESTSELLERS_SUBTITLE' | translate }}
+            </p>
 
-            <div class="courses-grid">
-                <div *ngFor="let course of bestSellers" class="course-card">
-                    <img [src]="course.imageUrl" [alt]="course.title" class="course-image">
-                    <div class="course-content">
-                        <h4 class="course-title">{{ course.title }}</h4>
-                        <p class="course-instructor">{{ course.instructorName }}</p>
-                        <div class="course-rating">
-                            <i *ngFor="let star of [1, 2, 3, 4, 5]"
-                               class="fas fa-star"
-                               [class.filled]="star <= course.averageRating"></i>
-                            <span>({{ course.averageRating | number:'1.1-1' }})</span>
+            <!-- Loading State -->
+            <div *ngIf="isLoading()"
+                 class="loading-container"
+                 role="status"
+                 aria-live="polite"
+                 aria-label="Kurslar yükleniyor">
+                <div class="courses-grid" aria-hidden="true">
+                    <div *ngFor="let skeleton of [1, 2, 3, 4, 5]; trackBy: trackStarByIndex"
+                         class="course-card loading-skeleton">
+                        <div class="course-image skeleton-image"></div>
+                        <div class="course-content">
+                            <div class="skeleton-title"></div>
+                            <div class="skeleton-instructor"></div>
+                            <div class="skeleton-rating"></div>
+                            <div class="skeleton-price"></div>
+                            <div class="skeleton-button"></div>
                         </div>
-                        <div class="course-price">{{ course.price | currency:'USD':'symbol' }}</div>
-                        <a [routerLink]="['/courses', course.id]" class="btn-secondary">{{ 'HOME_COURSE_BTN' | translate }}</a>
                     </div>
+                </div>
+                <p class="loading-text sr-only">Kurslar yükleniyor, lütfen bekleyiniz...</p>
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="errorMessage() && !isLoading()"
+                 class="error-container"
+                 role="alert"
+                 aria-live="assertive">
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle error-icon"
+                       aria-hidden="true"></i>
+                    <h3 class="error-title">Bir sorun oluştu</h3>
+                    <p class="error-text">{{ errorMessage() }}</p>
+                    <button *ngIf="showRetryButton()"
+                            (click)="retryLoadingCourses()"
+                            class="btn-retry"
+                            type="button"
+                            [attr.aria-label]="'Kursları tekrar yüklemeyi dene'"
+                            [disabled]="isLoading()">
+                        <i class="fas fa-redo" aria-hidden="true"></i>
+                        Tekrar Dene
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success State - Courses List -->
+            <div *ngIf="hasData() && !isLoading()"
+                 class="courses-container"
+                 role="region"
+                 aria-labelledby="courses-list-heading">
+                <h3 id="courses-list-heading" class="sr-only">
+                    En çok satan kurslar listesi
+                </h3>
+                <div class="courses-grid"
+                     role="list"
+                     aria-label="En çok satan kurslar">
+                    <article *ngFor="let course of bestSellers(); trackBy: trackCourseById"
+                             class="course-card"
+                             role="listitem"
+                             [attr.aria-labelledby]="'course-title-' + course.id"
+                             tabindex="0">
+                        <div class="course-image-container">
+                            <img [src]="course.imageUrl"
+                                 [alt]="course.title + ' kurs görseli'"
+                                 class="course-image"
+                                 loading="lazy"
+                                 decoding="async"
+                                 width="300"
+                                 height="220"
+                                 (error)="onImageError($event)">
+                        </div>
+                        <div class="course-content">
+                            <h4 [id]="'course-title-' + course.id"
+                                class="course-title">
+                                {{ course.title }}
+                            </h4>
+                            <p class="course-instructor"
+                               [attr.aria-label]="'Eğitmen: ' + course.instructorName">
+                                {{ course.instructorName }}
+                            </p>
+                            <div class="course-rating"
+                                 role="img"
+                                 [attr.aria-label]="'Kurs puanı: ' + (course.averageRating | number:'1.1-1') + ' / 5 yıldız'">
+                                <span class="rating-stars" aria-hidden="true">
+                                    <i *ngFor="let star of getStarArray(course); trackBy: trackStarByIndex"
+                                       class="fas fa-star"
+                                       [class.filled]="isStarFilled(star, course)"
+                                       [attr.title]="star + '. yıldız' + (isStarFilled(star, course) ? ' dolu' : ' boş')"></i>
+                                </span>
+                                <span class="rating-value">
+                                    ({{ course.averageRating | number:'1.1-1' }})
+                                </span>
+                            </div>
+                            <div class="course-price"
+                                 [attr.aria-label]="'Kurs fiyatı: ' + getFormattedPrice(course)">
+                                {{ getFormattedPrice(course) | currency:'USD':'symbol' }}
+                            </div>
+                            <a [routerLink]="['/courses', course.id]"
+                               class="btn-secondary"
+                               role="button"
+                               [attr.aria-label]="(('HOME_COURSE_BTN' | translate) + ' - ' + course.title + ' kursunu görüntüle')"
+                               tabindex="0">
+                                {{ 'HOME_COURSE_BTN' | translate }}
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!hasData() && !isLoading() && !errorMessage()"
+                 class="empty-state"
+                 role="status"
+                 aria-live="polite">
+                <div class="empty-content">
+                    <i class="fas fa-graduation-cap empty-icon" aria-hidden="true"></i>
+                    <h3 class="empty-title">Henüz kurs bulunmuyor</h3>
+                    <p class="empty-text">
+                        Şu anda gösterilecek en çok satan kurs bulunmuyor.
+                        Lütfen daha sonra tekrar kontrol edin.
+                    </p>
+                    <a href="/courses"
+                       class="btn-primary"
+                       role="button"
+                       aria-label="Tüm kursları görüntüle">
+                        Tüm Kursları Gör
+                    </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Skip Links for Screen Readers -->
+    <nav class="skip-links" aria-label="Hızlı erişim linkleri">
+        <a href="#bestsellers-title" class="skip-link">
+            En çok satan kurslara git
+        </a>
+        <a href="/courses" class="skip-link">
+            Kurs kataloğuna git
+        </a>
+    </nav>
 </div>

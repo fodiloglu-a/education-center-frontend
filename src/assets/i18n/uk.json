@@ -901,7 +901,8 @@
   "YEARLY_BASIC_PLAN": "Базовий річний план",
   "YEARLY_PREMIUM_PLAN": "Преміум річний план",
   "CUSTOM_PLAN": "Користувацький план",
-  "UNKNOWN_PLAN": "Невідомий план"
+  "UNKNOWN_PLAN": "Невідомий план",
+  "ACTIVATION": "Активність"
 
 
 }

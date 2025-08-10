@@ -11,7 +11,7 @@
                     <li><a routerLink="/home" routerLinkActive="active" (click)="closeMobileMenu()">{{ 'HOME' | translate }}</a></li>
                     <li><a routerLink="/courses" routerLinkActive="active">{{ 'COURSES' | translate }}</a></li>
                     <li *ngIf="isLoggedIn$ | async"><a routerLink="/profile" routerLinkActive="active">{{ 'PROFILE' | translate }}</a></li>
-                    <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active">{{ 'REVIEWS' | translate }}</a></li>
+                    <li *ngIf="isLoggedIn$ | async"><a routerLink="/reviews" routerLinkActive="active">{{ 'ACTIVATION' | translate }}</a></li>
                     <li *ngIf="(hasRole('ROLE_ADMIN') | async) || (hasRole('ROLE_INSTRUCTOR') | async)"><a routerLink="/instructor" routerLinkActive="active">{{ 'ADMIN_PANEL' | translate }}</a></li>
                 </ul>
             </nav>
