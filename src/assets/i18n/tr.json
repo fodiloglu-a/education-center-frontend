@@ -903,7 +903,8 @@
   "AUTH_ERROR": "Kimlik doğrulama hatası",
   "COURSES_LOAD_ERROR": "Kurslar yüklenemedi",
   "REFRESH_ERROR": "Yenileme hatası",
-  "RETRY_ERROR": "Yeniden deneme hatası"
+  "RETRY_ERROR": "Yeniden deneme hatası",
+  "GO_TO_INS_PROFILE": "Eğitmen profiline git"
 
 
 
