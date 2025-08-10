@@ -29,7 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private translateSubscription: Subscription = new Subscription();
   private isMenuOpenSubject = new BehaviorSubject<boolean>(false);
   isMenuOpen$: Observable<boolean> = this.isMenuOpenSubject.asObservable();
-
+  currentYear='12:23:2025'
   // Dil seçimi açılır menüsü için durum
   isLanguageDropdownOpen: boolean = false; // Yeni özellik
 

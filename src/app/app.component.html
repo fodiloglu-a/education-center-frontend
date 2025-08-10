@@ -109,4 +109,22 @@
     <footer class="app-footer">
         <p>&copy; 2025 {{ 'APP_TITLE' | translate }}</p>
     </footer>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/logo/logo_light.png" alt="Logo">
+                </div>
+
+                <div class="footer-info">
+                    <p>&copy; {{ currentYear }} {{ 'FOOTER_COPYRIGHT' | translate }}</p>
+                    <div class="footer-policies">
+                        <a routerLink="/privacy">{{ 'FOOTER_PRIVACY' | translate }}</a>
+                        <a routerLink="/terms">{{ 'FOOTER_TERMS' | translate }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </footer>
 </div>

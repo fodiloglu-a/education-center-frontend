@@ -870,7 +870,16 @@
   "YEARLY_BASIC_PLAN": "Temel Yıllık Plan",
   "YEARLY_PREMIUM_PLAN": "Premium Yıllık Plan",
   "CUSTOM_PLAN": "Özel Plan",
-  "UNKNOWN_PLAN": "Bilinmeyen Plan"
+  "UNKNOWN_PLAN": "Bilinmeyen Plan",
+  "FOOTER_DESCRIPTION": "En kaliteli online eğitimlerle kariyerinizi geliştirin.",
+  "FOOTER_COURSES": "Kurslar",
+  "FOOTER_ABOUT": "Hakkımızda",
+  "FOOTER_CONTACT": "İletişim",
+  "FOOTER_HELP": "Yardım",
+  "FOOTER_COPYRIGHT": "Tüm hakları saklıdır.",
+  "FOOTER_PRIVACY": "Gizlilik",
+  "FOOTER_TERMS": "Şartlar"
+
 
 
 

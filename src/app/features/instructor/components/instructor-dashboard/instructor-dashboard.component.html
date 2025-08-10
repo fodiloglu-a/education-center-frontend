@@ -126,13 +126,7 @@
             <span class="material-icons">person</span>
             {{ 'PROFILE' | translate }}
         </button>
-        <button
-                class="tab-btn"
-                [class.active]="activeTab === 'settings'"
-                (click)="setActiveTab('settings')">
-            <span class="material-icons">settings</span>
-            {{ 'SETTINGS' | translate }}
-        </button>
+
 
         <!-- Subscription-dependent Actions -->
         <div class="subscription-dependent-actions">
@@ -472,12 +466,7 @@
             </div>
         </div>
 
-        <div class="tab-content" *ngIf="activeTab === 'settings'">
-            <div class="settings-section">
-                <h3>{{ 'INSTRUCTOR_SETTINGS' | translate }}</h3>
-                <p class="coming-soon">{{ 'SETTINGS_COMING_SOON' | translate }}</p>
-            </div>
-        </div>
+
     </div>
 
     <div *ngIf="!isLoading && !stats && !errorMessage" class="no-content-found">

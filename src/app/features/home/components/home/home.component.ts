@@ -26,6 +26,7 @@ export class HomeComponent implements OnInit {
   bestSellers: CourseResponse[] = [];
   errorMessage: string | null = null;
 
+
   constructor(private courseService: CourseService) { }
 
   ngOnInit(): void {
