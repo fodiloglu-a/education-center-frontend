@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
 import { Subject, BehaviorSubject, combineLatest, timer } from 'rxjs';
@@ -208,7 +208,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   private readonly searchSubject$ = new BehaviorSubject<string>('');
   private readonly filterSubject$ = new BehaviorSubject<Partial<FilterOptions>>({});
 
-  constructor() {
+  constructor(private router:Router) {
     // Initialize browser-specific features
     if (isPlatformBrowser(this.platformId)) {
       this.initializeBrowserFeatures();
@@ -227,7 +227,11 @@ export class CourseListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
+  onCourseClick(courseId: number): void {
+    console.log('Course clicked:', courseId);
+    this.router.navigate([`/courses/${courseId}`]);
+    // Add analytics tracking here if needed
+  }
   // ========== INITIALIZATION ==========
 
   private initializeComponent(): void {
@@ -583,10 +587,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
     });
   }
 
-  onCourseClick(courseId: number): void {
-    console.log('Course clicked:', courseId);
-    // Add analytics tracking here if needed
-  }
+
 
   clearMessages(): void {
     this.updateState({
