@@ -2,5 +2,5 @@
 // 'ng build --configuration=production' veya 'ng build' komutlarıyla derlendiğinde kullanılır.
 export const environment = {
   production: true, // Üretim ortamı olduğunu belirtir
-  apiUrl: 'https://education-center-backand.onrender.com' // Backend API'sinin üretim URL'si (şimdilik localhost)
+  apiUrl: 'https://education-center-backand.onrender.com/api' // Backend API'sinin üretim URL'si (şimdilik localhost)
 };
