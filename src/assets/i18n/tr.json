@@ -905,12 +905,17 @@
   "REFRESH_ERROR": "Yenileme hatası",
   "RETRY_ERROR": "Yeniden deneme hatası",
   "GO_TO_INS_PROFILE": "Eğitmen profiline git",
-  "APP_TITLE": "Eğitim Merkezi",
-  "FOOTER_COPYRIGHT": "Tüm hakları saklıdır.",
-  "FOOTER_PRIVACY": "Gizlilik Politikası",
-  "FOOTER_TERMS": "Kullanım Şartları",
   "FILTER": {
     "CATEGORY": "Kategori",
     "LEVEL": "Seviye"
-  }
+  },
+  "EXPERT_LEARNER": "Uzman Öğrenci",
+  "ADVANCED_LEARNER": "İleri Düzey Öğrenci",
+  "INTERMEDIATE_LEARNER": "Orta Düzey Öğrenci",
+  "ACTIVE_LEARNER": "Aktif Öğrenci",
+  "BEGINNER_LEARNER": "Başlangıç Düzey Öğrenci",
+  "NEW_LEARNER": "Yeni Öğrenci",
+  "PROFILE_PAGE_TITLE": "Profil Sayfası",
+  "ENROLLED_STUDENTS": "Kayıtlı Öğrenciler",
+  "LEVEL": "Seviye"
 }

@@ -9,7 +9,7 @@
         <h2 class="page-title">{{ 'REVIEWS_AND_NOTES' | translate }}</h2>
         <p class="page-subtitle">
             <ng-container *ngIf="courseId">{{ 'REVIEWS_FOR_COURSE' | translate }}: <strong>{{ courseId }}</strong></ng-container>
-            <ng-container *ngIf="userId">{{ 'REVIEWS_AND_NOTES_BY_USER' | translate }}: <strong>{{ userId }}</strong></ng-container>
+            <ng-container *ngIf="userId">{{ 'REVIEWS_AND_NOTES_BY_USER' | translate }} <strong></strong></ng-container>
             <ng-container *ngIf="!courseId && !userId">{{ 'ALL_REVIEWS_AND_NOTES_SUBTITLE' | translate }}</ng-container>
         </p>
     </div>

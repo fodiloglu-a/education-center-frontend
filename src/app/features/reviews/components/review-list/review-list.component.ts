@@ -84,6 +84,7 @@ export class ReviewListComponent implements OnInit {
 
       this.loadReviewsAndNotesForContext();
     });
+
   }
 
   /**

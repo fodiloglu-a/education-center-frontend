@@ -341,7 +341,6 @@
   "INSTRUCTOR": "Інструктор",
   "ROLE_ADMIN": "Адміністратор",
   "ACCOUNT_ACTIONS": "Hesap Eylemleri",
-  "MY_CERTIFICATES": "Sertifikalarım",
   "MY_REVIEWS": "Yorumlarım",
   "REVIEWS_AND_NOTES": "Відгуки та нотатки",
   "REVIEWS_AND_NOTES_BY_USER": "Відгуки та нотатки користувача",
@@ -935,7 +934,16 @@
   "FILTER": {
     "CATEGORY": "Категорія",
     "LEVEL": "Рівень"
-  }
+  },
+  "EXPERT_LEARNER": "Досвідчений учень",
+  "ADVANCED_LEARNER": "Учень просунутого рівня",
+  "INTERMEDIATE_LEARNER": "Учень середнього рівня",
+  "ACTIVE_LEARNER": "Активний учень",
+  "BEGINNER_LEARNER": "Початківець",
+  "NEW_LEARNER": "Новий учень",
+  "PROFILE_PAGE_TITLE": "Сторінка профілю",
+  "ENROLLED_STUDENTS": "Зареєстровані студенти",
+  "LEVEL": "Рівень"
 
 
 

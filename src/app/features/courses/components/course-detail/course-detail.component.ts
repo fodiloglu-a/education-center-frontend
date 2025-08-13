@@ -9,7 +9,7 @@ import {
   PLATFORM_ID,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import {CommonModule, isPlatformBrowser, NgOptimizedImage} from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -56,7 +56,8 @@ interface ComponentState {
     TranslateModule,
     ReactiveFormsModule,
     LoadingSpinnerComponent,
-    AlertDialogComponent
+    AlertDialogComponent,
+    NgOptimizedImage
   ],
   templateUrl: './course-detail.component.html',
   styleUrl: './course-detail.component.css',
@@ -93,6 +94,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Public getters
+  courseImageUrl: string|null = null;
   get isLoading(): boolean { return this.currentState.isLoading; }
   get errorMessage(): string | null { return this.currentState.errorMessage; }
   get successMessage(): string | null { return this.currentState.successMessage; }
@@ -211,6 +213,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
                 reviews: reviews$
               });
             }),
+
             catchError(error => {
               console.error('Error loading course data:', error);
               this.updateState({
@@ -226,12 +229,16 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
         )
         .subscribe(data => {
           if (data) {
+
+            this.courseImageUrl=data.course.imageUrl;
+            console.log(this.courseImageUrl);
             this.course = data.course;
             this.courseReviews = data.reviews || [];
             this.processUserReview();
             this.cdr.markForCheck();
           }
         });
+
   }
 
   private processUserReview(): void {
@@ -725,12 +732,56 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
   // ========== UTILITY METHODS ==========
 
   getCategoryTranslation(category: CourseCategory): string {
-    return this.translate.instant(`CATEGORY.${category}`);
+    if (!category) return '';
+
+    // Normalizasyon: "Web Development" -> "WEB_DEVELOPMENT"
+    const normalized = category
+        .toString()
+        .trim()
+        .replace(/[-\s]+/g, '_')  // boşluk & tireleri altçizgi yap
+        .replace(/[^\w]/g, '')    // geçersiz karakterleri temizle
+        .toUpperCase();
+
+    const key = `CATEGORY.${normalized}`;
+    const value = this.translate.instant(key);
+
+    // Çeviri bulunursa onu döndür
+    if (value && value !== key) {
+      return value;
+    }
+
+    // Fallback: "WEB_DEVELOPMENT" -> "Web Development"
+    return normalized
+        .toLowerCase()
+        .replace(/_/g, ' ')
+        .replace(/(^|\s)\S/g, m => m.toUpperCase());
   }
 
   getLevelTranslation(level: CourseLevel): string {
-    return this.translate.instant(`LEVEL.${level}`);
+    if (!level) return '';
+
+    // Normalizasyon: "Beginner Level" -> "BEGINNER_LEVEL"
+    const normalized = level
+        .toString()
+        .trim()
+        .replace(/[-\s]+/g, '_')
+        .replace(/[^\w]/g, '')
+        .toUpperCase();
+
+    const key = `LEVEL.${normalized}`;
+    const value = this.translate.instant(key);
+
+    if (value && value !== key) {
+      return value;
+    }
+
+    // Fallback: "BEGINNER_LEVEL" -> "Beginner Level"
+    return normalized
+        .toLowerCase()
+        .replace(/_/g, ' ')
+        .replace(/(^|\s)\S/g, m => m.toUpperCase());
   }
+
 
   formatPrice(price: number): string {
     if (price === 0) {
