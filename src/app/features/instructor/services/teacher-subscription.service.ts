@@ -20,7 +20,7 @@ import {
     providedIn: 'root'
 })
 export class TeacherSubscriptionService {
-    private readonly API_URL = 'http://localhost:8080/api/teacher-subscription';
+    private readonly API_URL = 'https://education-center-backand.onrender.com/api/teacher-subscription';
 
     // Abonelik durumu için subject
     private subscriptionStatusSubject = new BehaviorSubject<TeacherSubscriptionStatus | null>(null);

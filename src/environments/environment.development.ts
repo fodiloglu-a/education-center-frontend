@@ -2,7 +2,7 @@
 // 'ng serve' veya 'ng build' (varsayılan olarak) komutlarıyla derlendiğinde kullanılır.
 // Üretim ortamı için 'environment.ts' dosyasına bakın.
 export const environment = {
-  production: true, // Geliştirme ortamı olduğunu belirtir
+  production: false, // Geliştirme ortamı olduğunu belirtir
   apiUrl: 'https://education-center-backand.onrender.com' // Backend API'sinin geliştirme URL'si
 };
 
