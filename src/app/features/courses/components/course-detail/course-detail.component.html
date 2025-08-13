@@ -89,22 +89,8 @@
                 <!-- Course Meta Information -->
                 <div class="course-meta">
                     <!-- Instructor Info -->
-                    <button
-                            type="button"
-                            class="action-btn ins-profile-btn icon-only"
-                            (click)="goToInsProfile()"
-                            [attr.aria-label]="'GO_TO_INS_PROFILE' | translate"
-                            [attr.title]="'GO_TO_INS_PROFILE' | translate">
 
-                        <!-- User-circle svg icon -->
-                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"/>
-                        </svg>
-
-                        <!-- Screen reader only text (keeps translation without visual label) -->
-                        <span class="sr-only">{{ 'GO_TO_INS_PROFILE' | translate }}</span>
-                    </button>
-                    <div class="meta-item instructor-info">
+                    <div (click)="goToInsProfile()"   class="meta-item instructor-info">
 
                         <div class="meta-icon">
                             <i class="fas fa-user-tie"></i>

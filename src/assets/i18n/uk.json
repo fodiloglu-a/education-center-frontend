@@ -931,7 +931,12 @@
   "APP_TITLE": "Освітній центр",
   "FOOTER_COPYRIGHT": "Всі права захищені.",
   "FOOTER_PRIVACY": "Політика конфіденційності",
-  "FOOTER_TERMS": "Умови використання"
+  "FOOTER_TERMS": "Умови використання",
+  "FILTER": {
+    "CATEGORY": "Категорія",
+    "LEVEL": "Рівень"
+  }
+
 
 
 }

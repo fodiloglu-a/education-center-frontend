@@ -908,10 +908,9 @@
   "APP_TITLE": "Eğitim Merkezi",
   "FOOTER_COPYRIGHT": "Tüm hakları saklıdır.",
   "FOOTER_PRIVACY": "Gizlilik Politikası",
-  "FOOTER_TERMS": "Kullanım Şartları"
-
-
-
-
-
+  "FOOTER_TERMS": "Kullanım Şartları",
+  "FILTER": {
+    "CATEGORY": "Kategori",
+    "LEVEL": "Seviye"
+  }
 }

@@ -599,13 +599,31 @@ export class CourseListComponent implements OnInit, OnDestroy {
   // ========== UTILITY METHODS ==========
 
   getCategoryTranslation(category: CourseCategory): string {
-    try {
-      return this.translate.instant(`CATEGORY.${category}`);
-    } catch (error) {
-      console.warn('Category translation failed:', error);
-      return category;
+    if (!category) return '';
+
+    // "Web Development" -> "WEB_DEVELOPMENT"
+    const normalized = category
+        .toString()
+        .trim()
+        .replace(/[-\s]+/g, '_')  // boşluk & tireleri altçizgi yap
+        .replace(/[^\w]/g, '')    // geçersiz karakterleri temizle
+        .toUpperCase();
+
+    const key = `CATEGORY.${normalized}`;
+    const value = this.translate.instant(key);
+
+    // instant bulunamazsa key döner, o zaman fallback olarak kategoriyi insan okuyabilir şekilde döndür
+    if (value && value !== key) {
+      return value;
     }
+
+    // Fallback: "WEB_DEVELOPMENT" -> "Web Development"
+    return normalized
+        .toLowerCase()
+        .replace(/_/g, ' ')
+        .replace(/(^|\s)\S/g, m => m.toUpperCase());
   }
+
 
   getCategoryOptions(): Array<{value: CourseCategory | 'ALL', label: string}> {
     return [
