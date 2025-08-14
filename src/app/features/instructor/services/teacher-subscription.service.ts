@@ -15,12 +15,14 @@ import {
     TeacherPlanType,
     TeacherSubscriptionStatusType
 } from '../models/instructor.models';
+import {environment} from "../../../../environments/environment";
 
 @Injectable({
     providedIn: 'root'
 })
 export class TeacherSubscriptionService {
-    private readonly API_URL = 'https://education-center-backand.onrender.com/api/teacher-subscription';
+
+    private readonly API_URL =environment.apiUrl+ '/teacher-subscription';
 
     // Abonelik durumu için subject
     private subscriptionStatusSubject = new BehaviorSubject<TeacherSubscriptionStatus | null>(null);

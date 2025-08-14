@@ -24,7 +24,6 @@ import { UserProfile } from '../../../auth/models/auth.models';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import { AuthService } from "../../../../core/services/auth.service";
-import {environment} from "../../../../../environments/environment.development";
 
 
 @Component({
