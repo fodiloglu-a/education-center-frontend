@@ -196,7 +196,7 @@
                             </div>
                             <div class="course-price"
                                  [attr.aria-label]="'Kurs fiyatı: ' + getFormattedPrice(course)">
-                                {{ getFormattedPrice(course) | currency:'USD':'symbol' }}
+                                {{ getFormattedPrice(course) | currency:'UAH':'₴' }}
                             </div>
                             <a [routerLink]="['/courses', course.id]"
                                class="btn-secondary"
