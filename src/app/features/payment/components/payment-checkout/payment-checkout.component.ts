@@ -648,10 +648,12 @@ export class PaymentCheckoutComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (response: PaymentResponse) => {
         console.log('✅ LiqPay payment initiated:', response);
+
         this.isProcessingPayment = false;
 
         if (response.data && response.signature) {
           this.redirectToLiqPay(response);
+
         } else {
           this.setError('Invalid payment response. Please try again.');
         }

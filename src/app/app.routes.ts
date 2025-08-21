@@ -3,12 +3,9 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
-import {HomeComponent} from "./features/home/components/home/home.component";
-import {
-  InstructorProfileComponent
-} from "./features/instructor/components/instructor-profile/instructor-profile.component";
-import {PaymentCheckoutComponent} from "./features/payment/components/payment-checkout/payment-checkout.component";
-
+import { HomeComponent } from "./features/home/components/home/home.component";
+import { InstructorProfileComponent } from "./features/instructor/components/instructor-profile/instructor-profile.component";
+import { PaymentCheckoutComponent } from "./features/payment/components/payment-checkout/payment-checkout.component";
 
 // Uygulamanın ana yönlendirme tanımları.
 export const routes: Routes = [
