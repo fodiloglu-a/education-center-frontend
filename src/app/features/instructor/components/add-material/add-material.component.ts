@@ -218,19 +218,54 @@ export class AddMaterialComponent implements OnInit, OnDestroy {
 
   async copyUrl(url: string): Promise<void> {
     try {
-      await navigator.clipboard.writeText(url);
-      this.showSuccess('URL panoya kopyalandı');
+      // URL'den filename'i çıkar
+      const filename = this.extractFilenameForUrl(url);
+
+      // Filename'i panoya kopyala
+      await navigator.clipboard.writeText(filename);
+      this.showSuccess('Dosya adı panoya kopyalandı');
     } catch (error) {
       // Fallback for older browsers
+      const filename = this.extractFilename(url);
       const textArea = document.createElement('textarea');
-      textArea.value = url;
+      textArea.value = filename;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      this.showSuccess('URL panoya kopyalandı');
+      this.showSuccess('Dosya adı panoya kopyalandı');
     }
   }
+
+// Yardımcı metod: URL'den filename çıkarır
+  private extractFilenameForUrl(url: string): string {
+    try {
+      // URL'i parse et
+      const urlObj = new URL(url);
+
+      // Path'den filename'i al (son slash'ten sonraki kısım)
+      const pathname = urlObj.pathname;
+      const filename = pathname.substring(pathname.lastIndexOf('/') + 1);
+
+      // URL decode et (örneğin %20 -> space)
+      return decodeURIComponent(filename);
+
+    } catch (error) {
+      console.error('URL parse hatası:', error);
+
+      // Fallback: Basit string işlemi
+      const lastSlashIndex = url.lastIndexOf('/');
+      const questionMarkIndex = url.indexOf('?', lastSlashIndex);
+
+      if (lastSlashIndex === -1) return url;
+
+      const start = lastSlashIndex + 1;
+      const end = questionMarkIndex === -1 ? url.length : questionMarkIndex;
+
+      return decodeURIComponent(url.substring(start, end));
+    }
+  }
+
 
   downloadMedia(url: string): void {
     const filename = this.extractFilename(url);

@@ -85,12 +85,11 @@ export class LessonFormComponent implements OnInit {
     this.lessonForm = new FormGroup({
       title: new FormControl('', [Validators.required, Validators.minLength(3)]),
       description: new FormControl('', [Validators.required, Validators.minLength(10)]),
-      videoUrl: new FormControl('', [Validators.required, Validators.pattern('^(https?:\/\/[^\\s\/$.?#].[^\\s]*)$')]), // Video URL'si için regex deseni eklendi
+      videoUrl: new FormControl(''), // ✅ Validation kaldırıldı
       lessonOrder: new FormControl(1, [Validators.required, Validators.min(1)]),
-      // YENİ EKLENEN FORM KONTROLLERİ
       duration: new FormControl(0, [Validators.required, Validators.min(0)]),
       isPreview: new FormControl(false),
-      resources: new FormControl('') // Textarea'dan diziye dönüştürülecek
+      resources: new FormControl('')
     });
   }
 

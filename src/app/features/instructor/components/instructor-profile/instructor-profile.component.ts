@@ -51,6 +51,7 @@ export class InstructorProfileComponent implements OnInit {
 
     this.userService.getInstructorProfile(this.instructorId).subscribe({
       next: (profile) => {
+        console.error('Eğitmen PROFILE:', profile);
         this.instructorProfile = profile;
         this.taughtCourses = profile.taughtCourses || []; // Kursları doğrudan DTO'dan al
         this.loading = false;

@@ -38,16 +38,10 @@
                     <div *ngIf="description?.errors?.['minlength']">{{ 'LESSON_DESCRIPTION_MIN_LENGTH' | translate: '{min: 10}' }}</div>
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="videoUrl">{{ 'VIDEO_URL' | translate }}</label>
-                <input type="url" id="videoUrl" formControlName="videoUrl" class="form-control"
-                       [class.is-invalid]="videoUrl?.invalid && (videoUrl?.dirty || videoUrl?.touched)"
+                <input type="text" id="videoUrl" formControlName="videoUrl" class="form-control"
                        placeholder="{{ 'VIDEO_URL_PLACEHOLDER' | translate }}">
-                <div *ngIf="videoUrl?.invalid && (videoUrl?.dirty || videoUrl?.touched)" class="invalid-feedback">
-                    <div *ngIf="videoUrl?.errors?.['required']">{{ 'VIDEO_URL_REQUIRED' | translate }}</div>
-                    <div *ngIf="videoUrl?.errors?.['pattern']">{{ 'VIDEO_URL_INVALID' | translate }}</div>
-                </div>
             </div>
 
             <div class="form-group">
