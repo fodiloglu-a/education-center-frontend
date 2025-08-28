@@ -210,24 +210,6 @@
                         <span class="item-value discount-value">-{{ formatCurrency(getDiscountAmount()) }}</span>
                     </div>
 
-                    <!-- Subtotal -->
-                    <div class="summary-item subtotal-item">
-                        <span class="item-label">{{ 'SUBTOTAL' | translate }}</span>
-                        <span class="item-value">{{ formatCurrency(getSubtotal()) }}</span>
-                    </div>
-
-                    <!-- Tax -->
-                    <div class="summary-item tax-item">
-                        <span class="item-label">
-                            {{ 'TAX' | translate }} ({{ getTaxPercentage() }}%)
-                            <i class="fas fa-info-circle tax-info"
-                               [title]="'TAX_INFO' | translate"
-                               role="button"
-                               tabindex="0"></i>
-                        </span>
-                        <span class="item-value">{{ formatCurrency(getTaxAmount()) }}</span>
-                    </div>
-
                     <!-- Divider -->
                     <div class="summary-divider"></div>
 

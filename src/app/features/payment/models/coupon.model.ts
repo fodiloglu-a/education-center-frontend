@@ -109,9 +109,8 @@ export interface CheckoutSummary {
     originalPrice: number;
     coupon?: Coupon;
     discountAmount: number;
-    subtotal: number;
-    taxRate: number;
-    taxAmount: number;
+
+
     finalPrice: number;
     currency: string;
     userId: number;
