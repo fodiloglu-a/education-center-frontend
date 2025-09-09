@@ -3,6 +3,6 @@
 // Üretim ortamı için 'environment.ts' dosyasına bakın.
 export const environment = {
   production: true, // Geliştirme ortamı olduğunu belirtir
-  apiUrl: 'http://localhost:8080//api' // Backend API'sinin geliştirme URL'si
+  apiUrl: 'https://education-center-backand.onrender.com/api' // Backend API'sinin geliştirme URL'si
 };
 
