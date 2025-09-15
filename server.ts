@@ -17,14 +17,16 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Serve sitemap.xml and robots.txt explicitly before other routes.
-  // This is the CRITICAL change to fix the redirection issue.
-  server.get('/sitemap.xml', (req, res) => {
-    res.sendFile(join(browserDistFolder, 'sitemap.xml'));
+  // Serve robots.txt from the root of the site.
+  // We need to serve this from the dist/browser/assets folder as per angular.json.
+  server.get('/robots.txt', (req, res) => {
+    res.sendFile(join(browserDistFolder, 'assets', 'robots.txt'));
   });
 
-  server.get('/robots.txt', (req, res) => {
-    res.sendFile(join(browserDistFolder, 'robots.txt'));
+  // Serve sitemap.xml from the root of the site.
+  // We need to serve this from the dist/browser/assets folder as per angular.json.
+  server.get('/sitemap.xml', (req, res) => {
+    res.sendFile(join(browserDistFolder, 'assets', 'sitemap.xml'));
   });
 
   // Example Express Rest API endpoints
