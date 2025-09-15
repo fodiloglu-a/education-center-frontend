@@ -18,7 +18,7 @@ export function app(): express.Express {
   server.set('views', browserDistFolder);
 
   // Serve sitemap.xml and robots.txt explicitly before other routes.
-  // This ensures that these files are not handled by the Angular SSR engine.
+  // This is the CRITICAL change to fix the redirection issue.
   server.get('/sitemap.xml', (req, res) => {
     res.sendFile(join(browserDistFolder, 'sitemap.xml'));
   });
