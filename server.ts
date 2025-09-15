@@ -17,16 +17,13 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Serve robots.txt from the root of the site.
-  // We need to serve this from the dist/browser/assets folder as per angular.json.
-  server.get('/robots.txt', (req, res) => {
-    res.sendFile(join(browserDistFolder, 'assets', 'robots.txt'));
+  // Serve sitemap.xml and robots.txt explicitly from the root of the browser dist folder.
+  server.get('/sitemap.xml', (req, res) => {
+    res.sendFile(join(browserDistFolder, 'sitemap.xml'));
   });
 
-  // Serve sitemap.xml from the root of the site.
-  // We need to serve this from the dist/browser/assets folder as per angular.json.
-  server.get('/sitemap.xml', (req, res) => {
-    res.sendFile(join(browserDistFolder, 'assets', 'sitemap.xml'));
+  server.get('/robots.txt', (req, res) => {
+    res.sendFile(join(browserDistFolder, 'robots.txt'));
   });
 
   // Example Express Rest API endpoints
