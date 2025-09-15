@@ -17,10 +17,11 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // ===== SEO ROUTE'LARI =====
+  // ===== SEO ROUTE'LARI (EN ÜSTTE) =====
 
   // robots.txt route'u
   server.get('/robots.txt', (req, res) => {
+    console.log('🤖 Robots.txt route çağrıldı'); // Debug log
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 saat cache
 
@@ -61,6 +62,7 @@ Crawl-delay: 1`;
 
   // sitemap.xml route'u
   server.get('/sitemap.xml', (req, res) => {
+    console.log('🗺️ Sitemap.xml route çağrıldı'); // Debug log
     const baseUrl = 'https://uademi.com';
     const today = new Date().toISOString().split('T')[0];
 
@@ -94,29 +96,37 @@ Crawl-delay: 1`;
 
     res.setHeader('Content-Type', 'application/xml');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 saat cache
+    console.log('✅ Sitemap XML response gönderildi'); // Debug log
     res.send(sitemap);
   });
 
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
 
-  // Serve static files from /browser
-  server.get('*.*', express.static(browserDistFolder, {
-    maxAge: '1y',
-    setHeaders: (res, path) => {
-      // Security headers
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      res.setHeader('X-Frame-Options', 'DENY');
-      res.setHeader('X-XSS-Protection', '1; mode=block');
-
-      // Cache control for different file types
-      if (path.endsWith('.js') || path.endsWith('.css')) {
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-      } else if (path.endsWith('.html')) {
-        res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-      }
+  // Serve static files from /browser (sitemap.xml hariç)
+  server.get('*.*', (req, res, next) => {
+    // Sitemap.xml'i static handler'dan hariç tut
+    if (req.path === '/sitemap.xml') {
+      return next();
     }
-  }));
+
+    express.static(browserDistFolder, {
+      maxAge: '1y',
+      setHeaders: (res, path) => {
+        // Security headers
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('X-Frame-Options', 'DENY');
+        res.setHeader('X-XSS-Protection', '1; mode=block');
+
+        // Cache control for different file types
+        if (path.endsWith('.js') || path.endsWith('.css')) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (path.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+        }
+      }
+    })(req, res, next);
+  });
 
   // All regular routes use the Angular engine
   server.get('*', (req, res, next) => {
