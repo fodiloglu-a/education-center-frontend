@@ -17,9 +17,11 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // ===== 1. SITEMAP.XML - EN ÖNCELİKLİ =====
-  server.get('/sitemap.xml', (req, res) => {
-    console.log('Sitemap route çağrıldı');
+  // ===== SEO ROUTES - MUTLAKA EN ÜSTTE =====
+
+  // Sitemap.xml - Angular routing'den ÖNCE
+  server.get('/sitemap.xml', function(req, res) {
+    console.log('Sitemap.xml route çağrıldı - Express');
 
     const baseUrl = 'https://uademi.com';
     const today = new Date().toISOString().split('T')[0];
@@ -35,7 +37,7 @@ export function app(): express.Express {
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
-    staticUrls.forEach(url => {
+    staticUrls.forEach(function(url) {
       sitemap += `
   <url>
     <loc>${url.loc}</loc>
@@ -50,14 +52,18 @@ export function app(): express.Express {
 
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.setHeader('X-Robots-Tag', 'noindex');
+
+    console.log('Sitemap XML gönderildi');
     res.send(sitemap);
+    return;
   });
 
-  // ===== 2. ROBOTS.TXT =====
-  server.get('/robots.txt', (req, res) => {
-    console.log('Robots.txt route çağrıldı');
+  // Robots.txt
+  server.get('/robots.txt', function(req, res) {
+    console.log('Robots.txt route çağrıldı - Express');
 
-    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=86400');
 
     const robotsTxt = `User-agent: *
@@ -92,30 +98,48 @@ Sitemap: https://uademi.com/sitemap.xml
 # Crawl delay (optional - helps prevent server overload)
 Crawl-delay: 1`;
 
+    console.log('Robots.txt gönderildi');
     res.send(robotsTxt);
+    return;
   });
 
-  // ===== 3. STATIC FILES =====
-  server.use(express.static(browserDistFolder, {
-    maxAge: '1y',
-    setHeaders: (res, path) => {
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      res.setHeader('X-Frame-Options', 'DENY');
-      res.setHeader('X-XSS-Protection', '1; mode=block');
-
-      if (path.endsWith('.js') || path.endsWith('.css')) {
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-      } else if (path.endsWith('.html')) {
-        res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-      }
+  // ===== STATIC FILES - SPESİFİK KONTROL =====
+  server.get('*.*', function(req, res, next) {
+    // SEO dosyalarını kesinlikle Angular'a yönlendirme
+    if (req.path === '/sitemap.xml' || req.path === '/robots.txt') {
+      console.log(`SEO dosyası static handler'a düştü: ${req.path}`);
+      return next();
     }
-  }));
 
-  // ===== 4. ANGULAR ROUTES - EN SONDA =====
-  server.get('*', (req, res, next) => {
+    // Diğer static dosyalar için normal servis
+    express.static(browserDistFolder, {
+      maxAge: '1y',
+      setHeaders: function(res, path) {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('X-Frame-Options', 'DENY');
+        res.setHeader('X-XSS-Protection', '1; mode=block');
+
+        if (path.endsWith('.js') || path.endsWith('.css')) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else if (path.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+        }
+      }
+    })(req, res, next);
+  });
+
+  // ===== ANGULAR ROUTES - EN SONDA =====
+  server.get('*', function(req, res, next) {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
-    console.log(`Angular route: ${originalUrl}`);
+    console.log(`Angular route çağrıldı: ${originalUrl}`);
+
+    // SEO dosyaları buraya düşmemeli - eğer düşerse hata ver
+    if (originalUrl === '/sitemap.xml' || originalUrl === '/robots.txt') {
+      console.error(`HATA: ${originalUrl} Angular route'una düştü!`);
+      res.status(500).send('SEO route error');
+      return;
+    }
 
     const userAgent = headers['user-agent'] || '';
     const isBot = /googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|linkedinbot|whatsapp|telegrambot/i.test(userAgent);
@@ -131,7 +155,7 @@ Crawl-delay: 1`;
             { provide: 'IS_BOT', useValue: isBot }
           ],
         })
-        .then((html) => {
+        .then(function(html) {
           res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
           if (isBot) {
@@ -147,7 +171,7 @@ Crawl-delay: 1`;
 
           res.send(html);
         })
-        .catch((err) => {
+        .catch(function(err) {
           console.error('Angular SSR hatası:', err);
           next(err);
         });
@@ -160,10 +184,11 @@ function run(): void {
   const port = process.env['PORT'] || 4000;
 
   const server = app();
-  server.listen(port, () => {
-    console.log(`Server başlatıldı: http://localhost:${port}`);
-    console.log(`Robots.txt: http://localhost:${port}/robots.txt`);
-    console.log(`Sitemap.xml: http://localhost:${port}/sitemap.xml`);
+  server.listen(port, function() {
+    console.log(`🚀 Server çalışıyor: http://localhost:${port}`);
+    console.log(`📄 Robots test: http://localhost:${port}/robots.txt`);
+    console.log(`🗺️ Sitemap test: http://localhost:${port}/sitemap.xml`);
+    console.log(`📋 Route sırası: SEO → Static → Angular`);
   });
 }
 
