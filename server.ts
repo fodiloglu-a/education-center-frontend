@@ -17,132 +17,26 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // ===== SEO ROUTES - MUTLAKA EN ÜSTTE =====
-
-  // Sitemap.xml - Angular routing'den ÖNCE
-  server.get('/sitemap.xml', function(req, res) {
-    console.log('Sitemap.xml route çağrıldı - Express');
-
-    const baseUrl = 'https://uademi.com';
-    const today = new Date().toISOString().split('T')[0];
-
-    const staticUrls = [
-      { loc: baseUrl, priority: '1.0', changefreq: 'daily' },
-      { loc: `${baseUrl}/courses`, priority: '0.9', changefreq: 'daily' },
-      { loc: `${baseUrl}/reviews`, priority: '0.7', changefreq: 'weekly' },
-      { loc: `${baseUrl}/auth/login`, priority: '0.6', changefreq: 'monthly' },
-      { loc: `${baseUrl}/auth/register`, priority: '0.6', changefreq: 'monthly' }
-    ];
-
-    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
-
-    staticUrls.forEach(function(url) {
-      sitemap += `
-  <url>
-    <loc>${url.loc}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${url.changefreq}</changefreq>
-    <priority>${url.priority}</priority>
-  </url>`;
-    });
-
-    sitemap += `
-</urlset>`;
-
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.setHeader('X-Robots-Tag', 'noindex');
-
-    console.log('Sitemap XML gönderildi');
-    res.send(sitemap);
-    return;
+  // Serve sitemap.xml and robots.txt explicitly before other routes.
+  // This ensures that these files are not handled by the Angular SSR engine.
+  server.get('/sitemap.xml', (req, res) => {
+    res.sendFile(join(browserDistFolder, 'sitemap.xml'));
   });
 
-  // Robots.txt
-  server.get('/robots.txt', function(req, res) {
-    console.log('Robots.txt route çağrıldı - Express');
-
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-
-    const robotsTxt = `User-agent: *
-Allow: /
-
-# SEO-friendly paths
-Allow: /courses
-Allow: /reviews
-Allow: /auth/login
-Allow: /auth/register
-
-# Protected areas - discourage indexing
-Disallow: /admin
-Disallow: /instructor
-Disallow: /profile
-Disallow: /certificates
-
-# Static assets
-Allow: /assets/
-Allow: /*.css
-Allow: /*.js
-Allow: /*.jpg
-Allow: /*.jpeg
-Allow: /*.png
-Allow: /*.gif
-Allow: /*.svg
-Allow: /*.webp
-
-# Sitemap location
-Sitemap: https://uademi.com/sitemap.xml
-
-# Crawl delay (optional - helps prevent server overload)
-Crawl-delay: 1`;
-
-    console.log('Robots.txt gönderildi');
-    res.send(robotsTxt);
-    return;
+  server.get('/robots.txt', (req, res) => {
+    res.sendFile(join(browserDistFolder, 'robots.txt'));
   });
 
-  // ===== STATIC FILES - SPESİFİK KONTROL =====
-  server.get('*.*', function(req, res, next) {
-    // SEO dosyalarını kesinlikle Angular'a yönlendirme
-    if (req.path === '/sitemap.xml' || req.path === '/robots.txt') {
-      console.log(`SEO dosyası static handler'a düştü: ${req.path}`);
-      return next();
-    }
+  // Example Express Rest API endpoints
+  // server.get('/api/**', (req, res) => { });
+  // Serve static files from /browser
+  server.get('*.*', express.static(browserDistFolder, {
+    maxAge: '1y'
+  }));
 
-    // Diğer static dosyalar için normal servis
-    express.static(browserDistFolder, {
-      maxAge: '1y',
-      setHeaders: function(res, path) {
-        res.setHeader('X-Content-Type-Options', 'nosniff');
-        res.setHeader('X-Frame-Options', 'DENY');
-        res.setHeader('X-XSS-Protection', '1; mode=block');
-
-        if (path.endsWith('.js') || path.endsWith('.css')) {
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        } else if (path.endsWith('.html')) {
-          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-        }
-      }
-    })(req, res, next);
-  });
-
-  // ===== ANGULAR ROUTES - EN SONDA =====
-  server.get('*', function(req, res, next) {
+  // All regular routes use the Angular engine
+  server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
-
-    console.log(`Angular route çağrıldı: ${originalUrl}`);
-
-    // SEO dosyaları buraya düşmemeli - eğer düşerse hata ver
-    if (originalUrl === '/sitemap.xml' || originalUrl === '/robots.txt') {
-      console.error(`HATA: ${originalUrl} Angular route'una düştü!`);
-      res.status(500).send('SEO route error');
-      return;
-    }
-
-    const userAgent = headers['user-agent'] || '';
-    const isBot = /googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|linkedinbot|whatsapp|telegrambot/i.test(userAgent);
 
     commonEngine
         .render({
@@ -150,31 +44,10 @@ Crawl-delay: 1`;
           documentFilePath: indexHtml,
           url: `${protocol}://${headers.host}${originalUrl}`,
           publicPath: browserDistFolder,
-          providers: [
-            { provide: APP_BASE_HREF, useValue: baseUrl },
-            { provide: 'IS_BOT', useValue: isBot }
-          ],
+          providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
         })
-        .then(function(html) {
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-
-          if (isBot) {
-            res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=7200');
-          } else {
-            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300');
-          }
-
-          res.setHeader('X-Content-Type-Options', 'nosniff');
-          res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-          res.setHeader('X-XSS-Protection', '1; mode=block');
-          res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-          res.send(html);
-        })
-        .catch(function(err) {
-          console.error('Angular SSR hatası:', err);
-          next(err);
-        });
+        .then((html) => res.send(html))
+        .catch((err) => next(err));
   });
 
   return server;
@@ -183,13 +56,19 @@ Crawl-delay: 1`;
 function run(): void {
   const port = process.env['PORT'] || 4000;
 
+  // Start up the Node server
   const server = app();
-  server.listen(port, function() {
-    console.log(`🚀 Server çalışıyor: http://localhost:${port}`);
-    console.log(`📄 Robots test: http://localhost:${port}/robots.txt`);
-    console.log(`🗺️ Sitemap test: http://localhost:${port}/sitemap.xml`);
-    console.log(`📋 Route sırası: SEO → Static → Angular`);
+  server.listen(port, () => {
+    console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
 
-run();
+// Webpack will replace 'require' with '__webpack_require__'
+// '__non_webpack_require__' is a proxy to Node's original 'require'.
+// The below code is to ensure that the server is run only when not requiring the bundle.
+declare const __non_webpack_require__: NodeRequire;
+const mainModule = __non_webpack_require__.main;
+const moduleFilename = mainModule && !mainModule.filename.includes('://') ? mainModule.filename : '__filename';
+if (moduleFilename === __filename) {
+  run();
+}

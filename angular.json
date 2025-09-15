@@ -47,8 +47,7 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/robots.txt"
+              "src/assets"
             ],
             "styles": [
               "src/custom-theme.scss",
@@ -113,8 +112,7 @@
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets",
-              "src/robots.txt"
+              "src/assets"
             ],
             "styles": [
               "src/styles.css"
