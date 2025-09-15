@@ -1,5 +1,3 @@
-// app.routes.ts
-
 import { Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
@@ -7,7 +5,6 @@ import { HomeComponent } from "./features/home/components/home/home.component";
 import { InstructorProfileComponent } from "./features/instructor/components/instructor-profile/instructor-profile.component";
 import { PaymentCheckoutComponent } from "./features/payment/components/payment-checkout/payment-checkout.component";
 
-// Uygulamanın ana yönlendirme tanımları.
 export const routes: Routes = [
   {
     path: '',
@@ -58,15 +55,15 @@ export const routes: Routes = [
     data: { roles: ['ROLE_ADMIN'] },
     title: 'Yönetici Paneli'
   },
-  // CHECKOUT ROUTE'U BURAYA TAŞIYIN:
   {
     path: 'checkout/:courseId',
     component: PaymentCheckoutComponent,
     title: 'Checkout'
   },
-  // WILDCARD EN SONDA OLMALI:
+  // WILDCARD - pathMatch: 'full' ekledik
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: '',
+    pathMatch: 'full'
   }
 ];
