@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /
+
+# SEO-friendly paths
+Allow: /courses
+Allow: /reviews
+Allow: /auth/login
+Allow: /auth/register
+
+# Protected areas - discourage indexing
+Disallow: /admin
+Disallow: /instructor
+Disallow: /profile
+Disallow: /certificates
+
+# Static assets
+Allow: /assets/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.png
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+# Sitemap location
+Sitemap: https://uademi.com/sitemap.xml
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1
