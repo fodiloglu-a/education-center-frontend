@@ -17,7 +17,7 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // ===== SEO ROUTE'LARI (EN ÜSTTE) =====
+  // ===== SEO ROUTE'LARI (EN ÜSTTE - ÖNCELİK) =====
 
   // robots.txt route'u
   server.get('/robots.txt', (req, res) => {
@@ -60,9 +60,10 @@ Crawl-delay: 1`;
     res.send(robotsTxt);
   });
 
-  // sitemap.xml route'u
+  // sitemap.xml route'u - MUTLAKA static handler'dan ÖNCE olmalı
   server.get('/sitemap.xml', (req, res) => {
     console.log('🗺️ Sitemap.xml route çağrıldı'); // Debug log
+
     const baseUrl = 'https://uademi.com';
     const today = new Date().toISOString().split('T')[0];
 
@@ -94,8 +95,11 @@ Crawl-delay: 1`;
     sitemap += `
 </urlset>`;
 
-    res.setHeader('Content-Type', 'application/xml');
+    // DOĞRU HEADERS SET ET
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 saat cache
+    res.setHeader('X-Robots-Tag', 'noindex'); // Sitemap'in kendisi index edilmesin
+
     console.log('✅ Sitemap XML response gönderildi'); // Debug log
     res.send(sitemap);
   });
@@ -103,34 +107,37 @@ Crawl-delay: 1`;
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
 
-  // Serve static files from /browser (sitemap.xml hariç)
-  server.get('*.*', (req, res, next) => {
-    // Sitemap.xml'i static handler'dan hariç tut
-    if (req.path === '/sitemap.xml') {
-      return next();
-    }
+  // Serve static files from /browser - SPECİFİK DOSYA TİPLERİ İÇİN
+  server.get(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|webm|mp4|pdf)$/i, express.static(browserDistFolder, {
+    maxAge: '1y',
+    setHeaders: (res, path) => {
+      // Security headers
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('X-Frame-Options', 'DENY');
+      res.setHeader('X-XSS-Protection', '1; mode=block');
 
-    express.static(browserDistFolder, {
-      maxAge: '1y',
-      setHeaders: (res, path) => {
-        // Security headers
-        res.setHeader('X-Content-Type-Options', 'nosniff');
-        res.setHeader('X-Frame-Options', 'DENY');
-        res.setHeader('X-XSS-Protection', '1; mode=block');
-
-        // Cache control for different file types
-        if (path.endsWith('.js') || path.endsWith('.css')) {
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        } else if (path.endsWith('.html')) {
-          res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
-        }
+      // Cache control for different file types
+      if (path.endsWith('.js') || path.endsWith('.css')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
       }
-    })(req, res, next);
-  });
+    }
+  }));
 
-  // All regular routes use the Angular engine
+  // All regular routes use the Angular engine - EN SONDA
   server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
+
+    // Debug log - hangi route'a geldiğini göster
+    console.log(`📍 Angular route çağrıldı: ${originalUrl}`);
+
+    // Eğer /sitemap.xml ise bu noktaya hiç gelmemesi gerekir
+    if (originalUrl === '/sitemap.xml') {
+      console.error('❌ HATA: sitemap.xml Angular route\'una düştü!');
+      res.status(404).send('Sitemap not found');
+      return;
+    }
 
     // SEO optimizations
     const userAgent = headers['user-agent'] || '';
@@ -167,7 +174,10 @@ Crawl-delay: 1`;
 
           res.send(html);
         })
-        .catch((err) => next(err));
+        .catch((err) => {
+          console.error('❌ Angular SSR hatası:', err);
+          next(err);
+        });
   });
 
   return server;
@@ -182,6 +192,7 @@ function run(): void {
     console.log(`🚀 Node Express server listening on http://localhost:${port}`);
     console.log(`📄 Robots.txt: http://localhost:${port}/robots.txt`);
     console.log(`🗺️  Sitemap.xml: http://localhost:${port}/sitemap.xml`);
+    console.log(`📋 Route Sırası: SEO Routes → Static Files → Angular Routes`);
   });
 }
 
