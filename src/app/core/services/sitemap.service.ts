@@ -14,7 +14,7 @@ export interface SitemapUrl {
 })
 export class SitemapService {
 
-    private baseUrl = 'https://uademi.com';
+    private baseUrl = 'https://acadenon.com/';
 
     constructor() { }
 
