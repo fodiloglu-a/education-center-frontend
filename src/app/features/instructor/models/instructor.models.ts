@@ -153,9 +153,9 @@ export interface TeacherSubscriptionCallbackResponse {
 
 // Eğitmen Abonelik Plan Tipleri
 export enum TeacherPlanType {
-  MONTHLY_BASIC = 'MONTHLY_BASIC',
+  PROFESSIONAL = 'PROFESSIONAL',
   MONTHLY_PREMIUM = 'MONTHLY_PREMIUM',
-  YEARLY_BASIC = 'YEARLY_BASIC',
+  BASIC = 'BASIC',
   YEARLY_PREMIUM = 'YEARLY_PREMIUM',
   CUSTOM = 'CUSTOM'
 }

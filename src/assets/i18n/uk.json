@@ -944,5 +944,118 @@
   "PROFILE_PAGE_TITLE": "Сторінка профілю",
   "ENROLLED_STUDENTS": "Зареєстровані студенти",
   "LEVEL": "Рівень",
-  "REVIEWS_IN_TOTAL": "Всього відгуків"
+  "REVIEWS_IN_TOTAL": "Всього відгуків",
+
+  "BECOME_INSTRUCTOR": "Стати викладачем",
+  "INSTRUCTOR_SUBSCRIPTION_DESCRIPTION": "Оберіть план підписки, який найкраще відповідає вашим потребам і почніть навчати тисячі студентів",
+
+  "SELECT_PLAN": "Оберіть план",
+  "CHECKOUT": "Оформлення",
+  "PAYMENT": "Оплата",
+
+  "LOADING_SUBSCRIPTION_DATA": "Завантаження даних підписки...",
+
+  "ALREADY_SUBSCRIBED_TITLE": "Ви вже маєте підписку",
+  "ALREADY_SUBSCRIBED_MESSAGE": "Ви вже є активним викладачем на нашій платформі. Перейдіть до панелі керування, щоб керувати своїми курсами.",
+  "GO_TO_DASHBOARD": "Перейти до панелі",
+  "ALREADY_SUBSCRIBED_ERROR": "У вас вже є активна підписка викладача",
+
+  "BASIC_PLAN": "Базовий",
+  "BASIC_PLAN_DESC": "Ідеально підходить для початківців",
+  "PROFESSIONAL_PLAN": "Професійний",
+  "PROFESSIONAL_PLAN_DESC": "Найпопулярніший вибір для активних викладачів",
+  "PREMIUM_PLAN": "Преміум",
+  "PREMIUM_PLAN_DESC": "Найкращі можливості для професіоналів",
+
+  "MOST_POPULAR": "Найпопулярніший",
+  "RECOMMENDED": "Рекомендований",
+
+  "MONTHLY": "місяць",
+  "SAVE": "Економія",
+  "PER_COURSE": "за курс",
+
+  "FEATURE_1_COURSE": "1 курс",
+  "FEATURE_BASIC_ANALYTICS": "Базова аналітика",
+  "FEATURE_STANDARD_SUPPORT": "Стандартна підтримка",
+  "FEATURE_COURSE_MANAGEMENT": "Управління курсом",
+
+  "FEATURE_3_COURSES": "До 3 курсів",
+  "FEATURE_ADVANCED_ANALYTICS": "Розширена аналітика",
+  "FEATURE_PRIORITY_SUPPORT": "Пріоритетна підтримка",
+  "FEATURE_CUSTOM_CERTIFICATES": "Власні сертифікати",
+  "FEATURE_MARKETING_TOOLS": "Інструменти маркетингу",
+
+  "FEATURE_5_COURSES": "До 5 курсів",
+  "FEATURE_PREMIUM_ANALYTICS": "Преміум аналітика",
+  "FEATURE_DEDICATED_SUPPORT": "Персональна підтримка 24/7",
+  "FEATURE_CUSTOM_BRANDING": "Власний брендинг",
+  "FEATURE_ADVANCED_MARKETING": "Розширені маркетингові інструменти",
+  "FEATURE_API_ACCESS": "Доступ до API",
+
+  "SELECT_PLAN": "Обрати план",
+  "SELECTED": "Обрано",
+  "SELECTING": "Обираю...",
+
+  "AGREE_TO_TERMS": "Я погоджуюсь з",
+  "TERMS_OF_SERVICE": "Умовами використання",
+  "AND": "та",
+  "PRIVACY_POLICY": "Політикою конфіденційності",
+  "TERMS_AGREEMENT_REQUIRED": "Необхідно прийняти умови використання",
+
+  "PROCEED_TO_CHECKOUT": "Перейти до оформлення",
+  "PLEASE_COMPLETE_FORM": "Будь ласка, заповніть всі обов'язкові поля",
+  "LOADING": "Завантаження...",
+
+  "ORDER_SUMMARY": "Підсумок замовлення",
+  "PLAN": "План",
+  "DURATION": "Тривалість",
+  "CUSTOMER": "Клієнт",
+  "EMAIL": "Електронна пошта",
+  "PLAN_PRICE": "Вартість плану",
+  "TOTAL": "Разом",
+  "NO_VAT_INSTRUCTOR_SUBSCRIPTION": "ПДВ не включено для підписки викладача",
+
+  "BACK_TO_PLANS": "Повернутися до планів",
+  "CONFIRM_PAYMENT": "Підтвердити оплату",
+  "PROCESSING": "Обробка...",
+  "CHECKOUT_DATA_MISSING": "Відсутні дані оформлення замовлення",
+  "CHECKOUT_FAILED": "Помилка оформлення замовлення",
+
+  "PAYMENT_PROCESSING": "Обробка платежу",
+  "PAYMENT_REDIRECT_MESSAGE": "Зачекайте, будь ласка. Ви будете перенаправлені на захищену сторінку оплати...",
+  "PAYMENT_HELP_MESSAGE": "Виникли проблеми? Поверніться назад і спробуйте ще раз.",
+  "BACK_TO_CHECKOUT": "Повернутися до оформлення",
+  "PAYMENT_INITIATION_FAILED": "Не вдалося ініціювати платіж",
+  "PAYMENT_FORM_ERROR": "Помилка форми оплати",
+
+  "INSTRUCTOR_BENEFITS_TITLE": "Переваги викладача",
+
+  "UNLIMITED_COURSES": "Необмежені курси",
+  "UNLIMITED_COURSES_DESC": "Завантажуйте стільки курсів, скільки дозволяє ваш план",
+
+  "ANALYTICS_REPORTS": "Аналітика та звіти",
+  "ANALYTICS_REPORTS_DESC": "Відстежуйте прогрес студентів і продуктивність курсів",
+
+  "PRIORITY_SUPPORT": "Пріоритетна підтримка",
+  "PRIORITY_SUPPORT_DESC": "Отримайте швидку допомогу від нашої команди підтримки",
+
+  "CUSTOM_CERTIFICATES": "Власні сертифікати",
+  "CUSTOM_CERTIFICATES_DESC": "Створюйте персоналізовані сертифікати для своїх студентів",
+
+  "FREQUENTLY_ASKED_QUESTIONS": "Часті запитання",
+
+  "FAQ_SUBSCRIPTION_CANCEL": "Чи можу я скасувати підписку в будь-який час?",
+  "FAQ_SUBSCRIPTION_CANCEL_ANSWER": "Так, ви можете скасувати свою підписку в будь-який час. Ваш доступ залишиться активним до кінця оплаченого періоду.",
+
+  "FAQ_PLAN_CHANGE": "Чи можу я змінити свій план пізніше?",
+  "FAQ_PLAN_CHANGE_ANSWER": "Так, ви можете оновити або понизити свій план в будь-який час. Зміни відобразяться в наступному платіжному циклі.",
+
+  "FAQ_PAYMENT_METHODS": "Які методи оплати ви приймаєте?",
+  "FAQ_PAYMENT_METHODS_ANSWER": "Ми приймаємо кредитні/дебетові картки та онлайн-платежі через LiqPay. Всі транзакції захищені та безпечні.",
+
+  "USER_ID_NOT_FOUND": "Ідентифікатор користувача не знайдено",
+  "PLANS_LOAD_FAILED": "Не вдалося завантажити плани підписки",
+  "UAH_PER_COURSE": "грн за курс"
+
 }
+

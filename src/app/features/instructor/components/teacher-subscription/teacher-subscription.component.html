@@ -1,5 +1,4 @@
 <!-- teacher-subscription.component.html -->
-
 <div class="teacher-subscription-container">
     <!-- Header Section -->
     <div class="subscription-header">
@@ -67,7 +66,7 @@
                         (dismissed)="clearMessages()">
                 </app-alert-dialog>
 
-                <!-- Plans Grid -->
+                <!-- Plans Grid - 3 PAKET -->
                 <div class="plans-grid" *ngIf="planCards.length > 0">
                     <div
                             *ngFor="let planCard of planCards"
@@ -76,11 +75,19 @@
 
                         <!-- Popular Badge -->
                         <div *ngIf="planCard.plan.popular" class="plan-badge popular">
+                            <br>
+                            <br>
+                            <br>
+                            <i class="fas fa-star"></i>
                             {{ 'MOST_POPULAR' | translate }}
                         </div>
 
                         <!-- Recommended Badge -->
                         <div *ngIf="planCard.plan.recommended" class="plan-badge recommended">
+                            <br>
+                            <br>
+                            <br>
+                            <i class="fas fa-crown"></i>
                             {{ 'RECOMMENDED' | translate }}
                         </div>
 
@@ -90,79 +97,49 @@
                         </div>
 
                         <div class="plan-pricing">
-                            <span class="plan-price">{{ formatPrice(planCard.plan.price) }}</span>
-                            <span class="plan-duration">/ {{ planCard.plan.duration }}</span>
+                            <div class="price-wrapper">
+                                <span class="plan-price">{{ formatPrice(planCard.plan.price) }}</span>
+                                <span class="plan-duration">/ {{ planCard.plan.duration }}</span>
+                            </div>
 
-                            <!-- Savings for yearly plans -->
+                            <!-- Savings for multi-course plans -->
                             <div *ngIf="planCard.plan.savings" class="plan-savings">
+                                <i class="fas fa-tag"></i>
                                 {{ 'SAVE' | translate }} {{ formatSavings(planCard.plan.savings) }}
                             </div>
-                        </div>
 
-                        <!-- Custom Plan Price Range -->
-                        <div *ngIf="planCard.plan.type === PlanType.CUSTOM" class="custom-price-range">
-                            <span>{{ formatPrice(planCard.plan.minPrice!) }} - {{ formatPrice(planCard.plan.maxPrice!) }}</span>
+                            <!-- Price per course info -->
+                            <div *ngIf="planCard.plan.savings" class="price-per-course">
+                                ~{{ formatPrice(Math.round(planCard.plan.price / (planCard.plan.savings > 900 ? 5 : 3))) }} {{ 'PER_COURSE' | translate }}
+                            </div>
                         </div>
 
                         <div class="plan-features">
                             <ul>
                                 <li *ngFor="let feature of planCard.plan.features">
-                                    <i class="fas fa-check"></i>
-                                    {{ feature }}
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>{{ feature }}</span>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="plan-footer">
                             <button
+                                    type="button"
                                     [class]="'btn ' + planCard.buttonClass"
                                     [disabled]="planCard.isLoading"
                                     (click)="$event.stopPropagation(); selectPlan(planCard)">
 
-                                <span *ngIf="!planCard.isLoading">{{ planCard.buttonText }}</span>
+                                <span *ngIf="!planCard.isLoading && !planCard.isSelected">
+                                    {{ 'SELECT_PLAN' | translate }}
+                                </span>
+                                <span *ngIf="!planCard.isLoading && planCard.isSelected">
+                                    <i class="fas fa-check"></i> {{ 'SELECTED' | translate }}
+                                </span>
                                 <span *ngIf="planCard.isLoading">
-                  <i class="fas fa-spinner fa-spin"></i> {{ 'SELECTING' | translate }}
-                </span>
+                                    <i class="fas fa-spinner fa-spin"></i> {{ 'SELECTING' | translate }}
+                                </span>
                             </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Custom Amount Input -->
-                <div *ngIf="showCustomAmountInput" class="custom-amount-section">
-                    <div class="custom-amount-card">
-                        <h4>{{ 'CUSTOM_AMOUNT_TITLE' | translate }}</h4>
-                        <p>{{ 'CUSTOM_AMOUNT_DESCRIPTION' | translate }}</p>
-
-                        <div class="form-group">
-                            <label for="customAmount">{{ 'AMOUNT_UAH' | translate }}</label>
-                            <input
-                                    type="number"
-                                    id="customAmount"
-                                    formControlName="customAmount"
-                                    class="form-control"
-                                    [placeholder]="'ENTER_AMOUNT' | translate"
-                                    min="100"
-                                    max="10000"
-                                    (input)="onCustomAmountChange()">
-
-                            <div class="input-help">
-                                {{ 'AMOUNT_RANGE_HELP' | translate: {min: '100', max: '10,000'} }}
-                            </div>
-
-                            <!-- Custom Amount Validation Errors -->
-                            <div *ngIf="subscriptionForm.get('customAmount')?.invalid && subscriptionForm.get('customAmount')?.touched"
-                                 class="form-error">
-                <span *ngIf="subscriptionForm.get('customAmount')?.errors?.['required']">
-                  {{ 'AMOUNT_REQUIRED' | translate }}
-                </span>
-                                <span *ngIf="subscriptionForm.get('customAmount')?.errors?.['min']">
-                  {{ 'AMOUNT_TOO_LOW' | translate }}
-                </span>
-                                <span *ngIf="subscriptionForm.get('customAmount')?.errors?.['max']">
-                  {{ 'AMOUNT_TOO_HIGH' | translate }}
-                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -177,15 +154,16 @@
                                     class="form-checkbox">
                             <span class="checkmark"></span>
                             <span class="checkbox-text">
-                {{ 'AGREE_TO_TERMS' | translate }}
+                                {{ 'AGREE_TO_TERMS' | translate }}
                                 <a href="/terms" target="_blank">{{ 'TERMS_OF_SERVICE' | translate }}</a>
                                 {{ 'AND' | translate }}
                                 <a href="/privacy" target="_blank">{{ 'PRIVACY_POLICY' | translate }}</a>
-              </span>
+                            </span>
                         </label>
 
                         <div *ngIf="subscriptionForm.get('agreedToTerms')?.invalid && subscriptionForm.get('agreedToTerms')?.touched"
                              class="form-error">
+                            <i class="fas fa-exclamation-circle"></i>
                             {{ 'TERMS_AGREEMENT_REQUIRED' | translate }}
                         </div>
                     </div>
@@ -195,16 +173,17 @@
                 <div *ngIf="selectedPlan" class="checkout-actions">
                     <button
                             type="button"
-                            class="btn btn-primary btn-lg"
+                            class="btn btn-primary btn-lg btn-checkout"
                             [disabled]="!canProceedToCheckout() || isLoadingCheckout"
                             (click)="proceedToCheckout()">
 
-            <span *ngIf="!isLoadingCheckout">
-              {{ 'PROCEED_TO_CHECKOUT' | translate }}
-            </span>
+                        <span *ngIf="!isLoadingCheckout">
+                            {{ 'PROCEED_TO_CHECKOUT' | translate }}
+                            <i class="fas fa-arrow-right"></i>
+                        </span>
                         <span *ngIf="isLoadingCheckout">
-              <i class="fas fa-spinner fa-spin"></i> {{ 'LOADING' | translate }}
-            </span>
+                            <i class="fas fa-spinner fa-spin"></i> {{ 'LOADING' | translate }}
+                        </span>
                     </button>
                 </div>
             </div>
@@ -225,42 +204,58 @@
 
                 <div class="checkout-content">
                     <div class="checkout-summary-card">
-                        <h3>{{ 'ORDER_SUMMARY' | translate }}</h3>
+                        <div class="checkout-header">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>{{ 'ORDER_SUMMARY' | translate }}</h3>
+                        </div>
 
                         <div *ngIf="checkoutSummary" class="summary-details">
                             <div class="summary-item">
-                                <span class="label">{{ 'PLAN' | translate }}:</span>
+                                <span class="label">
+                                    <i class="fas fa-box"></i>
+                                    {{ 'PLAN' | translate }}
+                                </span>
                                 <span class="value">{{ checkoutSummary.planName }}</span>
                             </div>
 
                             <div class="summary-item">
-                                <span class="label">{{ 'DURATION' | translate }}:</span>
+                                <span class="label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ 'DURATION' | translate }}
+                                </span>
                                 <span class="value">{{ checkoutSummary.planDuration }}</span>
                             </div>
 
                             <div class="summary-item">
-                                <span class="label">{{ 'CUSTOMER' | translate }}:</span>
+                                <span class="label">
+                                    <i class="fas fa-user"></i>
+                                    {{ 'CUSTOMER' | translate }}
+                                </span>
                                 <span class="value">{{ checkoutSummary.userName }}</span>
                             </div>
 
                             <div class="summary-item">
-                                <span class="label">{{ 'EMAIL' | translate }}:</span>
+                                <span class="label">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ 'EMAIL' | translate }}
+                                </span>
                                 <span class="value">{{ checkoutSummary.userEmail }}</span>
                             </div>
 
                             <hr>
 
                             <div class="summary-item price-item">
-                                <span class="label">{{ 'PLAN_PRICE' | translate }}:</span>
+                                <span class="label">{{ 'PLAN_PRICE' | translate }}</span>
                                 <span class="value">{{ formatPrice(checkoutSummary.originalPrice) }}</span>
                             </div>
 
                             <div class="summary-item total-item">
-                                <span class="label">{{ 'TOTAL' | translate }}:</span>
+                                <span class="label">{{ 'TOTAL' | translate }}</span>
                                 <span class="value total-price">{{ formatPrice(checkoutSummary.finalPrice) }}</span>
                             </div>
 
                             <div class="vat-info">
+                                <i class="fas fa-info-circle"></i>
                                 <small>{{ 'NO_VAT_INSTRUCTOR_SUBSCRIPTION' | translate }}</small>
                             </div>
                         </div>
@@ -270,6 +265,7 @@
                                     type="button"
                                     class="btn btn-outline btn-lg"
                                     (click)="goBackToPlans()">
+                                <i class="fas fa-arrow-left"></i>
                                 {{ 'BACK_TO_PLANS' | translate }}
                             </button>
 
@@ -279,12 +275,13 @@
                                     [disabled]="isProcessingPayment"
                                     (click)="confirmPayment()">
 
-                <span *ngIf="!isProcessingPayment">
-                  {{ 'CONFIRM_PAYMENT' | translate }}
-                </span>
+                                <span *ngIf="!isProcessingPayment">
+                                    <i class="fas fa-credit-card"></i>
+                                    {{ 'CONFIRM_PAYMENT' | translate }}
+                                </span>
                                 <span *ngIf="isProcessingPayment">
-                  <i class="fas fa-spinner fa-spin"></i> {{ 'PROCESSING' | translate }}
-                </span>
+                                    <i class="fas fa-spinner fa-spin"></i> {{ 'PROCESSING' | translate }}
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -297,7 +294,7 @@
             <div class="container">
                 <div class="payment-processing-card">
                     <div class="payment-icon">
-                        <i class="fas fa-credit-card"></i>
+                        <i class="fas fa-credit-card fa-3x"></i>
                     </div>
 
                     <h3>{{ 'PAYMENT_PROCESSING' | translate }}</h3>
@@ -308,7 +305,10 @@
                     </div>
 
                     <div class="payment-help">
-                        <p>{{ 'PAYMENT_HELP_MESSAGE' | translate }}</p>
+                        <p>
+                            <i class="fas fa-question-circle"></i>
+                            {{ 'PAYMENT_HELP_MESSAGE' | translate }}
+                        </p>
                         <button
                                 type="button"
                                 class="btn btn-outline"
@@ -327,25 +327,33 @@
             <h2>{{ 'INSTRUCTOR_BENEFITS_TITLE' | translate }}</h2>
             <div class="benefits-grid">
                 <div class="benefit-item">
-                    <i class="fas fa-upload"></i>
+                    <div class="benefit-icon">
+                        <i class="fas fa-upload"></i>
+                    </div>
                     <h4>{{ 'UNLIMITED_COURSES' | translate }}</h4>
                     <p>{{ 'UNLIMITED_COURSES_DESC' | translate }}</p>
                 </div>
 
                 <div class="benefit-item">
-                    <i class="fas fa-chart-line"></i>
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
                     <h4>{{ 'ANALYTICS_REPORTS' | translate }}</h4>
                     <p>{{ 'ANALYTICS_REPORTS_DESC' | translate }}</p>
                 </div>
 
                 <div class="benefit-item">
-                    <i class="fas fa-headset"></i>
+                    <div class="benefit-icon">
+                        <i class="fas fa-headset"></i>
+                    </div>
                     <h4>{{ 'PRIORITY_SUPPORT' | translate }}</h4>
                     <p>{{ 'PRIORITY_SUPPORT_DESC' | translate }}</p>
                 </div>
 
                 <div class="benefit-item">
-                    <i class="fas fa-certificate"></i>
+                    <div class="benefit-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
                     <h4>{{ 'CUSTOM_CERTIFICATES' | translate }}</h4>
                     <p>{{ 'CUSTOM_CERTIFICATES_DESC' | translate }}</p>
                 </div>
@@ -359,17 +367,26 @@
             <h2>{{ 'FREQUENTLY_ASKED_QUESTIONS' | translate }}</h2>
             <div class="faq-list">
                 <div class="faq-item">
-                    <h4>{{ 'FAQ_SUBSCRIPTION_CANCEL' | translate }}</h4>
+                    <h4>
+                        <i class="fas fa-question-circle"></i>
+                        {{ 'FAQ_SUBSCRIPTION_CANCEL' | translate }}
+                    </h4>
                     <p>{{ 'FAQ_SUBSCRIPTION_CANCEL_ANSWER' | translate }}</p>
                 </div>
 
                 <div class="faq-item">
-                    <h4>{{ 'FAQ_PLAN_CHANGE' | translate }}</h4>
+                    <h4>
+                        <i class="fas fa-question-circle"></i>
+                        {{ 'FAQ_PLAN_CHANGE' | translate }}
+                    </h4>
                     <p>{{ 'FAQ_PLAN_CHANGE_ANSWER' | translate }}</p>
                 </div>
 
                 <div class="faq-item">
-                    <h4>{{ 'FAQ_PAYMENT_METHODS' | translate }}</h4>
+                    <h4>
+                        <i class="fas fa-question-circle"></i>
+                        {{ 'FAQ_PAYMENT_METHODS' | translate }}
+                    </h4>
                     <p>{{ 'FAQ_PAYMENT_METHODS_ANSWER' | translate }}</p>
                 </div>
             </div>

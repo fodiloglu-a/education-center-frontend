@@ -918,5 +918,118 @@
   "PROFILE_PAGE_TITLE": "Profil Sayfası",
   "ENROLLED_STUDENTS": "Kayıtlı Öğrenciler",
   "LEVEL": "Seviye",
-  "REVIEWS_IN_TOTAL": "Toplam Değerlendirme"
+  "REVIEWS_IN_TOTAL": "Toplam Değerlendirme",
+
+
+  "BECOME_INSTRUCTOR": "Eğitmen Olun",
+  "INSTRUCTOR_SUBSCRIPTION_DESCRIPTION": "İhtiyaçlarınıza en uygun abonelik planını seçin ve binlerce öğrenciye ders vermeye başlayın",
+
+  "SELECT_PLAN": "Plan Seçin",
+  "CHECKOUT": "Ödeme",
+  "PAYMENT": "Ödeme",
+
+  "LOADING_SUBSCRIPTION_DATA": "Abonelik verileri yükleniyor...",
+
+  "ALREADY_SUBSCRIBED_TITLE": "Zaten Aboneniz Var",
+  "ALREADY_SUBSCRIBED_MESSAGE": "Platformumuzda zaten aktif bir eğitmensiniz. Kurslarınızı yönetmek için kontrol panelinize gidin.",
+  "GO_TO_DASHBOARD": "Panele Git",
+  "ALREADY_SUBSCRIBED_ERROR": "Zaten aktif bir eğitmen aboneliğiniz var",
+
+  "BASIC_PLAN": "Temel",
+  "BASIC_PLAN_DESC": "Yeni başlayanlar için ideal",
+  "PROFESSIONAL_PLAN": "Profesyonel",
+  "PROFESSIONAL_PLAN_DESC": "Aktif eğitmenler için en popüler seçim",
+  "PREMIUM_PLAN": "Premium",
+  "PREMIUM_PLAN_DESC": "Profesyoneller için en iyi özellikler",
+
+  "MOST_POPULAR": "En Popüler",
+  "RECOMMENDED": "Önerilen",
+
+  "MONTHLY": "ay",
+  "SAVE": "Tasarruf",
+  "PER_COURSE": "kurs başına",
+
+  "FEATURE_1_COURSE": "1 kurs",
+  "FEATURE_BASIC_ANALYTICS": "Temel analitik",
+  "FEATURE_STANDARD_SUPPORT": "Standart destek",
+  "FEATURE_COURSE_MANAGEMENT": "Kurs yönetimi",
+
+  "FEATURE_3_COURSES": "3 kursa kadar",
+  "FEATURE_ADVANCED_ANALYTICS": "Gelişmiş analitik",
+  "FEATURE_PRIORITY_SUPPORT": "Öncelikli destek",
+  "FEATURE_CUSTOM_CERTIFICATES": "Özel sertifikalar",
+  "FEATURE_MARKETING_TOOLS": "Pazarlama araçları",
+
+  "FEATURE_5_COURSES": "5 kursa kadar",
+  "FEATURE_PREMIUM_ANALYTICS": "Premium analitik",
+  "FEATURE_DEDICATED_SUPPORT": "7/24 özel destek",
+  "FEATURE_CUSTOM_BRANDING": "Özel markalama",
+  "FEATURE_ADVANCED_MARKETING": "Gelişmiş pazarlama araçları",
+  "FEATURE_API_ACCESS": "API erişimi",
+
+  "SELECT_PLAN": "Planı Seç",
+  "SELECTED": "Seçildi",
+  "SELECTING": "Seçiliyor...",
+
+  "AGREE_TO_TERMS": "Kabul ediyorum",
+  "TERMS_OF_SERVICE": "Kullanım Şartları",
+  "AND": "ve",
+  "PRIVACY_POLICY": "Gizlilik Politikası",
+  "TERMS_AGREEMENT_REQUIRED": "Kullanım şartlarını kabul etmelisiniz",
+
+  "PROCEED_TO_CHECKOUT": "Ödemeye Geç",
+  "PLEASE_COMPLETE_FORM": "Lütfen tüm zorunlu alanları doldurun",
+  "LOADING": "Yükleniyor...",
+
+  "ORDER_SUMMARY": "Sipariş Özeti",
+  "PLAN": "Plan",
+  "DURATION": "Süre",
+  "CUSTOMER": "Müşteri",
+  "EMAIL": "E-posta",
+  "PLAN_PRICE": "Plan Ücreti",
+  "TOTAL": "Toplam",
+  "NO_VAT_INSTRUCTOR_SUBSCRIPTION": "Eğitmen aboneliği için KDV dahil değildir",
+
+  "BACK_TO_PLANS": "Planlara Dön",
+  "CONFIRM_PAYMENT": "Ödemeyi Onayla",
+  "PROCESSING": "İşleniyor...",
+  "CHECKOUT_DATA_MISSING": "Ödeme verileri eksik",
+  "CHECKOUT_FAILED": "Ödeme işlemi başarısız",
+
+  "PAYMENT_PROCESSING": "Ödeme İşleniyor",
+  "PAYMENT_REDIRECT_MESSAGE": "Lütfen bekleyin. Güvenli ödeme sayfasına yönlendiriliyorsunuz...",
+  "PAYMENT_HELP_MESSAGE": "Sorun mu yaşıyorsunuz? Geri dönüp tekrar deneyin.",
+  "BACK_TO_CHECKOUT": "Ödemeye Dön",
+  "PAYMENT_INITIATION_FAILED": "Ödeme başlatılamadı",
+  "PAYMENT_FORM_ERROR": "Ödeme formu hatası",
+
+  "INSTRUCTOR_BENEFITS_TITLE": "Eğitmen Avantajları",
+
+  "UNLIMITED_COURSES": "Sınırsız Kurs",
+  "UNLIMITED_COURSES_DESC": "Planınızın izin verdiği kadar kurs yükleyin",
+
+  "ANALYTICS_REPORTS": "Analitik ve Raporlar",
+  "ANALYTICS_REPORTS_DESC": "Öğrenci ilerlemesini ve kurs performansını takip edin",
+
+  "PRIORITY_SUPPORT": "Öncelikli Destek",
+  "PRIORITY_SUPPORT_DESC": "Destek ekibimizden hızlı yardım alın",
+
+  "CUSTOM_CERTIFICATES": "Özel Sertifikalar",
+  "CUSTOM_CERTIFICATES_DESC": "Öğrencileriniz için kişiselleştirilmiş sertifikalar oluşturun",
+
+  "FREQUENTLY_ASKED_QUESTIONS": "Sık Sorulan Sorular",
+
+  "FAQ_SUBSCRIPTION_CANCEL": "Aboneliğimi istediğim zaman iptal edebilir miyim?",
+  "FAQ_SUBSCRIPTION_CANCEL_ANSWER": "Evet, aboneliğinizi istediğiniz zaman iptal edebilirsiniz. Erişiminiz ödenen dönemin sonuna kadar aktif kalacaktır.",
+
+  "FAQ_PLAN_CHANGE": "Planımı sonradan değiştirebilir miyim?",
+  "FAQ_PLAN_CHANGE_ANSWER": "Evet, planınızı istediğiniz zaman yükseltebilir veya düşürebilirsiniz. Değişiklikler bir sonraki fatura döneminde geçerli olacaktır.",
+
+  "FAQ_PAYMENT_METHODS": "Hangi ödeme yöntemlerini kabul ediyorsunuz?",
+  "FAQ_PAYMENT_METHODS_ANSWER": "Kredi/banka kartları ve LiqPay üzerinden çevrimiçi ödemeleri kabul ediyoruz. Tüm işlemler güvenli ve korumalıdır.",
+
+  "USER_ID_NOT_FOUND": "Kullanıcı kimliği bulunamadı",
+  "PLANS_LOAD_FAILED": "Abonelik planları yüklenemedi",
+  "UAH_PER_COURSE": "UAH/kurs"
+
 }

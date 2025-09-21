@@ -63,13 +63,12 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
 
   // Form management
   subscriptionForm: FormGroup;
-  showCustomAmountInput: boolean = false;
 
   // UI states
   activeStep: 'plans' | 'checkout' | 'payment' = 'plans';
   userId: number | null = null;
 
-  // Plan cards for UI
+  // Plan cards for UI - YENİ 3 PAKET YAPISI
   planCards: TeacherSubscriptionPlanCard[] = [];
 
   // Plan types enum for template
@@ -106,7 +105,6 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
   private initializeForm(): FormGroup {
     return this.formBuilder.group({
       selectedPlanType: ['', [Validators.required]],
-      customAmount: [null], // Initial validators will be set dynamically
       agreedToTerms: [false, [Validators.requiredTrue]]
     });
   }
@@ -174,41 +172,81 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
   }
 
   private setupPlanCards(plans: TeacherSubscriptionPlansResponse): void {
+    // Backend'den gelen planları kullanarak 3 paket oluştur
+    // Eğer backend'den farklı bir yapı geliyorsa, manuel olarak oluştur
+
     this.planCards = [
+      // BASIC PAKET - monthlyBasic'i kullan ama fiyatı güncelle
       {
-        plan: { ...plans.monthlyBasic, recommended: false, popular: false },
+        plan: {
+          ...plans.monthlyBasic,
+          type: TeacherPlanType.BASIC,
+          price: 799, // YENİ FİYAT
+          name: this.translate.instant('BASIC_PLAN'),
+          description: this.translate.instant('BASIC_PLAN_DESC'),
+          features: [
+            this.translate.instant('FEATURE_1_COURSE'),
+            this.translate.instant('FEATURE_BASIC_ANALYTICS'),
+            this.translate.instant('FEATURE_STANDARD_SUPPORT'),
+            this.translate.instant('FEATURE_COURSE_MANAGEMENT')
+          ],
+          recommended: false,
+          popular: false
+        },
         isSelected: false,
         isLoading: false,
         buttonText: this.translate.instant('SELECT_PLAN'),
         buttonClass: 'btn-outline'
       },
+      // PROFESSIONAL PAKET - monthlyPremium'u kullan ama fiyatı güncelle
       {
-        plan: { ...plans.monthlyPremium, recommended: false, popular: true },
+        plan: {
+          ...plans.monthlyPremium,
+          type: TeacherPlanType.PROFESSIONAL,
+          price: 1999, // YENİ FİYAT
+          name: this.translate.instant('PROFESSIONAL_PLAN'),
+          description: this.translate.instant('PROFESSIONAL_PLAN_DESC'),
+          savings: 398, // 3x799 - 1999 = 398 UAH tasarruf
+          features: [
+            this.translate.instant('FEATURE_3_COURSES'),
+            this.translate.instant('FEATURE_ADVANCED_ANALYTICS'),
+            this.translate.instant('FEATURE_PRIORITY_SUPPORT'),
+            this.translate.instant('FEATURE_CUSTOM_CERTIFICATES'),
+            this.translate.instant('FEATURE_MARKETING_TOOLS')
+          ],
+          recommended: false,
+          popular: true
+        },
         isSelected: false,
         isLoading: false,
         buttonText: this.translate.instant('SELECT_PLAN'),
         buttonClass: 'btn-primary'
       },
+      // PREMIUM PAKET - yearlyPremium'u kullan ama aylık olarak göster
       {
-        plan: { ...plans.yearlyBasic, recommended: false, popular: false },
-        isSelected: false,
-        isLoading: false,
-        buttonText: this.translate.instant('SELECT_PLAN'),
-        buttonClass: 'btn-outline'
-      },
-      {
-        plan: { ...plans.yearlyPremium, recommended: true, popular: false },
+        plan: {
+          ...plans.yearlyPremium,
+          type: TeacherPlanType.YEARLY_PREMIUM, // Var olan enum'u kullan
+          price: 2999, // YENİ FİYAT
+          duration: this.translate.instant('MONTHLY'), // Aylık göster
+          name: this.translate.instant('PREMIUM_PLAN'),
+          description: this.translate.instant('PREMIUM_PLAN_DESC'),
+          savings: 996, // 5x799 - 2999 = 996 UAH tasarruf
+          features: [
+            this.translate.instant('FEATURE_5_COURSES'),
+            this.translate.instant('FEATURE_PREMIUM_ANALYTICS'),
+            this.translate.instant('FEATURE_DEDICATED_SUPPORT'),
+            this.translate.instant('FEATURE_CUSTOM_BRANDING'),
+            this.translate.instant('FEATURE_ADVANCED_MARKETING'),
+            this.translate.instant('FEATURE_API_ACCESS')
+          ],
+          recommended: true,
+          popular: false
+        },
         isSelected: false,
         isLoading: false,
         buttonText: this.translate.instant('SELECT_PLAN'),
         buttonClass: 'btn-success'
-      },
-      {
-        plan: { ...plans.custom, recommended: false, popular: false },
-        isSelected: false,
-        isLoading: false,
-        buttonText: this.translate.instant('SELECT_PLAN'),
-        buttonClass: 'btn-secondary'
       }
     ];
   }
@@ -230,43 +268,7 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
       selectedPlanType: planCard.plan.type
     });
 
-    // Show custom amount input for custom plans
-    this.showCustomAmountInput = planCard.plan.type === TeacherPlanType.CUSTOM;
-
-    // Update validators based on plan type
-    this.updateCustomAmountValidators(planCard.plan);
-
     this.clearMessages();
-  }
-
-  private updateCustomAmountValidators(plan: TeacherSubscriptionPlan): void {
-    const customAmountControl = this.subscriptionForm.get('customAmount');
-
-    if (this.showCustomAmountInput) {
-      const validators = [
-        Validators.required,
-        Validators.min(plan.minPrice || 100),
-        Validators.max(plan.maxPrice || 10000)
-      ];
-      customAmountControl?.setValidators(validators);
-    } else {
-      customAmountControl?.clearValidators();
-      customAmountControl?.setValue(null);
-    }
-
-    customAmountControl?.updateValueAndValidity();
-  }
-
-  onCustomAmountChange(): void {
-    const amount = this.subscriptionForm.get('customAmount')?.value;
-    if (amount && this.selectedPlan) {
-      const validation = this.teacherSubscriptionService.validateCustomAmount(amount);
-      if (!validation.valid) {
-        this.errorMessage = validation.message || '';
-      } else {
-        this.clearMessages();
-      }
-    }
   }
 
   proceedToCheckout(): void {
@@ -288,7 +290,7 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
 
     this.teacherSubscriptionService.getCheckoutSummary(
         formData.selectedPlanType,
-        formData.customAmount
+        undefined // customAmount yok artık
     ).pipe(
         catchError(error => {
           this.errorMessage = error.message || this.translate.instant('CHECKOUT_FAILED');
@@ -315,8 +317,8 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
     this.clearMessages();
 
     const paymentRequest: TeacherSubscriptionPaymentRequest = {
-      planType: this.checkoutSummary.planType,
-      customAmount: this.subscriptionForm.get('customAmount')?.value
+      planType: this.checkoutSummary.planType
+      // customAmount artık yok
     };
 
     this.teacherSubscriptionService.initiateSubscriptionPayment(paymentRequest).pipe(
@@ -385,17 +387,7 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
   }
 
   canProceedToCheckout(): boolean {
-    if (!this.subscriptionForm.valid || !this.selectedPlan) {
-      return false;
-    }
-
-    if (this.showCustomAmountInput) {
-      const amount = this.subscriptionForm.get('customAmount')?.value;
-      const validation = this.teacherSubscriptionService.validateCustomAmount(amount);
-      return validation.valid;
-    }
-
-    return true;
+    return this.subscriptionForm.valid && this.selectedPlan !== null;
   }
 
   getPlanCardClass(planCard: TeacherSubscriptionPlanCard): string {
@@ -428,4 +420,6 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
   get selectedPlanType(): TeacherPlanType | null {
     return this.selectedPlan?.type as TeacherPlanType || null;
   }
+
+  protected readonly Math = Math;
 }
