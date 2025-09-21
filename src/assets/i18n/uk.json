@@ -1071,7 +1071,44 @@
   "COPY": "Копіювати",
   "DOWNLOAD": "Завантажити",
   "UPDATE": "Оновити",
-  "DELETE": "Видалити"
+  "DELETE": "Видалити",
+  "errors": {
+    "404": {
+      "title": "Sayfa Bulunamadı",
+      "message": "Aradığınız sayfa mevcut değil, taşınmış veya silinmiş olabilir.",
+      "homeButton": "Ana Sayfaya Dön",
+      "backButton": "Geri Git",
+      "supportText": "Sorun devam ederse",
+      "supportLink": "destek ekibimizle iletişime geçin"
+    },
+    "403": {
+      "title": "Erişim Engellendi",
+      "message": "Bu sayfaya erişim yetkiniz bulunmuyor.",
+      "homeButton": "Ana Sayfaya Dön",
+      "backButton": "Geri Git",
+      "supportText": "Yetki almak için",
+      "supportLink": "destek ekibimizle iletişime geçin"
+    },
+    "401": {
+      "title": "Yetkisiz Erişim",
+      "message": "Bu içeriği görüntülemek için giriş yapmanız gerekiyor.",
+      "homeButton": "Ana Sayfaya Dön",
+      "backButton": "Geri Git",
+      "loginButton": "Giriş Yap",
+      "supportText": "Giriş yapamıyorsanız",
+      "supportLink": "destek ekibimizle iletişime geçin"
+    },
+    "500": {
+      "title": "Sunucu Hatası",
+      "message": "Bir şeyler ters gitti. Lütfen daha sonra tekrar deneyin.",
+      "homeButton": "Ana Sayfaya Dön",
+      "backButton": "Geri Git",
+      "retryButton": "Tekrar Dene",
+      "supportText": "Sorun devam ederse",
+      "supportLink": "destek ekibimizle iletişime geçin"
+    }
+  }
+
 
 }
 
