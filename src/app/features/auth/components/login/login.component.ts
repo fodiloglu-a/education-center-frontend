@@ -80,7 +80,7 @@ export class LoginComponent implements OnInit {
         // Giriş başarılıysa token'ı ve kullanıcı bilgilerini kaydet
         this.tokenService.saveTokenAndUser(jwtResponse);
         // Kullanıcıyı ana sayfaya veya yönlendirilmek istenen URL'ye yönlendir
-        this.router.navigate(['/profile']); // Başarılı giriş sonrası profil sayfasına yönlendir
+        this.router.navigate(['/home']); // Başarılı giriş sonrası profil sayfasına yönlendir
       }
     });
   }
