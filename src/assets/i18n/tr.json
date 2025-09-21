@@ -1030,6 +1030,22 @@
 
   "USER_ID_NOT_FOUND": "Kullanıcı kimliği bulunamadı",
   "PLANS_LOAD_FAILED": "Abonelik planları yüklenemedi",
-  "UAH_PER_COURSE": "UAH/kurs"
+  "UAH_PER_COURSE": "UAH/kurs",
+  "UPLOAD_YOUR_FILES": "Dosyalarınızı Yükleyin",
+  "UPLOAD_INSTRUCTIONS": "Dosyaları buraya sürükleyip bırakın veya seçmek için tıklayın",
+  "SELECT_FILE": "Dosya Seç",
+  "UPLOADING": "Yükleniyor...",
+  "SUPPORTED_FORMATS": "Desteklenen formatlar: JPG, PNG, GIF, WebP, MP4, WebM",
+  "MAX_FILE_SIZE": "Maksimum dosya boyutu: 50MB",
+  "LOADING_MEDIA_FILES": "Medya dosyaları yükleniyor...",
+  "NO_FILES_UPLOADED": "Henüz dosya yüklenmemiş",
+  "UPLOAD_FIRST_FILE": "İlk medya dosyanızı yükleyerek başlayın",
+  "MY_MEDIA_FILES": "Medya Dosyalarım",
+  "FILES": "dosya",
+  "COPY_URL": "URL'yi kopyala",
+  "COPY": "Kopyala",
+  "DOWNLOAD": "İndir",
+  "UPDATE": "Güncelle",
+  "DELETE": "Sil"
 
 }

@@ -2,12 +2,13 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, finalize, catchError, of } from 'rxjs';
 import { AddMaterialService } from "../../services/add-material.service";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-add-material',
   templateUrl: './add-material.component.html',
   standalone: true,
-  imports: [CommonModule],
+    imports: [CommonModule, TranslatePipe],
   styleUrls: ['./add-material.component.css']
 })
 export class AddMaterialComponent implements OnInit, OnDestroy {

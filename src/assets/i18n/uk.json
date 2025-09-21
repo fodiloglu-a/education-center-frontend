@@ -1055,7 +1055,23 @@
 
   "USER_ID_NOT_FOUND": "Ідентифікатор користувача не знайдено",
   "PLANS_LOAD_FAILED": "Не вдалося завантажити плани підписки",
-  "UAH_PER_COURSE": "грн за курс"
+  "UAH_PER_COURSE": "грн за курс",
+  "UPLOAD_YOUR_FILES": "Завантажте свої файли",
+  "UPLOAD_INSTRUCTIONS": "Перетягніть файли сюди або клацніть для вибору",
+  "SELECT_FILE": "Вибрати файл",
+  "UPLOADING": "Завантаження...",
+  "SUPPORTED_FORMATS": "Підтримувані формати: JPG, PNG, GIF, WebP, MP4, WebM",
+  "MAX_FILE_SIZE": "Максимальний розмір файлу: 50MB",
+  "LOADING_MEDIA_FILES": "Завантаження медіафайлів...",
+  "NO_FILES_UPLOADED": "Файли ще не завантажено",
+  "UPLOAD_FIRST_FILE": "Почніть із завантаження першого медіафайлу",
+  "MY_MEDIA_FILES": "Мої медіафайли",
+  "FILES": "файлів",
+  "COPY_URL": "Копіювати URL",
+  "COPY": "Копіювати",
+  "DOWNLOAD": "Завантажити",
+  "UPDATE": "Оновити",
+  "DELETE": "Видалити"
 
 }
 

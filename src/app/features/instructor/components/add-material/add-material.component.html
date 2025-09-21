@@ -19,12 +19,12 @@
     >
         <div class="upload-content">
             <div class="upload-icon">📤</div>
-            <h3>Dosyalarınızı Yükleyin</h3>
-            <p>Dosyaları buraya sürükleyip bırakın veya seçmek için tıklayın</p>
+            <h3>{{ 'UPLOAD_YOUR_FILES' | translate }}</h3>
+            <p>{{ 'UPLOAD_INSTRUCTIONS' | translate }}</p>
 
             <label for="uploadInput" class="upload-button">
-                <span *ngIf="!isLoading">Dosya Seç</span>
-                <span *ngIf="isLoading">Yükleniyor...</span>
+                <span *ngIf="!isLoading">{{ 'SELECT_FILE' | translate }}</span>
+                <span *ngIf="isLoading">{{ 'UPLOADING' | translate }}</span>
             </label>
 
             <input
@@ -37,8 +37,8 @@
             >
 
             <div class="upload-info">
-                <small>Desteklenen formatlar: JPG, PNG, GIF, WebP, MP4, WebM</small>
-                <small>Maksimum dosya boyutu: 50MB</small>
+                <small>{{ 'SUPPORTED_FORMATS' | translate }}</small>
+                <small>{{ 'MAX_FILE_SIZE' | translate }}</small>
             </div>
         </div>
 
@@ -55,21 +55,21 @@
 <!-- Loading Spinner -->
 <div *ngIf="isLoading && uploadProgress === 0" class="loading-spinner">
     <div class="spinner"></div>
-    <p>Medya dosyaları yükleniyor...</p>
+    <p>{{ 'LOADING_MEDIA_FILES' | translate }}</p>
 </div>
 
 <!-- Empty State -->
 <div *ngIf="!isLoading && mediaList.length === 0" class="empty-state">
     <div class="empty-icon">📁</div>
-    <h3>Henüz dosya yüklenmemiş</h3>
-    <p>İlk medya dosyanızı yükleyerek başlayın</p>
+    <h3>{{ 'NO_FILES_UPLOADED' | translate }}</h3>
+    <p>{{ 'UPLOAD_FIRST_FILE' | translate }}</p>
 </div>
 
 <!-- Media Grid -->
 <div *ngIf="mediaList.length > 0" class="media-container">
     <div class="media-header">
-        <h2>Medya Dosyalarım</h2>
-        <span class="media-count">{{ mediaList.length }} dosya</span>
+        <h2>{{ 'MY_MEDIA_FILES' | translate }}</h2>
+        <span class="media-count">{{ mediaList.length }} {{ 'FILES' | translate }}</span>
     </div>
 
     <div class="media-grid">
@@ -114,26 +114,26 @@
                     <button
                             class="action-btn primary"
                             (click)="copyUrl(url)"
-                            title="URL'yi kopyala"
+                            [title]="'COPY_URL' | translate"
                     >
                         <span class="btn-icon">📋</span>
-                        <span class="btn-text">Kopyala</span>
+                        <span class="btn-text">{{ 'COPY' | translate }}</span>
                     </button>
 
                     <button
                             class="action-btn secondary"
                             (click)="downloadMedia(url)"
-                            title="İndir"
+                            [title]="'DOWNLOAD' | translate"
                     >
                         <span class="btn-icon">⬇️</span>
-                        <span class="btn-text">İndir</span>
+                        <span class="btn-text">{{ 'DOWNLOAD' | translate }}</span>
                     </button>
                 </div>
 
                 <div class="action-row">
-                    <label class="action-btn warning" title="Güncelle">
+                    <label class="action-btn warning" [title]="'UPDATE' | translate">
                         <span class="btn-icon">🔁</span>
-                        <span class="btn-text">Güncelle</span>
+                        <span class="btn-text">{{ 'UPDATE' | translate }}</span>
                         <input
                                 type="file"
                                 accept="image/*,video/*"
@@ -145,10 +145,10 @@
                     <button
                             class="action-btn danger"
                             (click)="deleteMedia(url)"
-                            title="Sil"
+                            [title]="'DELETE' | translate"
                     >
                         <span class="btn-icon">🗑️</span>
-                        <span class="btn-text">Sil</span>
+                        <span class="btn-text">{{ 'DELETE' | translate }}</span>
                     </button>
                 </div>
             </div>
