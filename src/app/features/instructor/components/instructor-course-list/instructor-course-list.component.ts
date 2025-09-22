@@ -2,7 +2,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // ngIf, ngFor gibi direktifler için
-import { RouterLink } from '@angular/router'; // routerLink için
+import {Router, RouterLink} from '@angular/router'; // routerLink için
 import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ngx-translate için
 import { InstructorService } from '../../services/instructor.service'; // InstructorService'i import ediyoruz
 import { TokenService } from '../../../../core/services/token.service'; // Kullanıcı ID'si için
@@ -32,11 +32,13 @@ export class InstructorCourseListComponent implements OnInit {
   errorMessage: string | null = null; // Hata mesajı
   successMessage: string | null = null; // Başarı mesajı
   instructorId: number | null = null; // Eğitmenin ID'si
+  errorAction: { text: string; callback: () => void } | null = null;
 
   constructor(
     private instructorService: InstructorService,
     private tokenService: TokenService,
     private translate: TranslateService,
+    private router: Router,
     private courseService: CourseService // CourseService enjekte edildi
   ) { }
 
@@ -135,5 +137,62 @@ export class InstructorCourseListComponent implements OnInit {
   clearMessages(): void {
     this.errorMessage = null;
     this.successMessage = null;
+  }
+  async checkAndNavigateToCourseCreation() {
+    if (!this.instructorId) return;
+
+    this.isLoading = true;
+    this.clearError();
+
+    try {
+      const response = await this.instructorService.canAddCourse(this.instructorId).toPromise();
+
+      if (response.canAdd) {
+        this.router.navigate(['/courses', 'new']);
+      } else {
+        this.showCourseLimitError(response);
+      }
+    } catch (error) {
+      console.error('Kurs kontrol hatası:', error);
+      this.showGenericError();
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private showCourseLimitError(response: any) {
+    let message = '';
+
+    if (response.errorType === 'SUBSCRIPTION_REQUIRED') {
+      message = this.translate.instant(response.errorKey);
+      this.showErrorWithAction(message, 'UPGRADE_SUBSCRIPTION', () => {
+        this.router.navigate(['/instructor/subscription']);
+      });
+    } else if (response.errorType === 'COURSE_LIMIT_REACHED') {
+      message = this.translate.instant(response.errorKey, {
+        current: response.currentCount
+      });
+      this.showErrorWithAction(message, 'VIEW_SUBSCRIPTION_PLANS', () => {
+        this.router.navigate(['/instructor/subscription']);
+      });
+    }
+  }
+
+  private showErrorWithAction(message: string, actionKey: string, action: () => void) {
+    this.errorMessage = message;
+    this.errorAction = {
+      text: this.translate.instant(actionKey),
+      callback: action
+    };
+  }
+
+  private showGenericError() {
+    this.errorMessage = this.translate.instant('GENERIC_ERROR');
+    this.errorAction = null;
+  }
+
+  clearError() {
+    this.errorMessage = null;
+    this.errorAction = null;
   }
 }

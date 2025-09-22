@@ -49,6 +49,7 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   successMessage: string | null = null;
   instructorId: number | null = null;
+  errorAction: { text: string; callback: () => void } | null = null;
 
   // Form management
   profileForm: FormGroup;
@@ -479,5 +480,62 @@ export class InstructorDashboardComponent implements OnInit, OnDestroy {
     } else {
       this.navigateToSubscription();
     }
+  }
+  async checkAndNavigateToCourseCreation() {
+    if (!this.instructorId) return;
+
+    this.isLoading = true;
+    this.clearError();
+
+    try {
+      const response = await this.instructorService.canAddCourse(this.instructorId).toPromise();
+
+      if (response.canAdd) {
+        this.router.navigate(['/courses', 'new']);
+      } else {
+        this.showCourseLimitError(response);
+      }
+    } catch (error) {
+      console.error('Kurs kontrol hatası:', error);
+      this.showGenericError();
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  private showCourseLimitError(response: any) {
+    let message = '';
+
+    if (response.errorType === 'SUBSCRIPTION_REQUIRED') {
+      message = this.translate.instant(response.errorKey);
+      this.showErrorWithAction(message, 'UPGRADE_SUBSCRIPTION', () => {
+        this.router.navigate(['/instructor/subscription']);
+      });
+    } else if (response.errorType === 'COURSE_LIMIT_REACHED') {
+      message = this.translate.instant(response.errorKey, {
+        current: response.currentCount
+      });
+      this.showErrorWithAction(message, 'VIEW_SUBSCRIPTION_PLANS', () => {
+        this.router.navigate(['/instructor/subscription']);
+      });
+    }
+  }
+
+  private showErrorWithAction(message: string, actionKey: string, action: () => void) {
+    this.errorMessage = message;
+    this.errorAction = {
+      text: this.translate.instant(actionKey),
+      callback: action
+    };
+  }
+
+  private showGenericError() {
+    this.errorMessage = this.translate.instant('GENERIC_ERROR');
+    this.errorAction = null;
+  }
+
+  clearError() {
+    this.errorMessage = null;
+    this.errorAction = null;
   }
 }

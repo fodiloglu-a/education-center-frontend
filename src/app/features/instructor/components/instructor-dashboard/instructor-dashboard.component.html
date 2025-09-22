@@ -190,10 +190,24 @@
 
                 <!-- Actions for subscribed teachers -->
                 <div *ngIf="instructorProfile?.isTeacher" class="action-buttons-grid">
-                    <a [routerLink]="['/courses', 'new']" class="action-button primary-btn">
+                    <a (click)="checkAndNavigateToCourseCreation()"
+                       class="action-button primary-btn"
+                       [class.disabled]="isLoading">
                         <span class="material-icons">add_circle</span>
                         <span>{{ 'CREATE_NEW_COURSE' | translate }}</span>
                     </a>
+                    <div *ngIf="errorMessage" class="error-dialog">
+                        <p>{{ errorMessage }}</p>
+                        <button *ngIf="errorAction"
+                                (click)="errorAction.callback()"
+                                class="btn btn-primary">
+                            {{ errorAction.text }}
+                        </button>
+                        <button (click)="clearError()" class="btn btn-secondary">
+                            {{ 'CLOSE' | translate }}
+                        </button>
+                    </div>
+
                     <a [routerLink]="['/instructor', 'courses']" class="action-button secondary-btn">
                         <span class="material-icons">list_alt</span>
                         <span>{{ 'MY_COURSES' | translate }}</span>

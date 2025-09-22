@@ -280,3 +280,204 @@
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* Tabletlerde 2-3 sütun */
   }
 }
+
+/* Error Dialog Styles */
+.error-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.error-dialog .error-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  min-width: 320px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+.error-dialog p {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #374151;
+  text-align: center;
+}
+
+.error-dialog .error-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.error-dialog .btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.error-dialog .btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.error-dialog .btn-primary:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.error-dialog .btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.error-dialog .btn-secondary:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.error-dialog .btn:active {
+  transform: translateY(0);
+}
+
+/* Dark mode support */
+[data-theme="dark"] .error-dialog .error-content {
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .error-dialog p {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .error-dialog .btn-secondary {
+  background-color: #374151;
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+[data-theme="dark"] .error-dialog .btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .error-dialog .error-content {
+    margin: 1rem;
+    padding: 1.5rem;
+    min-width: unset;
+  }
+
+  .error-dialog .error-actions {
+    flex-direction: column;
+  }
+
+  .error-dialog .btn {
+    width: 100%;
+  }
+}
+
+/* Close button alternative (if you want to add an X button) */
+.error-dialog .close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.error-dialog .close-btn:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+[data-theme="dark"] .error-dialog .close-btn {
+  color: #6b7280;
+}
+
+[data-theme="dark"] .error-dialog .close-btn:hover {
+  background-color: #374151;
+  color: #d1d5db;
+}
+
+/* Error icon support */
+.error-dialog .error-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.error-dialog .error-icon .material-icons {
+  font-size: 3rem;
+  color: #ef4444;
+}
+
+/* Success variant (for future use) */
+.error-dialog.success .error-icon .material-icons {
+  color: #10b981;
+}
+
+/* Warning variant */
+.error-dialog.warning .error-icon .material-icons {
+  color: #f59e0b;
+}

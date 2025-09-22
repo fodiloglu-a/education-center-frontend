@@ -15,9 +15,20 @@
 
   <!-- Yeni Kurs Oluştur Butonu -->
   <div class="action-bar">
-    <button class="action-button primary-btn" routerLink="/courses/new">
+    <button class="action-button primary-btn" (click)="checkAndNavigateToCourseCreation()">
       <span class="material-icons">add_circle</span> {{ 'CREATE_NEW_COURSE' | translate }}
     </button>
+      <div *ngIf="errorMessage" class="error-dialog">
+          <p>{{ errorMessage }}</p>
+          <button *ngIf="errorAction"
+                  (click)="errorAction.callback()"
+                  class="btn btn-primary">
+              {{ errorAction.text }}
+          </button>
+          <button (click)="clearError()" class="btn btn-secondary">
+              {{ 'CLOSE' | translate }}
+          </button>
+      </div>
   </div>
 
   <!-- Eğitmen Kurs Kartları Listesi -->

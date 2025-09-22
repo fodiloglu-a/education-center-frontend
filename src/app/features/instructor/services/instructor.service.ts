@@ -55,4 +55,7 @@ export class InstructorService {
 
   // Not: Kurs oluşturma, güncelleme ve silme işlemleri CourseService üzerinden yapılacaktır.
   // Eğitmen paneli bileşenleri, CourseService'i kullanarak bu işlemleri tetikleyecektir.
+  canAddCourse(instructorId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/instructors/${instructorId}/can-add-course`);
+  }
 }

@@ -377,6 +377,14 @@
 
 
   "INSTRUCTOR_DASHBOARD_COMPONENT": "INSTRUCTOR_DASHBOARD_COMPONENT",
+  "COURSE_LIMIT_REACHED": "Abonelik planınızın kurs limiti doldu",
+  "COURSE_LIMIT_BASIC": "Temel plan sadece 1 kurs oluşturmaya izin verir. Daha fazla kurs için aboneliğinizi yükseltin.",
+  "COURSE_LIMIT_PROFESSIONAL": "Profesyonel plan 3 kursa kadar izin verir. Şu anda {{current}} kursunuz var.",
+  "COURSE_LIMIT_PREMIUM": "Premium plan 5 kursa kadar izin verir. Şu anda {{current}} kursunuz var.",
+  "SUBSCRIPTION_REQUIRED_TO_CREATE": "Kurs oluşturmak için aktif eğitmen aboneliği gerekli",
+  "SUBSCRIPTION_EXPIRED": "Aboneliğinizin süresi dolmuş. Kurs oluşturmaya devam etmek için aboneliğinizi yenileyin",
+  "UPGRADE_SUBSCRIPTION": "Aboneliği Yükselt",
+  "VIEW_SUBSCRIPTION_PLANS": "Abonelik Planlarını Görüntüle",
   "SUBSCRIPTION_REQUIRED_TITLE": "Öğretmen Aboneliği Gerekiyor",
   "SUBSCRIPTION_REQUIRED_MESSAGE": "Kurs yayınlamak, öğrencilere ulaşmak ve istatistiklerinize erişmek için öğretmen aboneliği satın almalısınız.",
   "PURCHASE_SUBSCRIPTION": "Abonelik Satın Al",

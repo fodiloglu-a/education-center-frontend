@@ -343,7 +343,17 @@
   "MANAGE_YOUR_COURSES_SUBTITLE": "Тут ви можете побачити всі курси, які ви створили та якими керуєте.",
   "NO_INSTRUCTOR_COURSES_FOUND": "Ви ще не створили жодного курсу.",
   "RETRY_LOAD_COURSES": "Спробувати завантажити курси ще раз",
+
+
   "INSTRUCTOR_DASHBOARD_COMPONENT": "INSTRUCTOR_DASHBOARD_COMPONENT",
+  "COURSE_LIMIT_REACHED": "Досягнуто ліміт курсів для вашого плану підписки",
+  "COURSE_LIMIT_BASIC": "Базовий план дозволяє створити лише 1 курс. Оновіть підписку для створення більше курсів.",
+  "COURSE_LIMIT_PROFESSIONAL": "Професійний план дозволяє створити до 3 курсів. У вас уже є {{current}} курсів.",
+  "COURSE_LIMIT_PREMIUM": "Преміум план дозволяє створити до 5 курсів. У вас уже є {{current}} курсів.",
+  "SUBSCRIPTION_REQUIRED_TO_CREATE": "Для створення курсів потрібна активна підписка викладача",
+  "SUBSCRIPTION_EXPIRED": "Термін дії вашої підписки закінчився. Оновіть підписку для продовження створення курсів",
+  "UPGRADE_SUBSCRIPTION": "Оновити підписку",
+  "VIEW_SUBSCRIPTION_PLANS": "Переглянути плани підписки",
   "SUBSCRIPTION_REQUIRED_TITLE": "Потрібна підписка викладача",
   "SUBSCRIPTION_REQUIRED_MESSAGE": "Щоб публікувати курси, охоплювати студентів та отримувати доступ до своєї статистики, ви повинні придбати підписку викладача.",
   "PURCHASE_SUBSCRIPTION": "Придбати підписку",
