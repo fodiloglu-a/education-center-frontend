@@ -1,0 +1,26 @@
+
+
+TODO
+
+todo:HomeComponent:
+- Tüm kurslar geldikten sonra çok satılan kurslar hata veriyor burada tüm satılan kurslar gelsin kullanıcı satın almışsa bile
+
+todo:ProfileComponenet:
+-Profil alanına bildirimler eklenecek.
+
+todo:InstructorDashboard:
+-Kupon butonunun yeri değiştirilecek
+-Sınav oluşturma alanı eklenecek
+-Sertifika oluşturma alanı eklenecek
+-Yer alan bu alanların değerleri teğit edilecek Toplam Kurs  Toplam Öğrenci  Ortalama Puan  Toplam Yorum
+
+todo:CouponComponent:
+
+-Tamamen revize edilecek,
+-
+
+
+
+
+
+

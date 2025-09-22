@@ -122,6 +122,11 @@
   "TR": "Турецька",
   "EN": "Англійська",
   "UK": "Українська",
+  "LANGUAGE.TR":"Турецька",
+  "LANGUAGE.EN":"Англійська",
+  "LANGUAGE.UK":"Українська",
+
+
   "COURSE_FORM_COMPONENT": "COURSE_FORM_COMPONENT",
   "CREATE_NEW_COURSE": "Створити новий курс",
   "EDIT_COURSE_SUBTITLE": "Редагувати деталі курсу",
