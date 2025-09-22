@@ -1046,6 +1046,167 @@
   "COPY": "Kopyala",
   "DOWNLOAD": "İndir",
   "UPDATE": "Güncelle",
-  "DELETE": "Sil"
+  "DELETE": "Sil",
 
+
+
+
+  "legal": {
+    "privacy": {
+      "title": "Gizlilik Sözleşmesi",
+      "lastUpdated": "Son güncelleme",
+      "tableOfContents": "İçindekiler",
+      "sections": {
+        "introduction": "Giriş",
+        "dataCollection": "Veri Toplama",
+        "dataUsage": "Veri Kullanımı",
+        "dataSharing": "Veri Paylaşımı",
+        "dataSecurity": "Veri Güvenliği",
+        "userRights": "Kullanıcı Hakları",
+        "cookies": "Çerezler",
+        "contact": "İletişim"
+      },
+      "content": {
+        "introduction": {
+          "p1": "Bu Gizlilik Sözleşmesi, Academia platformunu kullanırken kişisel bilgilerinizin nasıl toplandığını, kullanıldığını ve korunduğunu açıklar.",
+          "p2": "Hizmetimizi kullanarak, bu gizlilik politikasında açıklanan uygulamaları kabul etmiş olursunuz."
+        },
+        "dataCollection": {
+          "intro": "Platformumuzda aşağıdaki türde veriler toplanmaktadır:",
+          "personal": {
+            "title": "Kişisel Bilgiler",
+            "name": "Ad ve soyad",
+            "email": "E-posta adresi",
+            "phone": "Telefon numarası",
+            "address": "Adres bilgileri"
+          },
+          "technical": {
+            "title": "Teknik Bilgiler",
+            "ip": "IP adresi",
+            "browser": "Tarayıcı bilgileri",
+            "device": "Cihaz bilgileri",
+            "usage": "Kullanım istatistikleri"
+          }
+        },
+        "dataUsage": {
+          "intro": "Toplanan veriler aşağıdaki amaçlarla kullanılmaktadır:",
+          "service": "Hizmet sağlama ve geliştirme",
+          "communication": "İletişim kurma",
+          "improvement": "Platform iyileştirme",
+          "security": "Güvenlik sağlama",
+          "legal": "Yasal yükümlülükler"
+        },
+        "dataSharing": {
+          "intro": "Verileriniz aşağıdaki durumlarda paylaşılabilir:",
+          "consent": "Açık izniz ile",
+          "legal": "Yasal zorunluluklar",
+          "service": "Hizmet sağlayıcıları ile",
+          "business": "İş transferi durumunda"
+        },
+        "dataSecurity": {
+          "intro": "Verilerinizin güvenliği bizim için önemlidir.",
+          "measures": "Teknik ve idari güvenlik önlemleri alınmaktadır."
+        },
+        "userRights": {
+          "intro": "KVKK kapsamında aşağıdaki haklarınız bulunmaktadır:",
+          "access": "Verilerinize erişim hakkı",
+          "correction": "Düzeltme hakkı",
+          "deletion": "Silme hakkı",
+          "restriction": "İşlemeyi sınırlama hakkı",
+          "portability": "Veri taşınabilirliği hakkı",
+          "objection": "İtiraz hakkı"
+        },
+        "cookies": {
+          "intro": "Web sitemizde çerezler kullanılmaktadır.",
+          "types": "Gerekli, analitik ve pazarlama çerezleri bulunmaktadır.",
+          "control": "Çerez ayarlarını tarayıcınızdan kontrol edebilirsiniz."
+        },
+        "contact": {
+          "intro": "Gizlilik ile ilgili sorularınız için bizimle iletişime geçebilirsiniz:"
+        }
+      }
+    }
+  },
+  "terms": {
+    "title": "Kullanım Şartları",
+    "lastUpdated": "Son güncelleme",
+    "tableOfContents": "İçindekiler",
+    "sections": {
+      "acceptance": "Şartların Kabulü",
+      "services": "Hizmetlerimiz",
+      "registration": "Kayıt ve Hesap",
+      "conduct": "Kullanıcı Davranışları",
+      "content": "İçerik ve Fikri Mülkiyet",
+      "payment": "Ödeme ve Faturalama",
+      "intellectual": "Fikri Mülkiyet Hakları",
+      "termination": "Hesap Sonlandırma",
+      "limitation": "Sorumluluk Sınırlaması",
+      "changes": "Değişiklikler"
+    },
+    "content": {
+      "acceptance": {
+        "p1": "Bu Kullanım Şartları, Academia platformunu kullanımınızı düzenler.",
+        "p2": "Platformumuzu kullanarak bu şartları kabul etmiş olursunuz."
+      },
+      "services": {
+        "p1": "Academia aşağıdaki hizmetleri sunmaktadır:",
+        "courses": "Online kurs erişimi",
+        "certificates": "Sertifika programları",
+        "community": "Topluluk etkileşimi",
+        "support": "Teknik destek"
+      },
+      "registration": {
+        "p1": "Hesap oluştururken doğru ve güncel bilgiler vermelisiniz.",
+        "p2": "Hesap güvenliğiniz sizin sorumluluğunuzdadır.",
+        "p3": "Hesabınızı başkalarıyla paylaşamazsınız."
+      },
+      "conduct": {
+        "intro": "Platformumuzu kullanırken aşağıdaki kurallara uymalısınız:",
+        "prohibited": {
+          "title": "Yasaklanan Davranışlar",
+          "illegal": "Yasadışı faaliyetler",
+          "harmful": "Zararlı içerik paylaşımı",
+          "spam": "Spam veya istenmeyen içerik",
+          "copyright": "Telif hakkı ihlali",
+          "privacy": "Gizlilik ihlali",
+          "impersonation": "Kimlik taklidi"
+        }
+      },
+      "content": {
+        "p1": "Platformdaki tüm içerikler telif hakkı koruması altındadır.",
+        "p2": "İçerikleri kişisel ve eğitim amaçlı kullanabilirsiniz.",
+        "p3": "İçerikleri çoğaltamaz, dağıtamaz veya ticari amaçla kullanamazsınız."
+      },
+      "payment": {
+        "p1": "Ücretli hizmetler için ödeme yapmanız gerekmektedir.",
+        "pricing": {
+          "title": "Fiyatlandırma",
+          "p1": "Fiyatlar önceden haber verilmeksizin değiştirilebilir."
+        },
+        "refund": {
+          "title": "İade Politikası",
+          "p1": "İade talepleri 14 gün içinde yapılabilir.",
+          "p2": "İade koşulları her kurs için farklılık gösterebilir."
+        }
+      },
+      "intellectual": {
+        "p1": "Platform ve içerikleri Academia'nın fikri mülkiyetidir.",
+        "p2": "Kullanıcılar içerikleri yalnızca lisanslı kullanım kapsamında kullanabilir.",
+        "p3": "Fikri mülkiyet ihlalleri yasal takibe tabidir."
+      },
+      "termination": {
+        "p1": "Hesabınızı istediğiniz zaman sonlandırabilirsiniz.",
+        "p2": "Şartları ihlal etmeniz durumunda hesabınız sonlandırılabilir.",
+        "p3": "Hesap sonlandırma durumunda verileriniz silinir."
+      },
+      "limitation": {
+        "p1": "Hizmetlerimiz 'olduğu gibi' sunulmaktadır.",
+        "p2": "Academia dolaylı zararlardan sorumlu değildir."
+      },
+      "changes": {
+        "p1": "Bu şartlar zaman zaman güncellenebilir.",
+        "p2": "Önemli değişiklikler size bildirilecektir."
+      }
+    }
+  }
 }

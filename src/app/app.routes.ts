@@ -4,10 +4,16 @@ import { RoleGuard } from './core/guards/role.guard';
 import { HomeComponent } from "./features/home/components/home/home.component";
 import { InstructorProfileComponent } from "./features/instructor/components/instructor-profile/instructor-profile.component";
 import { PaymentCheckoutComponent } from "./features/payment/components/payment-checkout/payment-checkout.component";
+
+// Error Pages
 import { Error403Component } from "./features/pages/error-403/error-403.component";
 import { Error401Component } from "./features/pages/error-401/error-401.component";
 import { Error500Component } from "./features/pages/error-500/error-500.component";
 import { Error404Component } from "./features/pages/error-404/error-404.component";
+
+// Legal Pages
+import { PrivacyPolicyComponent } from "./features/pages/privacy-policy/privacy-policy.component";
+import { TermsOfServiceComponent } from "./features/pages/terms-of-service/terms-of-service.component";
 
 export const routes: Routes = [
   // Ana sayfa
@@ -88,8 +94,41 @@ export const routes: Routes = [
   {
     path: 'checkout/:courseId',
     component: PaymentCheckoutComponent,
-    canActivate: [AuthGuard], // Ödeme için giriş gerekli
+    canActivate: [AuthGuard],
     title: 'Ödeme'
+  },
+
+  // ========== YASAL SAYFALAR ==========
+  {
+    path: 'privacy-policy',
+    component: PrivacyPolicyComponent,
+    title: 'Gizlilik Sözleşmesi'
+  },
+  {
+    path: 'terms-of-service',
+    component: TermsOfServiceComponent,
+    title: 'Kullanım Şartları'
+  },
+  // Alternatif route'lar (SEO için)
+  {
+    path: 'privacy',
+    redirectTo: '/privacy-policy',
+    pathMatch: 'full'
+  },
+  {
+    path: 'terms',
+    redirectTo: '/terms-of-service',
+    pathMatch: 'full'
+  },
+  {
+    path: 'legal/privacy',
+    redirectTo: '/privacy-policy',
+    pathMatch: 'full'
+  },
+  {
+    path: 'legal/terms',
+    redirectTo: '/terms-of-service',
+    pathMatch: 'full'
   },
 
   // ========== HATA SAYFALARI ==========
@@ -117,7 +156,6 @@ export const routes: Routes = [
 
   // ========== WILDCARD ROUTE ==========
   // ÖNEMLİ: Bu route EN SON olmalı!
-  // Tüm tanımsız route'ları 404 sayfasına yönlendirir
   {
     path: '**',
     component: Error404Component,

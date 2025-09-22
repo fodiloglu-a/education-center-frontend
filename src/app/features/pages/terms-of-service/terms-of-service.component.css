@@ -1,0 +1,154 @@
+/* Aynı CSS dosyası privacy-policy ile */
+.legal-document {
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+.document-header {
+    background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
+    color: white;
+    padding: 4rem 0 2rem;
+    text-align: center;
+}
+
+.document-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.document-subtitle {
+    font-size: 1.125rem;
+    opacity: 0.9;
+}
+
+.document-content {
+    padding: 3rem 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.table-of-contents {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #764ba2;
+}
+
+.table-of-contents h3 {
+    color: #1f2937;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.table-of-contents ul {
+    list-style: none;
+    padding: 0;
+}
+
+.table-of-contents li {
+    margin-bottom: 0.5rem;
+}
+
+.table-of-contents a {
+    color: #764ba2;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.table-of-contents a:hover {
+    color: #553c7b;
+    text-decoration: underline;
+}
+
+.document-section {
+    background: white;
+    border-radius: 12px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.document-section h2 {
+    color: #1f2937;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.document-section h3 {
+    color: #374151;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.document-section h4 {
+    color: #4b5563;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.document-section p {
+    color: #6b7280;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.document-section ul {
+    color: #6b7280;
+    padding-left: 1.5rem;
+    line-height: 1.7;
+}
+
+.document-section li {
+    margin-bottom: 0.5rem;
+}
+
+.contact-info {
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.contact-info p {
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .document-header {
+        padding: 2rem 0 1rem;
+    }
+
+    .document-title {
+        font-size: 2rem;
+    }
+
+    .document-content {
+        padding: 1.5rem 0;
+    }
+
+    .container {
+        padding: 0 1rem;
+    }
+
+    .table-of-contents,
+    .document-section {
+        padding: 1.5rem;
+    }
+}

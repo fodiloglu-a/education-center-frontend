@@ -1,0 +1,116 @@
+<div class="legal-document">
+    <!-- Header -->
+    <div class="document-header">
+        <div class="container">
+            <h1 class="document-title">{{ 'legal.privacy.title' | translate }}</h1>
+            <p class="document-subtitle">{{ 'legal.privacy.lastUpdated' | translate }}: 22 Eylül 2025</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="document-content">
+        <div class="container">
+            <!-- Table of Contents -->
+            <div class="table-of-contents">
+                <h3>{{ 'legal.privacy.tableOfContents' | translate }}</h3>
+                <ul>
+                    <li><a (click)="scrollToSection('introduction')">{{ 'legal.privacy.sections.introduction' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('data-collection')">{{ 'legal.privacy.sections.dataCollection' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('data-usage')">{{ 'legal.privacy.sections.dataUsage' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('data-sharing')">{{ 'legal.privacy.sections.dataSharing' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('data-security')">{{ 'legal.privacy.sections.dataSecurity' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('user-rights')">{{ 'legal.privacy.sections.userRights' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('cookies')">{{ 'legal.privacy.sections.cookies' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('contact')">{{ 'legal.privacy.sections.contact' | translate }}</a></li>
+                </ul>
+            </div>
+
+            <!-- Sections -->
+            <section id="introduction" class="document-section">
+                <h2>1. {{ 'legal.privacy.sections.introduction' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.introduction.p1' | translate }}</p>
+                <p>{{ 'legal.privacy.content.introduction.p2' | translate }}</p>
+            </section>
+
+            <section id="data-collection" class="document-section">
+                <h2>2. {{ 'legal.privacy.sections.dataCollection' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.dataCollection.intro' | translate }}</p>
+
+                <h3>2.1 {{ 'legal.privacy.content.dataCollection.personal.title' | translate }}</h3>
+                <ul>
+                    <li>{{ 'legal.privacy.content.dataCollection.personal.name' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataCollection.personal.email' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataCollection.personal.phone' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataCollection.personal.address' | translate }}</li>
+                </ul>
+
+                <h3>2.2 {{ 'legal.privacy.content.dataCollection.technical.title' | translate }}</h3>
+                <ul>
+                    <li>{{ 'legal.privacy.content.dataCollection.technical.ip' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataCollection.technical.browser' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataCollection.technical.device' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataCollection.technical.usage' | translate }}</li>
+                </ul>
+            </section>
+
+            <section id="data-usage" class="document-section">
+                <h2>3. {{ 'legal.privacy.sections.dataUsage' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.dataUsage.intro' | translate }}</p>
+                <ul>
+                    <li>{{ 'legal.privacy.content.dataUsage.service' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataUsage.communication' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataUsage.improvement' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataUsage.security' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataUsage.legal' | translate }}</li>
+                </ul>
+            </section>
+
+            <section id="data-sharing" class="document-section">
+                <h2>4. {{ 'legal.privacy.sections.dataSharing' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.dataSharing.intro' | translate }}</p>
+                <ul>
+                    <li>{{ 'legal.privacy.content.dataSharing.consent' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataSharing.legal' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataSharing.service' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.dataSharing.business' | translate }}</li>
+                </ul>
+            </section>
+
+            <section id="data-security" class="document-section">
+                <h2>5. {{ 'legal.privacy.sections.dataSecurity' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.dataSecurity.intro' | translate }}</p>
+                <p>{{ 'legal.privacy.content.dataSecurity.measures' | translate }}</p>
+            </section>
+
+            <section id="user-rights" class="document-section">
+                <h2>6. {{ 'legal.privacy.sections.userRights' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.userRights.intro' | translate }}</p>
+                <ul>
+                    <li>{{ 'legal.privacy.content.userRights.access' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.userRights.correction' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.userRights.deletion' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.userRights.restriction' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.userRights.portability' | translate }}</li>
+                    <li>{{ 'legal.privacy.content.userRights.objection' | translate }}</li>
+                </ul>
+            </section>
+
+            <section id="cookies" class="document-section">
+                <h2>7. {{ 'legal.privacy.sections.cookies' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.cookies.intro' | translate }}</p>
+                <p>{{ 'legal.privacy.content.cookies.types' | translate }}</p>
+                <p>{{ 'legal.privacy.content.cookies.control' | translate }}</p>
+            </section>
+
+            <section id="contact" class="document-section">
+                <h2>8. {{ 'legal.privacy.sections.contact' | translate }}</h2>
+                <p>{{ 'legal.privacy.content.contact.intro' | translate }}</p>
+                <div class="contact-info">
+                    <p><strong>E-posta:</strong> privacyacademia.com</p>
+                    <p><strong>Adres:</strong> Academia Platform, İstanbul, Türkiye</p>
+                    <p><strong>Telefon:</strong> +90 (212) 123 45 67</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

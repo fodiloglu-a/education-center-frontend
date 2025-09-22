@@ -1,0 +1,123 @@
+<div class="legal-document">
+    <!-- Header -->
+    <div class="document-header">
+        <div class="container">
+            <h1 class="document-title">{{ 'legal.terms.title' | translate }}</h1>
+            <p class="document-subtitle">{{ 'legal.terms.lastUpdated' | translate }}: 22 Eylül 2025</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="document-content">
+        <div class="container">
+            <!-- Table of Contents -->
+            <div class="table-of-contents">
+                <h3>{{ 'legal.terms.tableOfContents' | translate }}</h3>
+                <ul>
+                    <li><a (click)="scrollToSection('acceptance')">{{ 'legal.terms.sections.acceptance' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('services')">{{ 'legal.terms.sections.services' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('registration')">{{ 'legal.terms.sections.registration' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('conduct')">{{ 'legal.terms.sections.conduct' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('content')">{{ 'legal.terms.sections.content' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('payment')">{{ 'legal.terms.sections.payment' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('intellectual')">{{ 'legal.terms.sections.intellectual' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('termination')">{{ 'legal.terms.sections.termination' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('limitation')">{{ 'legal.terms.sections.limitation' | translate }}</a></li>
+                    <li><a (click)="scrollToSection('changes')">{{ 'legal.terms.sections.changes' | translate }}</a></li>
+                </ul>
+            </div>
+
+            <!-- Sections -->
+            <section id="acceptance" class="document-section">
+                <h2>1. {{ 'legal.terms.sections.acceptance' | translate }}</h2>
+                <p>{{ 'legal.terms.content.acceptance.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.acceptance.p2' | translate }}</p>
+            </section>
+
+            <section id="services" class="document-section">
+                <h2>2. {{ 'legal.terms.sections.services' | translate }}</h2>
+                <p>{{ 'legal.terms.content.services.p1' | translate }}</p>
+                <ul>
+                    <li>{{ 'legal.terms.content.services.courses' | translate }}</li>
+                    <li>{{ 'legal.terms.content.services.certificates' | translate }}</li>
+                    <li>{{ 'legal.terms.content.services.community' | translate }}</li>
+                    <li>{{ 'legal.terms.content.services.support' | translate }}</li>
+                </ul>
+            </section>
+
+            <section id="registration" class="document-section">
+                <h2>3. {{ 'legal.terms.sections.registration' | translate }}</h2>
+                <p>{{ 'legal.terms.content.registration.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.registration.p2' | translate }}</p>
+                <p>{{ 'legal.terms.content.registration.p3' | translate }}</p>
+            </section>
+
+            <section id="conduct" class="document-section">
+                <h2>4. {{ 'legal.terms.sections.conduct' | translate }}</h2>
+                <p>{{ 'legal.terms.content.conduct.intro' | translate }}</p>
+
+                <h3>4.1 {{ 'legal.terms.content.conduct.prohibited.title' | translate }}</h3>
+                <ul>
+                    <li>{{ 'legal.terms.content.conduct.prohibited.illegal' | translate }}</li>
+                    <li>{{ 'legal.terms.content.conduct.prohibited.harmful' | translate }}</li>
+                    <li>{{ 'legal.terms.content.conduct.prohibited.spam' | translate }}</li>
+                    <li>{{ 'legal.terms.content.conduct.prohibited.copyright' | translate }}</li>
+                    <li>{{ 'legal.terms.content.conduct.prohibited.privacy' | translate }}</li>
+                    <li>{{ 'legal.terms.content.conduct.prohibited.impersonation' | translate }}</li>
+                </ul>
+            </section>
+
+            <section id="content" class="document-section">
+                <h2>5. {{ 'legal.terms.sections.content' | translate }}</h2>
+                <p>{{ 'legal.terms.content.content.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.content.p2' | translate }}</p>
+                <p>{{ 'legal.terms.content.content.p3' | translate }}</p>
+            </section>
+
+            <section id="payment" class="document-section">
+                <h2>6. {{ 'legal.terms.sections.payment' | translate }}</h2>
+                <p>{{ 'legal.terms.content.payment.p1' | translate }}</p>
+
+                <h3>6.1 {{ 'legal.terms.content.payment.pricing.title' | translate }}</h3>
+                <p>{{ 'legal.terms.content.payment.pricing.p1' | translate }}</p>
+
+                <h3>6.2 {{ 'legal.terms.content.payment.refund.title' | translate }}</h3>
+                <p>{{ 'legal.terms.content.payment.refund.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.payment.refund.p2' | translate }}</p>
+            </section>
+
+            <section id="intellectual" class="document-section">
+                <h2>7. {{ 'legal.terms.sections.intellectual' | translate }}</h2>
+                <p>{{ 'legal.terms.content.intellectual.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.intellectual.p2' | translate }}</p>
+                <p>{{ 'legal.terms.content.intellectual.p3' | translate }}</p>
+            </section>
+
+            <section id="termination" class="document-section">
+                <h2>8. {{ 'legal.terms.sections.termination' | translate }}</h2>
+                <p>{{ 'legal.terms.content.termination.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.termination.p2' | translate }}</p>
+                <p>{{ 'legal.terms.content.termination.p3' | translate }}</p>
+            </section>
+
+            <section id="limitation" class="document-section">
+                <h2>9. {{ 'legal.terms.sections.limitation' | translate }}</h2>
+                <p>{{ 'legal.terms.content.limitation.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.limitation.p2' | translate }}</p>
+            </section>
+
+            <section id="changes" class="document-section">
+                <h2>10. {{ 'legal.terms.sections.changes' | translate }}</h2>
+                <p>{{ 'legal.terms.content.changes.p1' | translate }}</p>
+                <p>{{ 'legal.terms.content.changes.p2' | translate }}</p>
+
+                <div class="contact-info">
+                    <h4>İletişim Bilgileri</h4>
+                    <p><strong>E-posta:</strong> legalacademia.com</p>
+                    <p><strong>Adres:</strong> Academia Platform, İstanbul, Türkiye</p>
+                    <p><strong>Telefon:</strong> +90 (212) 123 45 67</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
