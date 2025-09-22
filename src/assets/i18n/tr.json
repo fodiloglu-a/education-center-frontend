@@ -1208,5 +1208,55 @@
         "p2": "Önemli değişiklikler size bildirilecektir."
       }
     }
+  },
+  "COURSE_ADMIN_APPROVAL_INFO": "Oluşturduğunuz eğitim, yayınlanmadan önce admin tarafından incelenecektir. Onay sürecinden sonra eğitiminiz yayına alınacaktır.",
+  "IMAGE_URL_PASTE_PLACEHOLDER": "Görsel dosya adını buraya yapıştırın (örn: a7640e24...png)",
+  "UPLOAD_IMAGE": "Görsel Yükle",
+  "IMAGE_URL_HELP_TEXT": "Görsel yüklemek için 'Görsel Yükle' butonuna tıklayın, dosyanızı yükleyin ve oluşan dosya adını (örn: a7640e24-e7f4-4ee0-8e0b-32b526828445_dosya.png) buraya yapıştırın.",
+  "IMAGE_PREVIEW": "Görsel Önizleme",
+  "COURSE_IMAGE_PREVIEW": "Eğitim görseli önizlemesi",
+  "IMAGE_PREVIEW_ERROR": "Görsel yüklenemedi",
+  "SUBMIT_FOR_APPROVAL": "Onay İçin Gönder",
+  "ADMIN_APPROVAL_NOTE": "Admin onayı gerektirir",
+  "COURSE_CREATE_SUCCESS_ADMIN_APPROVAL": "Eğitim başarıyla oluşturuldu",
+  "ADMIN_APPROVAL_PENDING": "Eğitiminiz admin onayı bekliyor. Onaylandıktan sonra yayınlanacaktır.",
+  "OPEN_MATERIAL_UPLOAD": "Materyal yükleme sayfasını aç",
+  "MINUTES": "dakika",
+  "PROCESSING": "İşleniyor",
+  "ADVANCED_INFORMATION": "Detaylı Bilgiler",
+  "REQUIREMENTS_HELP_TEXT": "Her satıra bir gereksinim yazın",
+  "WHAT_YOU_WILL_LEARN_HELP_TEXT": "Her satıra bir öğrenilecek konu yazın",
+  "TARGET_AUDIENCE_HELP_TEXT": "Her satıra bir hedef kitle yazın",
+  "PUBLISHED_HELP_TEXT": "Eğitimi yayınla/yayından kaldır",
+  "CANCEL": "İptal",
+
+  "CATEGORY": {
+    "PROGRAMMING": "Programlama",
+    "WEB_DEVELOPMENT": "Web Geliştirme",
+    "MOBILE_DEVELOPMENT": "Mobil Geliştirme",
+    "DATA_SCIENCE": "Veri Bilimi",
+    "MACHINE_LEARNING": "Makine Öğrenmesi",
+    "CYBER_SECURITY": "Siber Güvenlik",
+    "CLOUD_COMPUTING": "Bulut Bilişim",
+    "DEVOPS": "DevOps",
+    "DESIGN": "Tasarım",
+    "BUSINESS": "İş Dünyası",
+    "MARKETING": "Pazarlama",
+    "PERSONAL_DEVELOPMENT": "Kişisel Gelişim",
+    "LANGUAGE": "Dil Eğitimi",
+    "OTHER": "Diğer"
+  },
+
+  "LEVEL": {
+    "BEGINNER": "Başlangıç",
+    "INTERMEDIATE": "Orta",
+    "ADVANCED": "İleri",
+    "ALL_LEVELS": "Tüm Seviyeler"
+  },
+
+  "LANGUAGE": {
+    "TR": "Türkçe",
+    "EN": "İngilizce",
+    "UK": "Ukraynaca"
   }
 }

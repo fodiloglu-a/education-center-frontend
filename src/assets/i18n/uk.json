@@ -1284,6 +1284,56 @@
         "accept": "приймаю"
       }
     }
+  },
+  "COURSE_ADMIN_APPROVAL_INFO": "Ваш курс буде переглянутий адміністратором перед публікацією. Після процесу схвалення ваш курс буде опублікований.",
+  "IMAGE_URL_PASTE_PLACEHOLDER": "Вставте назву файлу зображення тут (наприклад, a7640e24...png)",
+  "UPLOAD_IMAGE": "Завантажити зображення",
+  "IMAGE_URL_HELP_TEXT": "Натисніть кнопку 'Завантажити зображення', щоб завантажити файл, потім вставте згенеровану назву файлу (наприклад, a7640e24-e7f4-4ee0-8e0b-32b526828445_файл.png) тут.",
+  "IMAGE_PREVIEW": "Попередній перегляд зображення",
+  "COURSE_IMAGE_PREVIEW": "Попередній перегляд зображення курсу",
+  "IMAGE_PREVIEW_ERROR": "Зображення не вдалося завантажити",
+  "SUBMIT_FOR_APPROVAL": "Надіслати на схвалення",
+  "ADMIN_APPROVAL_NOTE": "Потребує схвалення адміністратора",
+  "COURSE_CREATE_SUCCESS_ADMIN_APPROVAL": "Курс успішно створено",
+  "ADMIN_APPROVAL_PENDING": "Ваш курс очікує на схвалення адміністратора. Він буде опублікований після схвалення.",
+  "OPEN_MATERIAL_UPLOAD": "Відкрити сторінку завантаження матеріалів",
+  "MINUTES": "хвилин",
+  "PROCESSING": "Обробка",
+  "ADVANCED_INFORMATION": "Детальна інформація",
+  "REQUIREMENTS_HELP_TEXT": "Введіть одну вимогу в рядок",
+  "WHAT_YOU_WILL_LEARN_HELP_TEXT": "Введіть один результат навчання в рядок",
+  "TARGET_AUDIENCE_HELP_TEXT": "Введіть одну цільову аудиторію в рядок",
+  "PUBLISHED_HELP_TEXT": "Опублікувати/зняти з публікації курс",
+  "CANCEL": "Скасувати",
+
+  "CATEGORY": {
+    "PROGRAMMING": "Програмування",
+    "WEB_DEVELOPMENT": "Веб-розробка",
+    "MOBILE_DEVELOPMENT": "Мобільна розробка",
+    "DATA_SCIENCE": "Наука про дані",
+    "MACHINE_LEARNING": "Машинне навчання",
+    "CYBER_SECURITY": "Кібербезпека",
+    "CLOUD_COMPUTING": "Хмарні обчислення",
+    "DEVOPS": "DevOps",
+    "DESIGN": "Дизайн",
+    "BUSINESS": "Бізнес",
+    "MARKETING": "Маркетинг",
+    "PERSONAL_DEVELOPMENT": "Особистий розвиток",
+    "LANGUAGE": "Мова",
+    "OTHER": "Інше"
+  },
+
+  "LEVEL": {
+    "BEGINNER": "Початківець",
+    "INTERMEDIATE": "Середній",
+    "ADVANCED": "Просунутий",
+    "ALL_LEVELS": "Всі рівні"
+  },
+
+  "LANGUAGE": {
+    "TR": "Турецька",
+    "EN": "Англійська",
+    "UK": "Українська"
   }
 
 

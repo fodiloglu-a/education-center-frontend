@@ -9,7 +9,7 @@ import { CourseService } from '../../services/course.service';
 // CourseCategory ve CourseLevel enumlarını import ediyoruz
 import { CourseDetailsResponse, CourseCategory, CourseLevel } from '../../models/course.models';
 import { catchError, finalize } from 'rxjs/operators';
-import {Observable, of} from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import { TokenService } from '../../../../core/services/token.service';
@@ -37,19 +37,22 @@ export class CourseFormComponent implements OnInit {
   successMessage: string | null = null;
   currentUserId: number | null = null;
 
+  // Material upload URL'i
+  readonly MATERIAL_UPLOAD_URL = 'http://localhost:4200/instructor/add-material';
+  // Cloudflare base URL
+  readonly CLOUDFLARE_BASE_URL = 'https://media-videos.849d26839fb7b1d41361dfa0cfed6323.r2.cloudflarestorage.com/';
+
   // Enum değerlerini şablonda kullanmak için
   courseCategories = Object.values(CourseCategory);
   courseLevels = Object.values(CourseLevel);
 
-  // Dil seçenekleri (basit bir örnek)
-  // Gerçek projede bu bir servisten veya dış kaynaktan gelmelidir.
+  // Dil seçenekleri
   languageOptions = [
     { value: 'TR', labelKey: 'LANGUAGE.TR' },
     { value: 'EN', labelKey: 'LANGUAGE.EN' },
     { value: 'UK', labelKey: 'LANGUAGE.UK' },
     // Diğer diller eklenebilir
   ];
-
 
   constructor(
       private route: ActivatedRoute,
@@ -70,36 +73,34 @@ export class CourseFormComponent implements OnInit {
       } else {
         this.isEditMode = false;
       }
-      this.initForm(); // Formu burada başlat
+      this.initForm();
       if (this.isEditMode && this.courseId) {
-        this.loadCourseDetails(this.courseId); // Düzenleme modundaysa detayları yükle
+        this.loadCourseDetails(this.courseId);
       } else {
-        this.isLoading = false; // Yeni kurs oluşturuluyorsa yükleme bitti
+        this.isLoading = false;
       }
     });
   }
 
   /**
    * Eğitim formunu başlatır.
-   * Yeni eklenen alanlar için FormControl'ler eklendi.
+   * externalPurchaseUrl ve certificateAvailable alanları kaldırıldı.
+   * imageUrl validasyonu güncellendi - artık URL formatı kontrolü yok
    */
   initForm(): void {
     this.courseForm = new FormGroup({
       title: new FormControl('', [Validators.required, Validators.minLength(3)]),
       description: new FormControl('', [Validators.required, Validators.minLength(10)]),
-      imageUrl: new FormControl('', [Validators.required, Validators.pattern('^(https?:\/\/[^\\s\/$.?#].[^\\s]*)$')]),
+      imageUrl: new FormControl('', [Validators.required]), // URL pattern validasyonu kaldırıldı
       price: new FormControl(0, [Validators.required, Validators.min(0)]),
-      published: new FormControl(false),
-      // YENİ EKLENEN FORM KONTROLLERİ
-      category: new FormControl(null, [Validators.required]), // Enum için başlangıçta null veya varsayılan bir değer
+      published: new FormControl(false), // Varsayılan olarak false, admin onayı gerekecek
+      category: new FormControl(null, [Validators.required]),
       duration: new FormControl(0, [Validators.required, Validators.min(0)]),
-      level: new FormControl(null, [Validators.required]), // Enum için başlangıçta null veya varsayılan bir değer
-      language: new FormControl(null, [Validators.required]), // Dil seçimi
-      externalPurchaseUrl: new FormControl(''), // Opsiyonel olduğu için required değil
-      requirements: new FormControl(''), // Textarea'dan diziye dönüştürülecek
-      whatYouWillLearn: new FormControl(''), // Textarea'dan diziye dönüştürülecek
-      targetAudience: new FormControl(''), // Textarea'dan diziye dönüştürülecek
-      certificateAvailable: new FormControl(false)
+      level: new FormControl(null, [Validators.required]),
+      language: new FormControl(null, [Validators.required]),
+      requirements: new FormControl(''),
+      whatYouWillLearn: new FormControl(''),
+      targetAudience: new FormControl('')
     });
   }
 
@@ -109,22 +110,42 @@ export class CourseFormComponent implements OnInit {
   get imageUrl() { return this.courseForm.get('imageUrl'); }
   get price() { return this.courseForm.get('price'); }
   get published() { return this.courseForm.get('published'); }
-  // YENİ EKLENEN GETTER'LAR
   get category() { return this.courseForm.get('category'); }
   get duration() { return this.courseForm.get('duration'); }
   get level() { return this.courseForm.get('level'); }
   get language() { return this.courseForm.get('language'); }
-  get externalPurchaseUrl() { return this.courseForm.get('externalPurchaseUrl'); }
   get requirements() { return this.courseForm.get('requirements'); }
   get whatYouWillLearn() { return this.courseForm.get('whatYouWillLearn'); }
   get targetAudience() { return this.courseForm.get('targetAudience'); }
-  get certificateAvailable() { return this.courseForm.get('certificateAvailable'); }
 
+  /**
+   * Görsel URL'ini Cloudflare URL'ine dönüştürür
+   */
+  getImagePreviewUrl(fileName: string): string {
+    if (!fileName) return '';
+
+    // Eğer zaten tam URL ise direkt döndür
+    if (fileName.startsWith('http://') || fileName.startsWith('https://')) {
+      return fileName;
+    }
+
+    // Dosya adını URL encode et (boşlukları %20'ye çevir)
+    const encodedFileName = encodeURIComponent(fileName);
+
+    // Cloudflare URL'ini oluştur
+    return `${this.CLOUDFLARE_BASE_URL}${encodedFileName}`;
+  }
+
+  /**
+   * Material upload sayfasını yeni sekmede açar
+   */
+  openMaterialUpload(): void {
+    window.open(this.MATERIAL_UPLOAD_URL, '_blank');
+  }
 
   /**
    * Düzenleme modundaysa eğitimin detaylarını yükler ve formu doldurur.
-   * Yeni eklenen alanlar için patchValue eklendi.
-   * @param id Eğitimin ID'si.
+   * externalPurchaseUrl ve certificateAvailable alanları kaldırıldı
    */
   loadCourseDetails(id: number): void {
     this.isLoading = true;
@@ -133,7 +154,7 @@ export class CourseFormComponent implements OnInit {
     if (!this.currentUserId) {
       this.isLoading = false;
       this.errorMessage = this.translate.instant('AUTHENTICATION_REQUIRED');
-      this.router.navigate(['/auth/login']); // Kullanıcı yoksa giriş sayfasına yönlendir
+      this.router.navigate(['/auth/login']);
       return;
     }
 
@@ -153,16 +174,13 @@ export class CourseFormComponent implements OnInit {
           imageUrl: course.imageUrl,
           price: course.price,
           published: course.published,
-          // YENİ EKLENEN ALANLARIN PATCH EDİLMESİ
           category: course.category,
           duration: course.duration,
           level: course.level,
           language: course.language,
-          externalPurchaseUrl: course.externalPurchaseUrl || '', // null ise boş string
-          requirements: course.requirements ? course.requirements.join('\n') : '', // Diziyi textarea için stringe çevir
+          requirements: course.requirements ? course.requirements.join('\n') : '',
           whatYouWillLearn: course.whatYouWillLearn ? course.whatYouWillLearn.join('\n') : '',
-          targetAudience: course.targetAudience ? course.targetAudience.join('\n') : '',
-          certificateAvailable: course.certificateAvailable
+          targetAudience: course.targetAudience ? course.targetAudience.join('\n') : ''
         });
       } else {
         this.errorMessage = this.translate.instant('COURSE_NOT_LOADED');
@@ -171,9 +189,20 @@ export class CourseFormComponent implements OnInit {
   }
 
   /**
+   * String'i satırlara bölerek array'e dönüştürür
+   * Boş satırları filtreler
+   */
+  private parseTextAreaToArray(text: string): string[] {
+    if (!text) return [];
+    return text.split('\n')
+        .map(item => item.trim())
+        .filter(item => item !== '');
+  }
+
+  /**
    * Eğitim formunu gönderir.
-   * Yeni eğitim oluşturur veya mevcut eğitimi günceller.
-   * Yeni eklenen alanların dönüşümü yapıldı.
+   * Admin onayı için published alanı false olarak ayarlanır (yeni eğitim için)
+   * externalPurchaseUrl ve certificateAvailable alanları kaldırıldı
    */
   onSubmit(): void {
     this.errorMessage = null;
@@ -189,30 +218,41 @@ export class CourseFormComponent implements OnInit {
 
     const rawCourseData = this.courseForm.value;
 
-    // String dizisi alanlarını newline karakterine göre böl
-    const courseData: CourseDetailsResponse = {
-      ...rawCourseData,
-      requirements: rawCourseData.requirements ? rawCourseData.requirements.split('\n').filter((item: string) => item.trim() !== '') : [],
-      whatYouWillLearn: rawCourseData.whatYouWillLearn ? rawCourseData.whatYouWillLearn.split('\n').filter((item: string) => item.trim() !== '') : [],
-      targetAudience: rawCourseData.targetAudience ? rawCourseData.targetAudience.split('\n').filter((item: string) => item.trim() !== '') : [],
-      // Diğer eksik alanları CourseDetailsResponse tipine uygun şekilde doldur
-      // Bu alanlar genellikle entity'de bulunmayan, ancak DTO'da beklenen türetilmiş veya ilişkisel verilerdir.
-      // Backend'e gönderirken bunları boş veya varsayılan değerlerle göndermek genellikle kabul edilebilir.
-      instructorName: '', // Frontend'de formdan gelmiyor, backend instructorId'den alacak
+    // Form verilerini backend formatına dönüştür
+    const courseData: Partial<CourseDetailsResponse> = {
+      title: rawCourseData.title,
+      description: rawCourseData.description,
+      imageUrl: rawCourseData.imageUrl,
+      price: rawCourseData.price,
+      published: this.isEditMode ? rawCourseData.published : false, // Yeni eğitim için her zaman false
+      category: rawCourseData.category,
+      duration: rawCourseData.duration,
+      level: rawCourseData.level,
+      language: rawCourseData.language,
+      requirements: this.parseTextAreaToArray(rawCourseData.requirements),
+      whatYouWillLearn: this.parseTextAreaToArray(rawCourseData.whatYouWillLearn),
+      targetAudience: this.parseTextAreaToArray(rawCourseData.targetAudience),
+      // Backend tarafından doldurulacak alanlar
+      instructorName: '',
       lessons: [],
       reviews: [],
       enrollmentCount: 0,
       averageRating: 0,
       totalReviews: 0,
+      certificateAvailable: false, // Varsayılan olarak false
       createdAt: new Date().toISOString(),
-      updatedAt: null // Güncelleme modunda backend tarafından set edilecek
+      updatedAt: null
     };
 
     let operation: Observable<any>;
+    let successMessageKey: string;
+
     if (this.isEditMode && this.courseId) {
-      operation = this.courseService.updateCourse(this.courseId, courseData);
+      operation = this.courseService.updateCourse(this.courseId, courseData as CourseDetailsResponse);
+      successMessageKey = 'COURSE_UPDATE_SUCCESS';
     } else {
-      operation = this.courseService.createCourse(courseData);
+      operation = this.courseService.createCourse(courseData as CourseDetailsResponse);
+      successMessageKey = 'COURSE_CREATE_SUCCESS_ADMIN_APPROVAL';
     }
 
     operation.pipe(
@@ -225,14 +265,30 @@ export class CourseFormComponent implements OnInit {
         })
     ).subscribe(response => {
       if (response) {
-        this.successMessage = this.translate.instant('COURSE_SAVE_SUCCESS');
-        this.router.navigate(['/courses', response.id]);
+        this.successMessage = this.translate.instant(successMessageKey);
+
+        // Eğer yeni eğitim oluşturulduysa, admin onayı bekleniyor mesajını göster
+        if (!this.isEditMode) {
+          this.successMessage += ' ' + this.translate.instant('ADMIN_APPROVAL_PENDING');
+        }
+
+        // 2 saniye bekle sonra yönlendir
+        setTimeout(() => {
+          this.router.navigate(['/courses', response.id]);
+        }, 2000);
       }
     });
   }
 
   /**
-   * Alert dialog kapatıldığında mesajları temizler.
+   * Form'da yapılmamış değişiklikler var mı kontrol eder
+   */
+  hasUnsavedChanges(): boolean {
+    return this.courseForm?.dirty || false;
+  }
+
+  /**
+   * Alert dialog kapatıldığında mesajları temizler
    */
   clearMessages(): void {
     this.errorMessage = null;

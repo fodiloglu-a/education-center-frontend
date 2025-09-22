@@ -15,6 +15,12 @@
             <ng-container *ngIf="!isEditMode">{{ 'CREATE_NEW_COURSE_SUBTITLE' | translate }}</ng-container>
         </p>
 
+        <!-- Admin Onay Bilgilendirmesi -->
+        <div class="admin-approval-info" *ngIf="!isEditMode">
+            <i class="info-icon">ℹ️</i>
+            <span>{{ 'COURSE_ADMIN_APPROVAL_INFO' | translate }}</span>
+        </div>
+
         <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="course-form">
             <div class="form-group">
                 <label for="title">{{ 'COURSE_TITLE' | translate }}</label>
@@ -38,15 +44,22 @@
                 </div>
             </div>
 
+            <!-- Görsel URL - Güncellendi -->
             <div class="form-group">
                 <label for="imageUrl">{{ 'IMAGE_URL' | translate }}</label>
-                <input type="url" id="imageUrl" formControlName="imageUrl" class="form-control"
-                       [class.is-invalid]="imageUrl?.invalid && (imageUrl?.dirty || imageUrl?.touched)"
-                       placeholder="{{ 'IMAGE_URL_PLACEHOLDER' | translate }}">
+                <div class="image-url-wrapper">
+                    <input type="text" id="imageUrl" formControlName="imageUrl" class="form-control"
+                           [class.is-invalid]="imageUrl?.invalid && (imageUrl?.dirty || imageUrl?.touched)"
+                           placeholder="{{ 'IMAGE_URL_PASTE_PLACEHOLDER' | translate }}">
+                    <button type="button" class="btn-upload-image" (click)="openMaterialUpload()">
+                        {{ 'UPLOAD_IMAGE' | translate }}
+                    </button>
+                </div>
+                <small class="help-text">{{ 'IMAGE_URL_HELP_TEXT' | translate }}</small>
                 <div *ngIf="imageUrl?.invalid && (imageUrl?.dirty || imageUrl?.touched)" class="invalid-feedback">
                     <div *ngIf="imageUrl?.errors?.['required']">{{ 'IMAGE_URL_REQUIRED' | translate }}</div>
-                    <div *ngIf="imageUrl?.errors?.['pattern']">{{ 'IMAGE_URL_INVALID' | translate }}</div>
                 </div>
+
             </div>
 
             <div class="form-group">
@@ -108,16 +121,6 @@
             </div>
 
             <div class="form-group">
-                <label for="externalPurchaseUrl">{{ 'EXTERNAL_PURCHASE_URL' | translate }}</label>
-                <input type="url" id="externalPurchaseUrl" formControlName="externalPurchaseUrl" class="form-control"
-                       [class.is-invalid]="externalPurchaseUrl?.invalid && (externalPurchaseUrl?.dirty || externalPurchaseUrl?.touched)"
-                       placeholder="{{ 'EXTERNAL_PURCHASE_URL_PLACEHOLDER' | translate }}">
-                <div *ngIf="externalPurchaseUrl?.invalid && (externalPurchaseUrl?.dirty || externalPurchaseUrl?.touched)" class="invalid-feedback">
-                    <div *ngIf="externalPurchaseUrl?.errors?.['pattern']">{{ 'EXTERNAL_PURCHASE_URL_INVALID' | translate }}</div>
-                </div>
-            </div>
-
-            <div class="form-group">
                 <label for="requirements">{{ 'REQUIREMENTS' | translate }}</label>
                 <textarea id="requirements" formControlName="requirements" class="form-control" rows="3"
                           placeholder="{{ 'REQUIREMENTS_PLACEHOLDER' | translate }}"></textarea>
@@ -135,23 +138,20 @@
                           placeholder="{{ 'TARGET_AUDIENCE_PLACEHOLDER' | translate }}"></textarea>
             </div>
 
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="certificateAvailable" formControlName="certificateAvailable" class="form-checkbox">
-                <label for="certificateAvailable">{{ 'CERTIFICATE_AVAILABLE' | translate }}</label>
-            </div>
-
-            <div class="form-group checkbox-group">
+            <!-- Yayınlanma Durumu - Sadece Edit Modunda Görünür -->
+            <div class="form-group checkbox-group" *ngIf="isEditMode">
                 <input type="checkbox" id="published" formControlName="published" class="form-checkbox">
                 <label for="published">{{ 'PUBLISHED' | translate }}</label>
+                <small class="admin-note">{{ 'ADMIN_APPROVAL_NOTE' | translate }}</small>
             </div>
 
             <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
 
             <button type="submit" class="submit-button primary-btn" [disabled]="courseForm.invalid || isLoading">
-        <span *ngIf="!isLoading">
-          <ng-container *ngIf="isEditMode">{{ 'SAVE_CHANGES' | translate }}</ng-container>
-          <ng-container *ngIf="!isEditMode">{{ 'CREATE_COURSE_BUTTON' | translate }}</ng-container>
-        </span>
+                <span *ngIf="!isLoading">
+                    <ng-container *ngIf="isEditMode">{{ 'SAVE_CHANGES' | translate }}</ng-container>
+                    <ng-container *ngIf="!isEditMode">{{ 'SUBMIT_FOR_APPROVAL' | translate }}</ng-container>
+                </span>
                 <span *ngIf="isLoading" class="spinner"></span>
             </button>
         </form>

@@ -1,232 +1,582 @@
 /* course-form.component.css */
 
+/* ==================== CONTAINER & LAYOUT ==================== */
 .course-form-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px);
-  padding: var(--spacing-lg);
-  background-color: var(--background-color);
-  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  background: #f8f9fa;
 }
 
 .course-form-card {
-  background-color: var(--card-bg);
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 600px; /* Daha geniş form için */
-  text-align: center;
-  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  animation: fadeIn 0.3s ease-in;
 }
 
+/* ==================== TYPOGRAPHY ==================== */
 .card-title {
-  color: var(--primary-color);
-  font-size: var(--font-size-xxl);
-  margin-bottom: var(--spacing-sm);
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
 }
 
 .card-subtitle {
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  margin-bottom: var(--spacing-xl);
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.5;
 }
 
-.course-form {
+/* ==================== ADMIN APPROVAL INFO ==================== */
+.admin-approval-info {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  animation: slideDown 0.3s ease-out;
 }
 
+.info-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* ==================== FORM GROUPS ==================== */
 .form-group {
-  text-align: left;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 1.75rem;
 }
 
 .form-group label {
   display: block;
-  font-size: var(--font-size-sm);
-  color: var(--accent-color);
-  margin-bottom: var(--spacing-xs);
+  font-size: 0.9375rem;
   font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.625rem;
+  letter-spacing: -0.01em;
 }
 
+/* ==================== FORM CONTROLS ==================== */
 .form-control {
   width: 100%;
-  padding: var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-base);
-  color: var(--text-color);
-  background-color: var(--input-bg);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  box-sizing: border-box;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  color: #1a1a1a;
+}
+
+.form-control:hover {
+  border-color: #d1d5db;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: #ffffff;
 }
 
 .form-control.is-invalid {
-  border-color: var(--error-color);
+  border-color: #ef4444;
+  background: #fef2f2;
 }
 
+.form-control.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Textarea specific */
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* Select specific */
+select.form-control {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+  padding-right: 3rem;
+  appearance: none;
+}
+
+/* ==================== IMAGE URL WRAPPER ==================== */
+.image-url-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.image-url-wrapper .form-control {
+  flex: 1;
+}
+
+.btn-upload-image {
+  padding: 0 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-upload-image:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+.btn-upload-image:active {
+  transform: translateY(0);
+}
+
+/* ==================== HELP TEXT ==================== */
+.help-text {
+  display: block;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+/* ==================== IMAGE PREVIEW ==================== */
+.image-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border: 2px dashed #e5e7eb;
+  border-radius: 10px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  object-fit: contain;
+}
+
+/* ==================== VALIDATION FEEDBACK ==================== */
 .invalid-feedback {
-  color: var(--error-color);
-  font-size: var(--font-size-xs);
-  margin-top: var(--spacing-xs);
-  text-align: left;
+  display: block;
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin-top: 0.5rem;
+  animation: fadeIn 0.2s ease;
 }
 
+/* ==================== CHECKBOX GROUP ==================== */
 .checkbox-group {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-group:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .form-checkbox {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
-  accent-color: var(--primary-color); /* Checkbox rengi */
+  accent-color: #667eea;
 }
 
 .checkbox-group label {
   margin-bottom: 0;
   cursor: pointer;
-  font-size: var(--font-size-base);
-  color: var(--text-color);
+  user-select: none;
+  flex: 1;
 }
 
+.admin-note {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ==================== ALERT MESSAGES ==================== */
 .alert {
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-md);
-  font-size: var(--font-size-base);
-  margin-top: var(--spacing-md);
-  text-align: center;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  animation: slideDown 0.3s ease-out;
 }
 
 .alert-error {
-  background-color: rgba(244, 67, 54, 0.1);
-  color: var(--error-color);
-  border: 1px solid var(--error-color);
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
-.alert-success {
-  background-color: rgba(76, 175, 80, 0.1);
-  color: var(--success-color);
-  border: 1px solid var(--success-color);
-}
-
+/* ==================== BUTTONS ==================== */
 .submit-button {
   width: 100%;
-  padding: var(--spacing-md);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: 10px;
   cursor: pointer;
-  margin-top: var(--spacing-lg);
-  transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
-  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  letter-spacing: -0.01em;
 }
 
-.submit-button:disabled {
-  opacity: 0.6;
+.primary-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.primary-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.35);
+}
+
+.primary-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.primary-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-  box-shadow: none;
+  background: #9ca3af;
 }
 
-/* Spinner Stilleri */
+.action-button {
+  padding: 0.875rem 1.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+}
+
+/* ==================== SPINNER ==================== */
 .spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
+/* ==================== BACK LINK ==================== */
 .back-link {
-  margin-top: var(--spacing-xl);
-  font-size: var(--font-size-base);
-  color: var(--text-color);
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e5e7eb;
 }
 
 .back-link a {
-  color: var(--primary-color);
+  color: #667eea;
   text-decoration: none;
-  font-weight: 600;
-  transition: color var(--transition-fast);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  transition: color 0.2s ease;
 }
 
 .back-link a:hover {
-  color: var(--deep-blue);
+  color: #764ba2;
   text-decoration: underline;
 }
 
+/* ==================== NO CONTENT FOUND ==================== */
 .no-content-found {
   text-align: center;
-  padding: var(--spacing-xl);
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  color: var(--text-color);
-  max-width: 500px;
-  margin: var(--spacing-xxl) auto;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .no-content-found p {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
 }
 
-.no-content-found .action-button {
-  width: auto;
-  min-width: 180px;
-  margin-top: var(--spacing-md);
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* ========================================= */
-/* Duyarlı Tasarım (Responsive Design) */
-/* ========================================= */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-@media (max-width: 480px) {
-  .course-form-card {
-    padding: var(--spacing-lg);
-    margin: var(--spacing-md);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================== MOBILE RESPONSIVE (900px ve altı) ==================== */
+@media screen and (max-width: 900px) {
+  /* Container ayarları */
+  .course-form-container {
+    padding: 1rem;
+    background: white;
   }
 
+  .course-form-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+  }
+
+  /* Typography */
   .card-title {
-    font-size: var(--font-size-xl);
+    font-size: 1.5rem;
+    margin-bottom: 0.375rem;
   }
 
   .card-subtitle {
-    font-size: var(--font-size-sm);
+    font-size: 0.9375rem;
+    margin-bottom: 1.5rem;
   }
 
+  /* Admin approval info */
+  .admin-approval-info {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Form groups */
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-group label {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Form controls */
   .form-control {
-    padding: var(--spacing-sm);
+    padding: 0.75rem 0.875rem;
+    font-size: 16px; /* iOS zoom engellemek için */
+    border-radius: 8px;
   }
 
+  /* Image URL wrapper - Dikey düzen */
+  .image-url-wrapper {
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .btn-upload-image {
+    width: 100%;
+    padding: 0.875rem;
+    justify-content: center;
+    font-size: 0.875rem;
+  }
+
+  /* Help text */
+  .help-text {
+    font-size: 0.8125rem;
+  }
+
+  /* Image preview */
+  .image-preview {
+    padding: 0.75rem;
+  }
+
+  .image-preview img {
+    max-height: 150px;
+  }
+
+  /* Checkbox group */
+  .checkbox-group {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-checkbox {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Buttons */
   .submit-button {
-    font-size: var(--font-size-base);
-    padding: var(--spacing-sm);
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9375rem;
+    margin-top: 1.5rem;
+  }
+
+  .action-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    width: 100%;
+  }
+
+  /* Alert */
+  .alert {
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  /* Back link */
+  .back-link {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .back-link a {
+    font-size: 0.875rem;
+  }
+
+  /* No content found */
+  .no-content-found {
+    padding: 3rem 1.5rem;
+  }
+
+  .no-content-found p {
+    font-size: 1rem;
+  }
+
+  /* Validation feedback */
+  .invalid-feedback {
+    font-size: 0.8125rem;
   }
 }
 
-/* Yeni eklenebilecek ek responsive ayarlar */
-/* Örneğin, daha büyük ekranlarda iki sütunlu form düzeni vb. */
-/* Şu anki temel responsive yapı çoğu şeyi iyi ele alacaktır */
+/* ==================== KÜÇÜK MOBIL (480px ve altı) ==================== */
+@media screen and (max-width: 480px) {
+  .course-form-container {
+    padding: 0.75rem;
+  }
+
+  .course-form-card {
+    padding: 1.25rem;
+    border-radius: 10px;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.875rem;
+  }
+
+  .admin-approval-info {
+    padding: 0.75rem;
+    gap: 0.625rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-control {
+    padding: 0.625rem 0.75rem;
+  }
+
+  textarea.form-control {
+    min-height: 80px;
+  }
+
+  .submit-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ==================== DARK MODE SUPPORT (Opsiyonel) ==================== */
+@media (prefers-color-scheme: dark) {
+  /* Dark mode stilleri buraya eklenebilir */
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+  .btn-upload-image,
+  .submit-button,
+  .action-button,
+  .back-link {
+    display: none;
+  }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+/* Focus görünürlüğü */
+*:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Reduced motion tercihlerine saygı */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
