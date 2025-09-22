@@ -1,6 +1,6 @@
 // teacher-subscription.component.ts
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -79,7 +79,8 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
       private tokenService: TokenService,
       private translate: TranslateService,
       private formBuilder: FormBuilder,
-      private router: Router
+      private router: Router,
+      private cdr: ChangeDetectorRef // ChangeDetectorRef eklendi
   ) {
     this.subscriptionForm = this.initializeForm();
   }
@@ -95,6 +96,7 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
 
     this.loadSubscriptionData();
     this.setupSubscriptionStatusListener();
+    this.setupLanguageChangeListener(); // Dil değişikliğini dinle
   }
 
   ngOnDestroy(): void {
@@ -107,6 +109,20 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
       selectedPlanType: ['', [Validators.required]],
       agreedToTerms: [false, [Validators.requiredTrue]]
     });
+  }
+
+  // DİL DEĞİŞİKLİĞİNİ DİNLEME FONKSİYONU
+  private setupLanguageChangeListener(): void {
+    this.translate.onLangChange
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          console.log('Language changed to:', this.translate.currentLang);
+          // Plan kartlarını yeniden oluştur
+          if (this.subscriptionPlans) {
+            this.setupPlanCards(this.subscriptionPlans);
+            this.cdr.detectChanges(); // Manuel değişiklik algılama
+          }
+        });
   }
 
   private setupSubscriptionStatusListener(): void {
@@ -172,6 +188,8 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
   }
 
   private setupPlanCards(plans: TeacherSubscriptionPlansResponse): void {
+    console.log('Setting up plan cards with language:', this.translate.currentLang);
+
     // Backend'den gelen planları kullanarak 3 paket oluştur
     // Eğer backend'den farklı bir yapı geliyorsa, manuel olarak oluştur
 
@@ -193,9 +211,11 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
           recommended: false,
           popular: false
         },
-        isSelected: false,
+        isSelected: this.selectedPlan?.type === TeacherPlanType.BASIC,
         isLoading: false,
-        buttonText: this.translate.instant('SELECT_PLAN'),
+        buttonText: this.selectedPlan?.type === TeacherPlanType.BASIC ?
+            this.translate.instant('SELECTED') :
+            this.translate.instant('SELECT_PLAN'),
         buttonClass: 'btn-outline'
       },
       // PROFESSIONAL PAKET - monthlyPremium'u kullan ama fiyatı güncelle
@@ -217,9 +237,11 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
           recommended: false,
           popular: true
         },
-        isSelected: false,
+        isSelected: this.selectedPlan?.type === TeacherPlanType.PROFESSIONAL,
         isLoading: false,
-        buttonText: this.translate.instant('SELECT_PLAN'),
+        buttonText: this.selectedPlan?.type === TeacherPlanType.PROFESSIONAL ?
+            this.translate.instant('SELECTED') :
+            this.translate.instant('SELECT_PLAN'),
         buttonClass: 'btn-primary'
       },
       // PREMIUM PAKET - yearlyPremium'u kullan ama aylık olarak göster
@@ -243,12 +265,16 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
           recommended: true,
           popular: false
         },
-        isSelected: false,
+        isSelected: this.selectedPlan?.type === TeacherPlanType.YEARLY_PREMIUM,
         isLoading: false,
-        buttonText: this.translate.instant('SELECT_PLAN'),
+        buttonText: this.selectedPlan?.type === TeacherPlanType.YEARLY_PREMIUM ?
+            this.translate.instant('SELECTED') :
+            this.translate.instant('SELECT_PLAN'),
         buttonClass: 'btn-success'
       }
     ];
+
+    console.log('Plan cards updated:', this.planCards);
   }
 
   selectPlan(planCard: TeacherSubscriptionPlanCard): void {
@@ -287,7 +313,7 @@ export class TeacherSubscriptionComponent implements OnInit, OnDestroy {
     this.clearMessages();
 
     const formData = this.subscriptionForm.value as TeacherSubscriptionFormData;
-
+    console.log(formData);
     this.teacherSubscriptionService.getCheckoutSummary(
         formData.selectedPlanType,
         undefined // customAmount yok artık
