@@ -219,7 +219,13 @@
   "LEVEL.INTERMEDIATE": "Середній",
   "LEVEL.ADVANCED": "Просунутий",
   "LEVEL.ALL_LEVELS": "Усі рівні",
+
   "LESSON_FORM_COMPONENT": "LESSON_FORM_COMPONENT",
+  "PREVIEW_LESSON_DESCRIPTION": "Це робить цей урок загальнодоступним як попередній перегляд курсу.",
+  "RESOURCES_HELP_TEXT": "Перелічіть додаткові ресурси (наприклад, документи, зовнішні посилання), розділяючи їх комами.",
+  "LESSON_VIDEO": "Відео уроку",
+  "PASTE_VIDEO_ID_HERE": "Вставте ідентифікатор відео тут",
+  "OPEN_MATERIALS": "Відкрити матеріали",
   "ADD_NEW_LESSON": "Додати новий урок",
   "EDIT_LESSON_SUBTITLE": "Редагувати деталі уроку.",
   "ADD_NEW_LESSON_SUBTITLE": "Заповніть форму нижче, щоб створити новий урок.",

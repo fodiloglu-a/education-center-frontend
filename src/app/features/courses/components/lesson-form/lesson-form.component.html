@@ -1,101 +1,404 @@
-<div class="lesson-form-container">
-    <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
+<main class="lesson-form-container">
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" *ngIf="isLoading" role="status" aria-live="polite">
+        <app-loading-spinner></app-loading-spinner>
+        <span class="sr-only">İçerik yükleniyor...</span>
+    </div>
 
-    <app-alert-dialog *ngIf="errorMessage" [message]="errorMessage" type="error" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+    <!-- Alert Messages Container -->
+    <aside class="alerts-wrapper" role="complementary" aria-label="Bildirimler">
+        <app-alert-dialog
+                *ngIf="errorMessage"
+                [message]="errorMessage"
+                type="error"
+                [autoClose]="true"
+                (closed)="clearMessages()"
+                role="alert"
+                aria-live="assertive">
+        </app-alert-dialog>
 
-    <app-alert-dialog *ngIf="successMessage" [message]="successMessage" type="success" [autoClose]="true" (closed)="clearMessages()"></app-alert-dialog>
+        <app-alert-dialog
+                *ngIf="successMessage"
+                [message]="successMessage"
+                type="success"
+                [autoClose]="true"
+                (closed)="clearMessages()"
+                role="status"
+                aria-live="polite">
+        </app-alert-dialog>
+    </aside>
 
-    <div class="lesson-form-card" *ngIf="!isLoading">
-        <h2 class="card-title">
-            <ng-container *ngIf="isEditMode">{{ 'EDIT_LESSON' | translate }}</ng-container>
-            <ng-container *ngIf="!isEditMode">{{ 'ADD_NEW_LESSON' | translate }}</ng-container>
-        </h2>
-        <p class="card-subtitle">
-            <ng-container *ngIf="isEditMode">{{ 'EDIT_LESSON_SUBTITLE' | translate }}</ng-container>
-            <ng-container *ngIf="!isEditMode">{{ 'ADD_NEW_LESSON_SUBTITLE' | translate }}</ng-container>
-        </p>
-        <p class="course-context-info">{{ 'FOR_COURSE' | translate }}: <strong>{{ courseTitle }}</strong></p>
+    <!-- Main Form Card -->
+    <article class="form-card" *ngIf="!isLoading && courseId">
+        <!-- Form Header -->
+        <header class="form-header">
+            <h1 class="form-title">
+                {{ isEditMode ? ('EDIT_LESSON' | translate) : ('ADD_NEW_LESSON' | translate) }}
+            </h1>
 
-        <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()" class="lesson-form">
-            <div class="form-group">
-                <label for="title">{{ 'LESSON_TITLE' | translate }}</label>
-                <input type="text" id="title" formControlName="title" class="form-control"
-                       [class.is-invalid]="title?.invalid && (title?.dirty || title?.touched)"
-                       placeholder="{{ 'LESSON_TITLE_PLACEHOLDER' | translate }}">
-                <div *ngIf="title?.invalid && (title?.dirty || title?.touched)" class="invalid-feedback">
-                    <div *ngIf="title?.errors?.['required']">{{ 'LESSON_TITLE_REQUIRED' | translate }}</div>
-                    <div *ngIf="title?.errors?.['minlength']">{{ 'LESSON_TITLE_MIN_LENGTH' | translate: '{min: 3}' }}</div>
+            <p class="form-subtitle">
+                {{ isEditMode ? ('EDIT_LESSON_SUBTITLE' | translate) : ('ADD_NEW_LESSON_SUBTITLE' | translate) }}
+            </p>
+
+            <div class="course-badge" role="note">
+                <span class="badge-label">{{ 'FOR_COURSE' | translate }}:</span>
+                <strong class="badge-value">{{ courseTitle }}</strong>
+            </div>
+        </header>
+
+        <!-- Form Body -->
+        <form
+                [formGroup]="lessonForm"
+                (ngSubmit)="onSubmit()"
+                class="lesson-form"
+                novalidate
+                aria-label="Ders formu">
+
+            <!-- Title Field -->
+            <fieldset class="form-field">
+                <label for="title" class="field-label">
+                    <span class="label-text">
+                        {{ 'LESSON_TITLE' | translate }}
+                        <abbr class="required" title="Zorunlu alan" aria-label="zorunlu">*</abbr>
+                    </span>
+                </label>
+
+                <div class="field-input-wrapper">
+                    <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            formControlName="title"
+                            class="field-input"
+                            [class.has-error]="title?.invalid && (title?.dirty || title?.touched)"
+                            [placeholder]="'LESSON_TITLE_PLACEHOLDER' | translate"
+                            [attr.aria-invalid]="title?.invalid && (title?.dirty || title?.touched)"
+                            [attr.aria-describedby]="title?.invalid && (title?.dirty || title?.touched) ? 'title-error' : null"
+                            autocomplete="off">
+
+                    <div
+                            *ngIf="title?.invalid && (title?.dirty || title?.touched)"
+                            class="field-error"
+                            id="title-error"
+                            role="alert">
+                        <span *ngIf="title?.errors?.['required']">
+                            {{ 'LESSON_TITLE_REQUIRED' | translate }}
+                        </span>
+                        <span *ngIf="title?.errors?.['minlength']">
+                            {{ 'LESSON_TITLE_MIN_LENGTH' | translate: {min: 3} }}
+                        </span>
+                    </div>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="description">{{ 'LESSON_DESCRIPTION' | translate }}</label>
-                <textarea id="description" formControlName="description" class="form-control" rows="5"
-                          [class.is-invalid]="description?.invalid && (description?.dirty || description?.touched)"
-                          placeholder="{{ 'LESSON_DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
-                <div *ngIf="description?.invalid && (description?.dirty || description?.touched)" class="invalid-feedback">
-                    <div *ngIf="description?.errors?.['required']">{{ 'LESSON_DESCRIPTION_REQUIRED' | translate }}</div>
-                    <div *ngIf="description?.errors?.['minlength']">{{ 'LESSON_DESCRIPTION_MIN_LENGTH' | translate: '{min: 10}' }}</div>
+            <!-- Description Field -->
+            <fieldset class="form-field">
+                <label for="description" class="field-label">
+                    <span class="label-text">
+                        {{ 'LESSON_DESCRIPTION' | translate }}
+                        <abbr class="required" title="Zorunlu alan" aria-label="zorunlu">*</abbr>
+                    </span>
+                </label>
+
+                <div class="field-input-wrapper">
+                    <textarea
+                            id="description"
+                            name="description"
+                            formControlName="description"
+                            class="field-textarea"
+                            rows="4"
+                            [class.has-error]="description?.invalid && (description?.dirty || description?.touched)"
+                            [placeholder]="'LESSON_DESCRIPTION_PLACEHOLDER' | translate"
+                            [attr.aria-invalid]="description?.invalid && (description?.dirty || description?.touched)"
+                            [attr.aria-describedby]="description?.invalid && (description?.dirty || description?.touched) ? 'description-error' : null">
+                    </textarea>
+
+                    <div
+                            *ngIf="description?.invalid && (description?.dirty || description?.touched)"
+                            class="field-error"
+                            id="description-error"
+                            role="alert">
+                        <span *ngIf="description?.errors?.['required']">
+                            {{ 'LESSON_DESCRIPTION_REQUIRED' | translate }}
+                        </span>
+                        <span *ngIf="description?.errors?.['minlength']">
+                            {{ 'LESSON_DESCRIPTION_MIN_LENGTH' | translate: {min: 10} }}
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="videoUrl">{{ 'VIDEO_URL' | translate }}</label>
-                <input type="text" id="videoUrl" formControlName="videoUrl" class="form-control"
-                       placeholder="{{ 'VIDEO_URL_PLACEHOLDER' | translate }}">
-            </div>
+            </fieldset>
 
-            <div class="form-group">
-                <label for="duration">{{ 'DURATION_MINUTES' | translate }}</label>
-                <input type="number" id="duration" formControlName="duration" class="form-control"
-                       [class.is-invalid]="duration?.invalid && (duration?.dirty || duration?.touched)"
-                       placeholder="{{ 'DURATION_PLACEHOLDER' | translate }}">
-                <div *ngIf="duration?.invalid && (duration?.dirty || duration?.touched)" class="invalid-feedback">
-                    <div *ngIf="duration?.errors?.['required']">{{ 'DURATION_REQUIRED' | translate }}</div>
-                    <div *ngIf="duration?.errors?.['min']">{{ 'DURATION_MIN_VALUE' | translate: '{min: 0}' }}</div>
+            <!-- Video Selection Section -->
+            <fieldset class="form-field video-field">
+                <legend class="field-label">
+                    <span class="label-text">
+                        {{ 'LESSON_VIDEO' | translate }}
+                    </span>
+                </legend>
+
+                <div class="video-controls">
+                    <div class="field-input-wrapper">
+                        <input
+                                type="text"
+                                id="videoId"
+                                name="videoId"
+                                formControlName="videoId"
+                                class="field-input video-input"
+                                [class.has-error]="videoId?.invalid && (videoId?.dirty || videoId?.touched)"
+                                [placeholder]="'PASTE_VIDEO_ID_HERE' | translate"
+                                (paste)="onVideoIdPaste($event)"
+                                (input)="onVideoIdChange($event)"
+                                [attr.aria-invalid]="videoId?.invalid && (videoId?.dirty || videoId?.touched)"
+                                [attr.aria-describedby]="'video-help ' + (videoId?.invalid && (videoId?.dirty || videoId?.touched) ? 'video-error' : '')"
+                                autocomplete="off">
+
+                        <button
+                                type="button"
+                                class="btn btn-secondary"
+                                (click)="openVideoSelector()"
+                                [attr.aria-label]="'OPEN_MATERIALS_PAGE' | translate">
+                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M10 2L8 7H2L6.5 10L4.5 15L10 11.5L15.5 15L13.5 10L18 7H12L10 2Z" fill="currentColor"/>
+                            </svg>
+                            <span>{{ 'OPEN_MATERIALS' | translate }}</span>
+                        </button>
+                    </div>
+
+                    <div class="field-help" id="video-help">
+                        <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M8 11V8M8 5V5.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ 'VIDEO_SELECTION_HELP' | translate }}</span>
+                    </div>
+
+                    <!-- Video Preview -->
+                    <div *ngIf="selectedVideoId && videoId?.valid" class="video-preview" role="region" aria-label="Video önizleme">
+                        <div class="preview-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M5 7L19 12L5 17V7Z" fill="currentColor"/>
+                            </svg>
+                        </div>
+
+                        <div class="preview-details">
+                            <h3 class="preview-title">{{ selectedVideoTitle || getVideoTitleFromId(selectedVideoId) }}</h3>
+                            <p class="preview-id">
+                                <span class="preview-label">{{ 'VIDEO_ID' | translate }}:</span>
+                                <code>{{ selectedVideoId }}</code>
+                            </p>
+                            <span class="preview-badge preview-badge--success">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                {{ 'VALID_VIDEO_ID' | translate }}
+                            </span>
+                        </div>
+
+                        <button
+                                type="button"
+                                class="btn-icon-only"
+                                (click)="clearSelectedVideo()"
+                                [attr.aria-label]="'CLEAR_VIDEO' | translate">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M6 6L14 14M6 14L14 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div
+                            *ngIf="videoId?.invalid && (videoId?.dirty || videoId?.touched)"
+                            class="field-error"
+                            id="video-error"
+                            role="alert">
+                        <span *ngIf="videoId?.errors?.['invalidVideoId']">
+                            {{ 'INVALID_VIDEO_ID_FORMAT' | translate }}
+                        </span>
+                    </div>
                 </div>
+            </fieldset>
+
+            <!-- Duration and Order Fields Row -->
+            <div class="form-row">
+                <!-- Duration Field -->
+                <fieldset class="form-field">
+                    <label for="duration" class="field-label">
+                        <span class="label-text">
+                            {{ 'DURATION_MINUTES' | translate }}
+                            <abbr class="required" title="Zorunlu alan" aria-label="zorunlu">*</abbr>
+                        </span>
+                    </label>
+
+                    <div class="field-input-wrapper">
+                        <input
+                                type="number"
+                                id="duration"
+                                name="duration"
+                                formControlName="duration"
+                                class="field-input"
+                                [class.has-error]="duration?.invalid && (duration?.dirty || duration?.touched)"
+                                [placeholder]="'DURATION_PLACEHOLDER' | translate"
+                                min="0"
+                                step="1"
+                                [attr.aria-invalid]="duration?.invalid && (duration?.dirty || duration?.touched)"
+                                [attr.aria-describedby]="duration?.invalid && (duration?.dirty || duration?.touched) ? 'duration-error' : null">
+
+                        <div
+                                *ngIf="duration?.invalid && (duration?.dirty || duration?.touched)"
+                                class="field-error"
+                                id="duration-error"
+                                role="alert">
+                            <span *ngIf="duration?.errors?.['required']">
+                                {{ 'DURATION_REQUIRED' | translate }}
+                            </span>
+                            <span *ngIf="duration?.errors?.['min']">
+                                {{ 'DURATION_MIN_VALUE' | translate: {min: 0} }}
+                            </span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Lesson Order Field -->
+                <fieldset class="form-field">
+                    <label for="lessonOrder" class="field-label">
+                        <span class="label-text">
+                            {{ 'LESSON_ORDER' | translate }}
+                            <abbr class="required" title="Zorunlu alan" aria-label="zorunlu">*</abbr>
+                        </span>
+                    </label>
+
+                    <div class="field-input-wrapper">
+                        <input
+                                type="number"
+                                id="lessonOrder"
+                                name="lessonOrder"
+                                formControlName="lessonOrder"
+                                class="field-input"
+                                [class.has-error]="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)"
+                                [placeholder]="'LESSON_ORDER_PLACEHOLDER' | translate"
+                                min="1"
+                                step="1"
+                                [attr.aria-invalid]="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)"
+                                [attr.aria-describedby]="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched) ? 'order-error' : null">
+
+                        <div
+                                *ngIf="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)"
+                                class="field-error"
+                                id="order-error"
+                                role="alert">
+                            <span *ngIf="lessonOrder?.errors?.['required']">
+                                {{ 'LESSON_ORDER_REQUIRED' | translate }}
+                            </span>
+                            <span *ngIf="lessonOrder?.errors?.['min']">
+                                {{ 'LESSON_ORDER_MIN_VALUE' | translate: {min: 1} }}
+                            </span>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
 
-            <div class="form-group">
-                <label for="lessonOrder">{{ 'LESSON_ORDER' | translate }}</label>
-                <input type="number" id="lessonOrder" formControlName="lessonOrder" class="form-control"
-                       [class.is-invalid]="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)"
-                       placeholder="{{ 'LESSON_ORDER_PLACEHOLDER' | translate }}">
-                <div *ngIf="lessonOrder?.invalid && (lessonOrder?.dirty || lessonOrder?.touched)" class="invalid-feedback">
-                    <div *ngIf="lessonOrder?.errors?.['required']">{{ 'LESSON_ORDER_REQUIRED' | translate }}</div>
-                    <div *ngIf="lessonOrder?.errors?.['min']">{{ 'LESSON_ORDER_MIN_VALUE' | translate: '{min: 1}' }}</div>
+            <!-- Preview Toggle -->
+            <fieldset class="form-field">
+                <div class="toggle-field">
+                    <input
+                            type="checkbox"
+                            id="isPreview"
+                            name="isPreview"
+                            formControlName="isPreview"
+                            class="toggle-input"
+                            role="switch"
+                            [attr.aria-checked]="lessonForm.get('isPreview')?.value">
+
+                    <label for="isPreview" class="toggle-label">
+                        <span class="toggle-switch" aria-hidden="true"></span>
+                        <span class="toggle-content">
+                            <strong>{{ 'IS_PREVIEW_LESSON' | translate }}</strong>
+                            <small>{{ 'PREVIEW_LESSON_DESCRIPTION' | translate }}</small>
+                        </span>
+                    </label>
                 </div>
+            </fieldset>
+
+            <!-- Resources Field -->
+            <fieldset class="form-field">
+                <label for="resources" class="field-label">
+                    <span class="label-text">
+                        {{ 'LESSON_RESOURCES' | translate }}
+                    </span>
+                </label>
+
+                <div class="field-input-wrapper">
+                    <textarea
+                            id="resources"
+                            name="resources"
+                            formControlName="resources"
+                            class="field-textarea"
+                            rows="3"
+                            [placeholder]="'LESSON_RESOURCES_PLACEHOLDER' | translate"
+                            [attr.aria-describedby]="'resources-help'">
+                    </textarea>
+
+                    <div class="field-help" id="resources-help">
+                        <svg class="help-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M8 11V8M8 5V5.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <span>{{ 'RESOURCES_HELP_TEXT' | translate }}</span>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button
+                        type="button"
+                        class="btn btn-outline"
+                        [routerLink]="['/courses', courseId]">
+                    {{ 'CANCEL' | translate }}
+                </button>
+
+                <button
+                        type="submit"
+                        class="btn btn-primary"
+                        [disabled]="lessonForm.invalid || isLoading"
+                        [class.is-loading]="isLoading">
+
+                    <span class="btn-content" *ngIf="!isLoading">
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M17 10L13 6V9H3V11H13V14L17 10Z" fill="currentColor"/>
+                        </svg>
+                        <span>
+                            {{ isEditMode ? ('SAVE_CHANGES' | translate) : ('ADD_LESSON_BUTTON' | translate) }}
+                        </span>
+                    </span>
+
+                    <span class="btn-loading" *ngIf="isLoading">
+                        <span class="spinner" aria-hidden="true"></span>
+                        <span>{{ 'SAVING' | translate }}...</span>
+                    </span>
+                </button>
             </div>
-
-            <div class="form-group checkbox-group">
-                <input type="checkbox" id="isPreview" formControlName="isPreview" class="form-checkbox">
-                <label for="isPreview">{{ 'IS_PREVIEW_LESSON' | translate }}</label>
-            </div>
-
-            <div class="form-group">
-                <label for="resources">{{ 'LESSON_RESOURCES' | translate }}</label>
-                <textarea id="resources" formControlName="resources" class="form-control" rows="3"
-                          placeholder="{{ 'LESSON_RESOURCES_PLACEHOLDER' | translate }}"></textarea>
-            </div>
-
-
-            <div *ngIf="errorMessage" class="alert alert-error">{{ errorMessage }}</div>
-
-            <button type="submit" class="submit-button primary-btn" [disabled]="lessonForm.invalid || isLoading">
-        <span *ngIf="!isLoading">
-          <ng-container *ngIf="isEditMode">{{ 'SAVE_CHANGES' | translate }}</ng-container>
-          <ng-container *ngIf="!isEditMode">{{ 'ADD_LESSON_BUTTON' | translate }}</ng-container>
-        </span>
-                <span *ngIf="isLoading" class="spinner"></span>
-            </button>
         </form>
+    </article>
 
-        <p class="back-link">
-            <a [routerLink]="['/courses', courseId]">{{ 'BACK_TO_COURSE_DETAIL' | translate }}</a>
-        </p>
-    </div>
+    <!-- Error State - No Course ID -->
+    <article class="empty-state" *ngIf="!isLoading && !courseId && !errorMessage">
+        <div class="empty-state-content">
+            <svg class="empty-icon" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" stroke-dasharray="5 5"/>
+                <path d="M32 20V36M32 44V44.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
 
-    <div *ngIf="!isLoading && !courseId && !errorMessage" class="no-content-found">
-        <p>{{ 'COURSE_ID_MISSING_FOR_LESSON_SAVE' | translate }}</p>
-        <button class="action-button primary-btn" routerLink="/courses">{{ 'BACK_TO_COURSES' | translate }}</button>
-    </div>
-</div>
+            <h2 class="empty-title">{{ 'COURSE_ID_MISSING' | translate }}</h2>
+            <p class="empty-description">{{ 'COURSE_ID_MISSING_FOR_LESSON_SAVE' | translate }}</p>
+
+            <button
+                    class="btn btn-primary"
+                    routerLink="/courses">
+                <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M7 10L3 6V9H1V11H3V14L7 10ZM19 9H11V11H19V9Z" fill="currentColor"/>
+                </svg>
+                <span>{{ 'BACK_TO_COURSES' | translate }}</span>
+            </button>
+        </div>
+    </article>
+</main>

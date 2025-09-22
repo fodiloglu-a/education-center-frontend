@@ -93,6 +93,7 @@ export class CourseService {
    * @returns Güncellenen eğitimin CourseDetailsResponse nesnesini içeren Observable.
    */
   addLessonToCourse(courseId: number, lesson: LessonDTO): Observable<CourseDetailsResponse> {
+    console.log(lesson.preview+'API');
     return this.http.post<CourseDetailsResponse>(`${this.apiUrl}/${courseId}/lessons`, lesson);
   }
 

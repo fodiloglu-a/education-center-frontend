@@ -1,166 +1,455 @@
-/* lesson-form.component.css */
+/* ==================================== */
+/* Genel Stiller & Değişkenler */
+/* ==================================== */
+
+:root {
+  /* Angulardaki ana stillerden değişkenleri referans alıyoruz */
+  --primary-color: var(--primary-color);
+  --secondary-color: var(--secondary-color);
+  --background-color: var(--background-color);
+  --accent-color: var(--accent-color);
+  --dark-color: var(--dark-color);
+  --text-color: var(--text-color);
+  --card-bg: var(--card-bg);
+  --surface-bg: var(--surface-bg);
+  --input-bg: var(--input-bg);
+  --border-color: var(--border-color);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --success-color: var(--success-color);
+  --error-color: var(--error-color);
+  --transition-normal: var(--transition-normal);
+  --border-radius-md: var(--border-radius-md);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-color);
+}
+
+/* ==================================== */
+/* Ana Konteyner ve Düzen */
+/* ==================================== */
 
 .lesson-form-container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  min-height: calc(100vh - var(--spacing-xxl) * 2 - 100px);
   padding: var(--spacing-lg);
-  background-color: var(--background-color);
-  box-sizing: border-box;
+  min-height: 100vh;
+  background-color: var(--surface-bg);
 }
 
-.lesson-form-card {
-  background-color: var(--card-bg);
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 600px; /* Daha geniş form için */
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.alerts-wrapper {
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.form-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  width: 100%;
+  max-width: 900px;
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.form-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px -5px rgba(61, 32, 16, 0.15), 0 6px 10px -3px rgba(61, 32, 16, 0.08);
+}
+
+/* ==================================== */
+/* Başlık ve Altyapı */
+/* ==================================== */
+
+.form-header {
   text-align: center;
-  box-sizing: border-box;
-}
-
-.card-title {
-  color: var(--primary-color);
-  font-size: var(--font-size-xxl);
-  margin-bottom: var(--spacing-sm);
-}
-
-.card-subtitle {
-  color: var(--text-color);
-  font-size: var(--font-size-base);
-  margin-bottom: var(--spacing-md); /* Başlık ile form arasında boşluk */
-}
-
-.course-context-info {
-  color: var(--accent-color);
-  font-size: var(--font-size-md);
   margin-bottom: var(--spacing-xl);
 }
 
-.course-context-info strong {
-  color: var(--primary-color);
+.form-title {
+  font-size: var(--font-size-xxl);
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: var(--spacing-sm);
 }
+
+.form-subtitle {
+  font-size: var(--font-size-md);
+  color: var(--accent-color);
+  margin-top: 0;
+}
+
+.course-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--secondary-color);
+  color: var(--dark-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin-top: var(--spacing-md);
+}
+
+.badge-label {
+  opacity: 0.8;
+}
+
+.badge-value {
+  margin-left: var(--spacing-sm);
+  font-weight: 600;
+}
+
+/* ==================================== */
+/* Form Alanları ve Kontroller */
+/* ==================================== */
 
 .lesson-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
-.form-group {
-  text-align: left;
-  margin-bottom: var(--spacing-sm);
+.form-field {
+  border: none;
+  padding: 0;
+  margin: 0;
 }
 
-.form-group label {
+.field-label {
   display: block;
-  font-size: var(--font-size-sm);
-  color: var(--accent-color);
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
   font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
 }
 
-.form-control {
+.label-text .required {
+  color: var(--error-color);
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.field-input,
+.field-textarea {
   width: 100%;
   padding: var(--spacing-md);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
+  background-color: var(--input-bg);
   font-size: var(--font-size-base);
   color: var(--text-color);
-  background-color: var(--input-bg);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  box-sizing: border-box;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.form-control:focus {
+.field-input::placeholder,
+.field-textarea::placeholder {
+  color: var(--accent-color);
+  opacity: 0.7;
+}
+
+.field-input:focus,
+.field-textarea:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
 }
 
-.form-control.is-invalid {
-  border-color: var(--error-color);
+.field-textarea {
+  resize: vertical;
+  min-height: 100px;
 }
 
-.invalid-feedback {
+.has-error {
+  border-color: var(--error-color) !important;
+}
+
+.field-error {
+  font-size: var(--font-size-sm);
   color: var(--error-color);
-  font-size: var(--font-size-xs);
   margin-top: var(--spacing-xs);
-  text-align: left;
+  line-height: 1.4;
+  display: block;
 }
 
-.checkbox-group {
+.field-help {
+  font-size: var(--font-size-sm);
+  color: var(--accent-color);
+  margin-top: var(--spacing-xs);
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  margin-top: var(--spacing-md);
 }
 
-.form-checkbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: var(--primary-color); /* Checkbox rengi */
+.help-icon {
+  flex-shrink: 0;
+  color: var(--primary-color);
 }
 
-.checkbox-group label {
-  margin-bottom: 0;
-  cursor: pointer;
-  font-size: var(--font-size-base);
-  color: var(--text-color);
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
-.alert {
-  padding: var(--spacing-sm);
+@media (min-width: 768px) {
+  .form-row {
+    flex-direction: row;
+  }
+  .form-row > .form-field {
+    flex: 1;
+  }
+}
+
+/* ==================================== */
+/* Video Alanı ve Önizleme */
+/* ==================================== */
+
+.video-field .field-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+@media (min-width: 576px) {
+  .video-field .field-input-wrapper {
+    flex-direction: row;
+  }
+  .video-input {
+    flex-grow: 1;
+  }
+}
+
+.video-preview {
+  display: flex;
+  align-items: center;
+  background-color: var(--light-accent);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius-md);
-  font-size: var(--font-size-base);
+  padding: var(--spacing-md);
+  gap: var(--spacing-md);
   margin-top: var(--spacing-md);
-  text-align: center;
 }
 
-.alert-error {
-  background-color: rgba(244, 67, 54, 0.1);
-  color: var(--error-color);
-  border: 1px solid var(--error-color);
+.preview-icon {
+  color: var(--primary-color);
+  background-color: var(--hover-bg);
+  border-radius: var(--border-radius-full);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.alert-success {
+.preview-details {
+  flex-grow: 1;
+}
+
+.preview-title {
+  font-size: var(--font-size-base);
+  margin: 0;
+  font-weight: 600;
+}
+
+.preview-id {
+  font-size: var(--font-size-sm);
+  color: var(--accent-color);
+  margin: var(--spacing-xs) 0;
+}
+
+.preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--border-radius-full);
+  font-weight: 500;
+}
+
+.preview-badge--success {
   background-color: rgba(76, 175, 80, 0.1);
   color: var(--success-color);
-  border: 1px solid var(--success-color);
 }
 
-.submit-button {
-  width: 100%;
-  padding: var(--spacing-md);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
+.btn-icon-only {
+  background: none;
   border: none;
-  border-radius: var(--border-radius-md);
+  padding: var(--spacing-sm);
   cursor: pointer;
-  margin-top: var(--spacing-lg);
-  transition: background-color var(--transition-normal), transform var(--transition-fast), opacity var(--transition-fast);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  color: var(--accent-color);
+  transition: color var(--transition-normal);
 }
 
-.submit-button:disabled {
+.btn-icon-only:hover {
+  color: var(--error-color);
+}
+
+/* ==================================== */
+/* Toggle Switch */
+/* ==================================== */
+
+.toggle-field {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+  background-color: var(--border-color);
+  border-radius: var(--border-radius-full);
+  transition: background-color var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.toggle-switch:before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--card-bg);
+  top: 4px;
+  left: 4px;
+  transition: transform var(--transition-normal);
+}
+
+.toggle-input:checked + .toggle-label .toggle-switch {
+  background-color: var(--success-color);
+}
+
+.toggle-input:checked + .toggle-label .toggle-switch:before {
+  transform: translateX(20px);
+}
+
+.toggle-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle-content small {
+  color: var(--accent-color);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* ==================================== */
+/* Düğmeler ve Eylemler */
+/* ==================================== */
+
+.form-actions {
+  display: flex;
+  flex-direction: column-reverse; /* Mobil için ters sıralama */
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+@media (min-width: 576px) {
+  .form-actions {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+  }
+}
+
+.btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--card-bg);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--deep-blue);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--hover-bg);
+  color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:disabled,
+.btn.is-loading {
   opacity: 0.6;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
-/* Spinner Stilleri */
+.btn-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid white;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid var(--primary-color);
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   animation: spin 1s linear infinite;
 }
 
@@ -169,70 +458,64 @@
   100% { transform: rotate(360deg); }
 }
 
-.back-link {
+/* ==================================== */
+/* Boş Durum (Empty State) */
+/* ==================================== */
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius-lg);
+  background-color: rgba(255, 248, 238, 0.5);
+  width: 100%;
+  max-width: 600px;
   margin-top: var(--spacing-xl);
+}
+
+.empty-icon {
+  color: var(--accent-color);
+  margin-bottom: var(--spacing-lg);
+  width: 64px;
+  height: 64px;
+}
+
+.empty-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--dark-color);
+  margin: 0;
+}
+
+.empty-description {
   font-size: var(--font-size-base);
   color: var(--text-color);
+  margin: var(--spacing-sm) 0 var(--spacing-lg);
 }
 
-.back-link a {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color var(--transition-fast);
+.empty-state .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
-.back-link a:hover {
-  color: var(--deep-blue);
-  text-decoration: underline;
+/* SVG İkonlar için genel stil */
+.btn-icon,
+.help-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  flex-shrink: 0;
 }
 
-.no-content-found {
-  text-align: center;
-  padding: var(--spacing-xl);
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-md);
-  color: var(--text-color);
-  max-width: 500px;
-  margin: var(--spacing-xxl) auto;
-}
-
-.no-content-found p {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--spacing-lg);
-}
-
-.no-content-found .action-button {
-  width: auto;
-  min-width: 180px;
-  margin-top: var(--spacing-md);
-}
-
-/* ========================================= */
-/* Duyarlı Tasarım (Responsive Design) */
-/* ========================================= */
-
-@media (max-width: 480px) {
-  .lesson-form-card {
-    padding: var(--spacing-lg);
-    margin: var(--spacing-md);
-  }
-
-  .card-title {
-    font-size: var(--font-size-xl);
-  }
-
-  .card-subtitle {
-    font-size: var(--font-size-sm);
-  }
-
-  .form-control {
-    padding: var(--spacing-sm);
-  }
-
-  .submit-button {
-    font-size: var(--font-size-base);
-    padding: var(--spacing-sm);
-  }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

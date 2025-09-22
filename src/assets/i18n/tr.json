@@ -239,6 +239,11 @@
 
 
   "LESSON_FORM_COMPONENT": "LESSON_FORM_COMPONENT",
+  "PREVIEW_LESSON_DESCRIPTION": "Bu dersin kursun bir önizlemesi olarak herkese açık olmasını sağlar.",
+  "RESOURCES_HELP_TEXT": "Ek kaynakları (örn. belgeler, harici bağlantılar) virgülle ayırarak listeleyin.",
+  "LESSON_VIDEO": "Ders Videosu",
+  "PASTE_VIDEO_ID_HERE": "Video kimliğini buraya yapıştırın",
+  "OPEN_MATERIALS": "Materyalleri Aç",
   "ADD_NEW_LESSON": "Yeni Ders Ekle",
   "EDIT_LESSON_SUBTITLE": "Ders detaylarını düzenleyin.",
   "ADD_NEW_LESSON_SUBTITLE": "Yeni bir ders oluşturmak için aşağıdaki formu doldurun.",
