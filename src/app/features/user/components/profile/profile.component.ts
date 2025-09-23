@@ -650,4 +650,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
   getDownloadCertificateAriaLabel(courseTitle: string): string {
     return `${this.translate.instant('DOWNLOAD_CERTIFICATE')} : ${courseTitle}`;
   }
+  /**
+   * Kullanıcının oturumunu kapatır.
+   */
+  logout(): void {
+    this.tokenService.signOut();
+    this.router.navigate(['/auth/login']);
+
+  }
 }

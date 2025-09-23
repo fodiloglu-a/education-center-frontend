@@ -151,6 +151,15 @@
                     <span class="material-icons" aria-hidden="true">vpn_key</span>
                     <span>{{ 'CHANGE_PASSWORD' | translate }}</span>
                 </a>
+                <a class="action-button secondary-btn"
+                   (click)="logout()"
+                   [attr.aria-label]="'LOGOUT' | translate"
+                   role="button">
+                    <span class="material-icons" aria-hidden="true">logout</span>
+                    <span>{{ 'LOGOUT' | translate }}</span>
+                </a>
+
+
             </nav>
         </section>
 
@@ -413,6 +422,10 @@
             <span>{{ 'RETRY_LOAD_PROFILE' | translate }}</span>
         </button>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
 </div>
 
 <!-- Screen Reader Only Content -->
