@@ -128,23 +128,7 @@
         </button>
 
 
-        <!-- Subscription-dependent Actions -->
-        <div class="subscription-dependent-actions">
-            <a *ngIf="instructorProfile?.isTeacher"
-               [routerLink]="['/instructor/coupons/new']"
-               class="tab-btn add-coupon-btn">
-                <span class="material-icons">add_circle</span>
-                {{ 'ADD_NEW_COUPON' | translate }}
-            </a>
 
-            <button *ngIf="!instructorProfile?.isTeacher"
-                    class="tab-btn disabled-btn"
-                    disabled
-                    title="{{ 'SUBSCRIPTION_REQUIRED_TOOLTIP' | translate }}">
-                <span class="material-icons">lock</span>
-                {{ 'ADD_NEW_COUPON' | translate }}
-            </button>
-        </div>
     </div>
 
     <div class="dashboard-content" *ngIf="!isLoading">
@@ -220,7 +204,30 @@
                         <span class="material-icons">library_add</span>
                         <span>{{ 'ADD_MATERIAL' | translate }}</span>
                     </a>
+                    <!-- Subscription-dependent Actions -->
+                    <br>
+                    <div style="align-content: center" class="subscription-dependent-actions">
+                        <a *ngIf="instructorProfile?.isTeacher"
+                           [routerLink]="['/instructor/coupons/new']"
+                           class="tab-btn add-coupon-btn">
+                            <span class="material-icons">add_circle</span>
+                            {{ 'ADD_NEW_COUPON' | translate }}
+                        </a>
+
+                        <button *ngIf="!instructorProfile?.isTeacher"
+                                class="tab-btn disabled-btn"
+                                disabled
+                                title="{{ 'SUBSCRIPTION_REQUIRED_TOOLTIP' | translate }}">
+                            <span class="material-icons">lock</span>
+                            {{ 'ADD_NEW_COUPON' | translate }}
+                        </button>
+                    </div>
+                    <br>
+
                 </div>
+
+
+
 
                 <!-- Actions for non-subscribed users -->
                 <div *ngIf="!instructorProfile?.isTeacher" class="subscription-required-actions">
