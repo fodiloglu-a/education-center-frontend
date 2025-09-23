@@ -3,24 +3,38 @@
 TODO
 
 todo:HomeComponent:
-- Tüm kurslar geldikten sonra çok satılan kurslar hata veriyor burada tüm satılan kurslar gelsin kullanıcı satın almışsa bile
+-------------------
+
 
 todo:ProfileComponenet:
+-----------------------
 -Profil alanına bildirimler eklenecek.
 
+
 todo:InstructorDashboard:
+-------------------------
 -Kupon butonunun yeri değiştirilecek
 -Sınav oluşturma alanı eklenecek
 -Sertifika oluşturma alanı eklenecek
 -Yer alan bu alanların değerleri teğit edilecek Toplam Kurs  Toplam Öğrenci  Ortalama Puan  Toplam Yorum
 
 todo:CouponComponent:
-
+----------------------
 -Tamamen revize edilecek,
--
-todo::
--Ders alanı ile ilgili komple revizyona geçilinecek.
 
+
+todo:LessonPlaterComponenet:
+-----------------------------
+-Ders alanı videoların kullanıcı rolune gore izlenme durumunu kontrol etmelisinBurada şuphe edilen şey kullanıcı online ise videoları izleyebilecek
+ve burada epitmen ise video izleyebliyormu kontrol edecel yani creator ise
+
+-Kullanıcı eğitimi tamamladıktan sonra sertifika başvurusunu yapacak
+Burada başvuru yapan kullanıcıya sınav atanacak kullanıcıya sınav atandıktan sonra kullanıcı sınavı başarılı bir
+şekilde tamamlar ise kullanıcının profilindeki certifika alanına sertifikası eklenecek.Buraya eklenen aynı alana sınavlar da eklenecek ona göre
+sınav tamamlanmamış ise goruntu farklı sınav tamamlanmış ise görüntü farklı yani ertidika olacak.
+
+todo:ProfileComponenet
+-LogOut butonunu buraya saklayacağız.
 
 
 

@@ -41,8 +41,7 @@
 
                 <ng-container *ngIf="!(isLoggedIn$ | async); else loggedInActions">
                     <button class="auth-button primary-btn" routerLink="/auth/login">{{ 'LOGIN' | translate }}</button>
-                    <button class="auth-button secondary-btn" routerLink="/auth/register">{{ 'REGISTER' | translate }}</button>
-                </ng-container>
+                 </ng-container>
                 <ng-template #loggedInActions>
                     <button class="auth-button primary-btn" (click)="logout()">{{ 'LOGOUT' | translate }}</button>
                 </ng-template>
