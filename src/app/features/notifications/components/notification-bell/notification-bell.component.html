@@ -1,6 +1,6 @@
-<!-- notification-bell.component.html -->
+<!-- notification-bell.component.html - GÜNCELLENMİŞ -->
 
-<div class="notification-bell-container" (clickOutside)="onClickOutside($event)">
+<div class="notification-bell-container">
     <!-- Bell Icon with Badge -->
     <button
             class="notification-bell-button"
@@ -8,17 +8,17 @@
             [attr.aria-label]="'NOTIFICATIONS' | translate"
             [attr.aria-expanded]="isDropdownOpen">
 
-    <span class="material-icons bell-icon" [class.has-notifications]="unreadCount > 0">
-      {{ unreadCount > 0 ? 'notifications_active' : 'notifications' }}
-    </span>
+        <span class="material-icons bell-icon" [class.has-notifications]="unreadCount > 0">
+            {{ unreadCount > 0 ? 'notifications_active' : 'notifications' }}
+        </span>
 
         <!-- Badge -->
         <span
                 *ngIf="unreadCount > 0"
                 class="notification-badge"
                 [attr.aria-label]="unreadCount + ' ' + ('UNREAD_NOTIFICATIONS' | translate)">
-      {{ unreadCount > 99 ? '99+' : unreadCount }}
-    </span>
+            {{ getUnreadCountDisplay() }}
+        </span>
     </button>
 
     <!-- Dropdown -->
@@ -47,7 +47,7 @@
                     [class.unread]="!notification.isRead"
                     [class]="getPriorityClass(notification)"
                     (click)="onNotificationClick(notification)"
-                    [attr.aria-label]="notification.title">
+                    [attr.aria-label]="getTitle(notification)">
 
                 <!-- Icon -->
                 <div class="notification-icon">
@@ -56,8 +56,12 @@
 
                 <!-- Content -->
                 <div class="notification-content">
-                    <h4 class="notification-title">{{ notification.title }}</h4>
-                    <p class="notification-message">{{ notification.message }}</p>
+                    <h4 class="notification-title">
+                        {{ getTitle(notification) }}
+                    </h4>
+                    <p class="notification-message">
+                        {{ getMessage(notification) }}
+                    </p>
                     <span class="notification-time">{{ notification.timeAgo }}</span>
                 </div>
 

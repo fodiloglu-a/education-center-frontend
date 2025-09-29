@@ -1,18 +1,25 @@
-// toast-notification.component.ts
+// toast-notification.component.ts - REVIZE EDİLMİŞ
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { NotificationService } from '../../services/notification.service';
-import { NotificationResponse } from '../../models/notification.models';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { NotificationService } from '../../services/notification.service';
+import {
+  NotificationResponse,
+  NOTIFICATION_TYPE_ICONS,
+  NOTIFICATION_TYPE_COLORS,
+  parseNotificationParams,
+  hasTranslationKey
+} from '../../models/notification.models';
 
 /**
  * ToastNotificationComponent
  * Yeni bildirim geldiğinde ekranda toast olarak gösterir
+ * Translation key desteği ile çok dilli bildirimler
  */
 @Component({
   selector: 'app-toast-notification',
@@ -33,84 +40,127 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
 })
 export class ToastNotificationComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
+  private readonly AUTO_CLOSE_DELAY = 5000; // 5 saniye
+  private readonly MAX_TOASTS = 3; // Maksimum toast sayısı
 
   // State
   notifications: NotificationResponse[] = [];
-  private autoCloseTimeout: any;
-  private readonly AUTO_CLOSE_DELAY = 5000; // 5 saniye
+  private autoCloseTimeouts = new Map<number, any>(); // Her toast için ayrı timeout
 
   constructor(
-      private notificationService: NotificationService,
-      private router: Router
+      private readonly notificationService: NotificationService,
+      private readonly router: Router,
+      private readonly translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
     // Yeni bildirim geldiğinde dinle
     this.notificationService.newNotification$
         .pipe(takeUntil(this.destroy$))
-        .subscribe(notification => {
-          if (notification) {
-            this.showToast(notification);
+        .subscribe({
+          next: (notification) => {
+            if (notification) {
+              this.showToast(notification);
+            }
+          },
+          error: (error) => {
+            console.error('Error receiving new notification:', error);
           }
         });
   }
 
   ngOnDestroy(): void {
+    this.clearAllTimeouts();
     this.destroy$.next();
     this.destroy$.complete();
-    this.clearAutoCloseTimeout();
   }
+
+  // =================== TOAST YÖNETİMİ ===================
 
   /**
    * Toast gösterir
+   * @param notification Gösterilecek bildirim
    */
   showToast(notification: NotificationResponse): void {
     // Aynı bildirimi tekrar gösterme
-    const exists = this.notifications.some(n => n.id === notification.id);
-    if (exists) {
+    if (this.isNotificationVisible(notification.id)) {
+      console.warn(`Notification ${notification.id} already visible`);
       return;
     }
 
-    // En fazla 3 toast göster
-    if (this.notifications.length >= 3) {
-      this.notifications.shift(); // İlk bildirimi kaldır
+    // En fazla MAX_TOASTS kadar toast göster
+    if (this.notifications.length >= this.MAX_TOASTS) {
+      const oldest = this.notifications[0];
+      this.closeToast(oldest);
     }
 
     this.notifications.push(notification);
 
-    // Auto close timer
-    this.autoCloseTimeout = setTimeout(() => {
+    // Auto close timer (her toast için ayrı)
+    const timeout = setTimeout(() => {
       this.closeToast(notification);
     }, this.AUTO_CLOSE_DELAY);
+
+    this.autoCloseTimeouts.set(notification.id, timeout);
   }
 
   /**
    * Toast'ı kapatır
+   * @param notification Kapatılacak bildirim
    */
   closeToast(notification: NotificationResponse): void {
     const index = this.notifications.findIndex(n => n.id === notification.id);
+
     if (index !== -1) {
       this.notifications.splice(index, 1);
+
+      // Timeout'u temizle
+      this.clearTimeout(notification.id);
     }
   }
 
   /**
+   * Tüm toast'ları kapatır
+   */
+  closeAllToasts(): void {
+    this.notifications = [];
+    this.clearAllTimeouts();
+  }
+
+  /**
+   * Bildirimin zaten görünür olup olmadığını kontrol eder
+   */
+  private isNotificationVisible(id: number): boolean {
+    return this.notifications.some(n => n.id === id);
+  }
+
+  // =================== EVENT HANDLERS ===================
+
+  /**
    * Toast'a tıklandığında
+   * @param notification Tıklanan bildirim
    */
   onToastClick(notification: NotificationResponse): void {
     // Okunmamışsa okundu işaretle
     if (!notification.isRead) {
       this.notificationService.markAsRead(notification.id)
           .pipe(takeUntil(this.destroy$))
-          .subscribe();
+          .subscribe({
+            next: () => {
+              console.log(`Notification ${notification.id} marked as read`);
+            },
+            error: (error) => {
+              console.error('Error marking notification as read:', error);
+            }
+          });
     }
 
     // Toast'ı kapat
     this.closeToast(notification);
 
     // Action URL varsa oraya git
-    if (notification.actionUrl) {
+    if (notification.actionUrl && notification.actionUrl.trim()) {
       this.router.navigate([notification.actionUrl]);
     } else {
       // Action URL yoksa bildirimler sayfasına git
@@ -120,75 +170,105 @@ export class ToastNotificationComponent implements OnInit, OnDestroy {
 
   /**
    * Close butonuna tıklandığında
+   * @param notification Kapatılacak bildirim
+   * @param event Click event
    */
   onCloseClick(notification: NotificationResponse, event: Event): void {
     event.stopPropagation();
     this.closeToast(notification);
   }
 
+  // =================== TIMEOUT YÖNETİMİ ===================
+
   /**
-   * Auto close timeout'u temizler
+   * Belirli bir timeout'u temizler
    */
-  private clearAutoCloseTimeout(): void {
-    if (this.autoCloseTimeout) {
-      clearTimeout(this.autoCloseTimeout);
-      this.autoCloseTimeout = null;
+  private clearTimeout(notificationId: number): void {
+    const timeout = this.autoCloseTimeouts.get(notificationId);
+    if (timeout) {
+      clearTimeout(timeout);
+      this.autoCloseTimeouts.delete(notificationId);
     }
   }
+
+  /**
+   * Tüm timeout'ları temizler
+   */
+  private clearAllTimeouts(): void {
+    this.autoCloseTimeouts.forEach(timeout => clearTimeout(timeout));
+    this.autoCloseTimeouts.clear();
+  }
+
+  // =================== TRANSLATION HELPERS ===================
+
+  /**
+   * Bildirim başlığını döndürür (translation key varsa translate eder)
+   */
+  getTitle(notification: NotificationResponse): string {
+    if (hasTranslationKey(notification)) {
+      const params = parseNotificationParams(notification.titleParams);
+      return this.translateService.instant(notification.titleKey!, params);
+    }
+    return notification.title;
+  }
+
+  /**
+   * Bildirim mesajını döndürür (translation key varsa translate eder)
+   */
+  getMessage(notification: NotificationResponse): string {
+    if (notification.messageKey && notification.messageKey.trim()) {
+      const params = parseNotificationParams(notification.messageParams);
+      return this.translateService.instant(notification.messageKey, params);
+    }
+    return notification.message;
+  }
+
+  /**
+   * Translation key kullanılıyor mu kontrol eder
+   */
+  hasTranslationKey(notification: NotificationResponse): boolean {
+    return hasTranslationKey(notification);
+  }
+
+  /**
+   * JSON params string'ini parse eder
+   */
+  parseParams(jsonParams: string | undefined | null): any {
+    return parseNotificationParams(jsonParams);
+  }
+
+  // =================== UI HELPERS ===================
 
   /**
    * Bildirim tipine göre icon döndürür
    */
   getNotificationIcon(notification: NotificationResponse): string {
-    const iconMap: { [key: string]: string } = {
-      'COURSE_PURCHASE': 'shopping_cart',
-      'CERTIFICATE_EARNED': 'workspace_premium',
-      'NEW_ENROLLMENT': 'person_add',
-      'COURSE_COMPLETED': 'check_circle',
-      'REVIEW_RECEIVED': 'rate_review',
-      'SUBSCRIPTION_EXPIRING': 'schedule',
-      'SUBSCRIPTION_EXPIRED': 'error_outline',
-      'SYSTEM_ANNOUNCEMENT': 'campaign',
-      'PAYMENT_SUCCESS': 'payment',
-      'PAYMENT_FAILED': 'error',
-      'COURSE_UPDATED': 'update',
-      'NEW_LESSON_ADDED': 'library_add',
-      'WELCOME': 'waving_hand'
-    };
-    return iconMap[notification.type] || 'notifications';
+    return NOTIFICATION_TYPE_ICONS[notification.type] || 'notifications';
   }
 
   /**
    * Bildirim tipine göre renk döndürür
    */
   getNotificationColor(notification: NotificationResponse): string {
-    const colorMap: { [key: string]: string } = {
-      'COURSE_PURCHASE': '#4361ee',
-      'CERTIFICATE_EARNED': '#ffb700',
-      'NEW_ENROLLMENT': '#06d6a0',
-      'COURSE_COMPLETED': '#10b981',
-      'REVIEW_RECEIVED': '#8b5cf6',
-      'SUBSCRIPTION_EXPIRING': '#fbbf24',
-      'SUBSCRIPTION_EXPIRED': '#f72585',
-      'SYSTEM_ANNOUNCEMENT': '#4cc9f0',
-      'PAYMENT_SUCCESS': '#10b981',
-      'PAYMENT_FAILED': '#f72585',
-      'COURSE_UPDATED': '#6366f1',
-      'NEW_LESSON_ADDED': '#06d6a0',
-      'WELCOME': '#4361ee'
-    };
-    return colorMap[notification.type] || '#4361ee';
+    return NOTIFICATION_TYPE_COLORS[notification.type] || '#4361ee';
   }
 
   /**
    * Bildirim önceliğine göre CSS class döndürür
    */
   getPriorityClass(notification: NotificationResponse): string {
-    const classMap: { [key: string]: string } = {
+    const classMap: Record<string, string> = {
       'HIGH': 'toast-priority-high',
       'MEDIUM': 'toast-priority-medium',
       'LOW': 'toast-priority-low'
     };
     return classMap[notification.priority] || 'toast-priority-medium';
+  }
+
+  /**
+   * Toast animasyon state'i
+   */
+  getToastAnimationState(): string {
+    return 'visible';
   }
 }

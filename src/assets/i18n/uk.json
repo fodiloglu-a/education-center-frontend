@@ -829,5 +829,15 @@
   "CLEAR_READ": "Очистити прочитані",
   "CLEAR_ALL": "Очистити все",
   "DELETE_NOTIFICATION": "Видалити повідомлення",
-  "CLOSE": "Закрити"
+  "CLOSE": "Закрити",
+  "NOTIFICATION": {
+    "WELCOME": {
+      "TITLE": "Hoş Geldiniz!",
+      "MESSAGE": "Eğitim platformumuza hoş geldiniz. Başarılar dileriz!"
+    },
+    "COURSE_PURCHASE": {
+      "TITLE": "Kurs Satın Alındı",
+      "MESSAGE": "{{courseName}} kursu başarıyla satın alındı."
+    }
+  }
 }

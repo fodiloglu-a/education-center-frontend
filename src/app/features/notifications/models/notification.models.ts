@@ -1,4 +1,4 @@
-// notification.models.ts - Angular Notification Models
+// notification.models.ts - GÜNCELLENMİŞ VERSİYON
 
 /**
  * Backend'deki NotificationResponse DTO'suna karşılık gelen interface
@@ -8,15 +8,29 @@ export interface NotificationResponse {
     userId: number;
     title: string;
     message: string;
+
+    // Translation key alanları
+    titleKey?: string;
+    messageKey?: string;
+    titleParams?: string;  // JSON string
+    messageParams?: string; // JSON string
+
     type: NotificationType;
     isRead: boolean;
-    createdAt: string; // ISO 8601 format
-    readAt: string | null; // ISO 8601 format veya null
+    createdAt: string;
+    readAt: string | null;
     actionUrl: string | null;
     priority: NotificationPriority;
     typeDisplayName: string;
     priorityDisplayName: string;
     timeAgo: string;
+}
+
+/**
+ * Parse edilmiş notification params interface
+ */
+export interface NotificationParams {
+    [key: string]: string | number;
 }
 
 /**
@@ -129,3 +143,49 @@ export const NOTIFICATION_TYPE_COLORS: Record<NotificationType, string> = {
     [NotificationType.NEW_LESSON_ADDED]: '#06d6a0',
     [NotificationType.WELCOME]: '#4361ee'
 };
+
+// =================== YENİ HELPER FUNCTIONS ===================
+
+/**
+ * Notification'ın translation key kullanıp kullanmadığını kontrol eder
+ */
+export function hasTranslationKey(notification: NotificationResponse): boolean {
+    return !!(notification.titleKey && notification.titleKey.trim());
+}
+
+/**
+ * JSON params string'ini parse eder
+ */
+export function parseNotificationParams(jsonParams: string | undefined | null): NotificationParams {
+    if (!jsonParams || jsonParams.trim() === '') {
+        return {};
+    }
+
+    try {
+        const parsed = JSON.parse(jsonParams);
+        return typeof parsed === 'object' && parsed !== null ? parsed : {};
+    } catch (e) {
+        console.error('Error parsing notification params:', jsonParams, e);
+        return {};
+    }
+}
+
+/**
+ * Notification için title döndürür (translation key varsa onu, yoksa title'ı)
+ */
+export function getNotificationTitle(notification: NotificationResponse): string {
+    if (hasTranslationKey(notification)) {
+        return notification.titleKey!;
+    }
+    return notification.title;
+}
+
+/**
+ * Notification için message döndürür (translation key varsa onu, yoksa message'ı)
+ */
+export function getNotificationMessage(notification: NotificationResponse): string {
+    if (notification.messageKey && notification.messageKey.trim()) {
+        return notification.messageKey;
+    }
+    return notification.message;
+}

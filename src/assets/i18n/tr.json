@@ -878,6 +878,17 @@
   "CLEAR_READ": "Okunmuşları Temizle",
   "CLEAR_ALL": "Tümünü Temizle",
   "DELETE_NOTIFICATION": "Bildirimi Sil",
-  "CLOSE": "Kapat"
+  "CLOSE": "Kapat",
+
+  "NOTIFICATION": {
+    "WELCOME": {
+      "TITLE": "Ласкаво просимо!",
+      "MESSAGE": "Ласкаво просимо до нашої платформи навчання. Бажаємо успіхів!"
+    },
+    "COURSE_PURCHASE": {
+      "TITLE": "Курс придбано",
+      "MESSAGE": "Курс {{courseName}} успішно придбано."
+    }
+  }
 
 }

@@ -1,27 +1,46 @@
-// notification-bell.component.ts
+// notification-bell.component.ts - REVIZE EDİLMİŞ
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { NotificationService } from '../../services/notification.service';
-import { NotificationResponse } from '../../models/notification.models';
-import { TranslateModule } from '@ngx-translate/core';
+import {
+  NotificationResponse,
+  NOTIFICATION_TYPE_ICONS,
+  NOTIFICATION_PRIORITY_CLASSES,
+  parseNotificationParams,
+  hasTranslationKey
+} from '../../models/notification.models';
 
 /**
  * NotificationBellComponent
  * Header/Navbar'da gösterilen bildirim bell icon ve dropdown
+ * Translation key desteği ile çok dilli bildirimler
  */
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
   imports: [CommonModule, TranslateModule],
   templateUrl: './notification-bell.component.html',
-  styleUrl: './notification-bell.component.css'
+  styleUrl: './notification-bell.component.css',
+  animations: [
+    trigger('slideDown', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
+      ])
+    ])
+  ]
 })
 export class NotificationBellComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // State
   unreadCount = 0;
@@ -30,25 +49,29 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   isLoading = false;
 
   constructor(
-      private notificationService: NotificationService,
-      private router: Router
+      private readonly notificationService: NotificationService,
+      private readonly router: Router,
+      private readonly translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
     // Unread count'u subscribe et
     this.notificationService.unreadCount$
         .pipe(takeUntil(this.destroy$))
-        .subscribe(count => {
-          this.unreadCount = count;
+        .subscribe({
+          next: (count) => {
+            this.unreadCount = count;
+          }
         });
 
-    // Yeni bildirim geldiğinde toast göster
+    // Yeni bildirim geldiğinde recent notifications'ı yenile
     this.notificationService.newNotification$
         .pipe(takeUntil(this.destroy$))
-        .subscribe(notification => {
-          if (notification) {
-            // Yeni bildirim geldi, recent notifications'ı yenile
-            this.loadRecentNotifications();
+        .subscribe({
+          next: (notification) => {
+            if (notification) {
+              this.loadRecentNotifications();
+            }
           }
         });
 
@@ -63,6 +86,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  // =================== DATA LOADING ===================
 
   /**
    * En son 5 bildirimi yükler
@@ -79,6 +104,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
           }
         });
   }
+
+  // =================== DROPDOWN CONTROL ===================
 
   /**
    * Dropdown'u toggle eder
@@ -100,6 +127,19 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Dropdown dışına tıklandığında kapat
+   */
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.notification-bell-container')) {
+      this.closeDropdown();
+    }
+  }
+
+  // =================== NOTIFICATION ACTIONS ===================
+
+  /**
    * Bildirime tıklandığında
    */
   onNotificationClick(notification: NotificationResponse): void {
@@ -107,14 +147,18 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     if (!notification.isRead) {
       this.notificationService.markAsRead(notification.id)
           .pipe(takeUntil(this.destroy$))
-          .subscribe();
+          .subscribe({
+            error: (error) => {
+              console.error('Error marking notification as read:', error);
+            }
+          });
     }
 
     // Dropdown'u kapat
     this.closeDropdown();
 
     // Action URL varsa oraya git
-    if (notification.actionUrl) {
+    if (notification.actionUrl && notification.actionUrl.trim()) {
       this.router.navigate([notification.actionUrl]);
     }
   }
@@ -131,6 +175,10 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
    * "Tümünü Okundu İşaretle" butonuna tıklandığında
    */
   markAllAsRead(): void {
+    if (this.unreadCount === 0) {
+      return;
+    }
+
     this.isLoading = true;
     this.notificationService.markAllAsRead()
         .pipe(takeUntil(this.destroy$))
@@ -146,47 +194,57 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
         });
   }
 
+  // =================== TRANSLATION HELPERS ===================
+
+  /**
+   * Bildirim başlığını döndürür (translation key varsa translate eder)
+   */
+  getTitle(notification: NotificationResponse): string {
+    if (hasTranslationKey(notification)) {
+      const params = parseNotificationParams(notification.titleParams);
+      return this.translateService.instant(notification.titleKey!, params);
+    }
+    return notification.title;
+  }
+
+  /**
+   * Bildirim mesajını döndürür (translation key varsa translate eder)
+   */
+  getMessage(notification: NotificationResponse): string {
+    if (notification.messageKey && notification.messageKey.trim()) {
+      const params = parseNotificationParams(notification.messageParams);
+      return this.translateService.instant(notification.messageKey, params);
+    }
+    return notification.message;
+  }
+
+  /**
+   * JSON params string'ini parse eder
+   */
+  parseParams(jsonParams: string | undefined): any {
+    return parseNotificationParams(jsonParams);
+  }
+
+  // =================== UI HELPERS ===================
+
   /**
    * Bildirim tipine göre icon döndürür
    */
   getNotificationIcon(notification: NotificationResponse): string {
-    const iconMap: { [key: string]: string } = {
-      'COURSE_PURCHASE': 'shopping_cart',
-      'CERTIFICATE_EARNED': 'workspace_premium',
-      'NEW_ENROLLMENT': 'person_add',
-      'COURSE_COMPLETED': 'check_circle',
-      'REVIEW_RECEIVED': 'rate_review',
-      'SUBSCRIPTION_EXPIRING': 'schedule',
-      'SUBSCRIPTION_EXPIRED': 'error_outline',
-      'SYSTEM_ANNOUNCEMENT': 'campaign',
-      'PAYMENT_SUCCESS': 'payment',
-      'PAYMENT_FAILED': 'error',
-      'COURSE_UPDATED': 'update',
-      'NEW_LESSON_ADDED': 'library_add',
-      'WELCOME': 'waving_hand'
-    };
-    return iconMap[notification.type] || 'notifications';
+    return NOTIFICATION_TYPE_ICONS[notification.type] || 'notifications';
   }
 
   /**
    * Bildirim önceliğine göre CSS class döndürür
    */
   getPriorityClass(notification: NotificationResponse): string {
-    const classMap: { [key: string]: string } = {
-      'HIGH': 'priority-high',
-      'MEDIUM': 'priority-medium',
-      'LOW': 'priority-low'
-    };
-    return classMap[notification.priority] || 'priority-medium';
+    return NOTIFICATION_PRIORITY_CLASSES[notification.priority] || 'priority-medium';
   }
 
   /**
-   * Dropdown dışına tıklandığında kapat
+   * Unread count display formatı
    */
-  onClickOutside(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.notification-bell-container')) {
-      this.closeDropdown();
-    }
+  getUnreadCountDisplay(): string {
+    return this.unreadCount > 99 ? '99+' : this.unreadCount.toString();
   }
 }

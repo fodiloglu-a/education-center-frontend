@@ -1,4 +1,4 @@
-<!-- notification-list.component.html -->
+<!-- notification-list.component.html - GÜNCELLENMİŞ -->
 
 <div class="notification-list-container">
     <!-- Header -->
@@ -83,7 +83,9 @@
             <!-- Content -->
             <div class="notification-card-content">
                 <div class="notification-card-header">
-                    <h3 class="notification-card-title">{{ notification.title }}</h3>
+                    <h4 class="notification-card-title">
+                        {{ getTitle(notification) }}
+                    </h4>
                     <button
                             class="delete-btn"
                             (click)="deleteNotification(notification, $event)"
@@ -92,14 +94,16 @@
                     </button>
                 </div>
 
-                <p class="notification-card-message">{{ notification.message }}</p>
+                <p class="notification-card-message">
+                    {{ getMessage(notification) }}
+                </p>
 
                 <div class="notification-card-footer">
                     <span class="notification-type-badge">{{ notification.typeDisplayName }}</span>
                     <span class="notification-time">
-            <span class="material-icons">schedule</span>
+                        <span class="material-icons">schedule</span>
                         {{ notification.timeAgo }}
-          </span>
+                    </span>
                 </div>
             </div>
 
@@ -127,8 +131,8 @@
         </button>
 
         <span class="pagination-info">
-      {{ currentPage + 1 }} / {{ totalPages }}
-    </span>
+            {{ currentPage + 1 }} / {{ totalPages }}
+        </span>
 
         <button
                 class="pagination-btn"

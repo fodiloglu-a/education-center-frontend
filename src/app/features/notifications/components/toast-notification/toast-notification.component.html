@@ -1,4 +1,4 @@
-<!-- toast-notification.component.html -->
+<!-- toast-notification.component.html - GÜNCELLENMİŞ -->
 
 <div class="toast-container">
     <div
@@ -9,7 +9,7 @@
             (click)="onToastClick(notification)"
             role="alert"
             aria-live="assertive"
-            [attr.aria-label]="notification.title">
+            [attr.aria-label]="getTitle(notification)">
 
         <!-- Icon -->
         <div class="toast-icon" [style.background]="getNotificationColor(notification)">
@@ -18,8 +18,12 @@
 
         <!-- Content -->
         <div class="toast-content">
-            <h4 class="toast-title">{{ notification.title }}</h4>
-            <p class="toast-message">{{ notification.message }}</p>
+            <h4 class="toast-title">
+                {{ getTitle(notification) }}
+            </h4>
+            <p class="toast-message">
+                {{ getMessage(notification) }}
+            </p>
             <span class="toast-time">{{ notification.timeAgo }}</span>
         </div>
 

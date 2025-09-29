@@ -1,17 +1,25 @@
-// notification-list.component.ts
+// notification-list.component.ts - REVIZE EDİLMİŞ
 
-import {Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../services/notification.service';
-import { NotificationResponse } from '../../models/notification.models';
-import { TranslateModule } from '@ngx-translate/core';
+import {
+  NotificationResponse,
+  NOTIFICATION_TYPE_ICONS,
+  NOTIFICATION_TYPE_COLORS,
+  NOTIFICATION_PRIORITY_CLASSES,
+  parseNotificationParams,
+  hasTranslationKey
+} from '../../models/notification.models';
 
 /**
  * NotificationListComponent
  * Profile sayfasında gösterilen tam bildirim listesi
+ * Translation key desteği ile çok dilli bildirimler
  */
 @Component({
   selector: 'app-notification-list',
@@ -21,7 +29,7 @@ import { TranslateModule } from '@ngx-translate/core';
   styleUrl: './notification-list.component.css'
 })
 export class NotificationListComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   // State
   notifications: NotificationResponse[] = [];
@@ -34,9 +42,10 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   totalItems = 0;
 
   constructor(
-      private notificationService: NotificationService,
-      private router: Router,
-      private cdr: ChangeDetectorRef
+      private readonly notificationService: NotificationService,
+      private readonly router: Router,
+      private readonly cdr: ChangeDetectorRef,
+      private readonly translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +56,8 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  // =================== DATA LOADING ===================
 
   /**
    * Bildirimleri yükler
@@ -76,6 +87,8 @@ export class NotificationListComponent implements OnInit, OnDestroy {
         });
   }
 
+  // =================== FILTERING ===================
+
   /**
    * Filtre uygular
    */
@@ -97,6 +110,8 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     this.applyFilter();
   }
 
+  // =================== NOTIFICATION ACTIONS ===================
+
   /**
    * Bildirime tıklandığında
    */
@@ -109,12 +124,16 @@ export class NotificationListComponent implements OnInit, OnDestroy {
             next: () => {
               notification.isRead = true;
               this.applyFilter();
+              this.cdr.detectChanges();
+            },
+            error: (error) => {
+              console.error('Error marking notification as read:', error);
             }
           });
     }
 
     // Action URL varsa oraya git
-    if (notification.actionUrl) {
+    if (notification.actionUrl && notification.actionUrl.trim()) {
       this.router.navigate([notification.actionUrl]);
     }
   }
@@ -123,6 +142,10 @@ export class NotificationListComponent implements OnInit, OnDestroy {
    * Tüm bildirimleri okundu işaretler
    */
   markAllAsRead(): void {
+    if (this.notifications.length === 0) {
+      return;
+    }
+
     this.isLoading = true;
     this.notificationService.markAllAsRead()
         .pipe(
@@ -148,7 +171,8 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   deleteNotification(notification: NotificationResponse, event: Event): void {
     event.stopPropagation();
 
-    if (!confirm('Bu bildirimi silmek istediğinizden emin misiniz?')) {
+    const confirmMessage = this.translateService.instant('NOTIFICATION.CONFIRM_DELETE');
+    if (!confirm(confirmMessage)) {
       return;
     }
 
@@ -168,7 +192,12 @@ export class NotificationListComponent implements OnInit, OnDestroy {
    * Tüm bildirimleri temizler
    */
   clearAllNotifications(): void {
-    if (!confirm('Tüm bildirimleri silmek istediğinizden emin misiniz?')) {
+    if (this.notifications.length === 0) {
+      return;
+    }
+
+    const confirmMessage = this.translateService.instant('NOTIFICATION.CONFIRM_CLEAR_ALL');
+    if (!confirm(confirmMessage)) {
       return;
     }
 
@@ -195,7 +224,12 @@ export class NotificationListComponent implements OnInit, OnDestroy {
    * Okunmuş bildirimleri temizler
    */
   clearReadNotifications(): void {
-    if (!confirm('Okunmuş bildirimleri silmek istediğinizden emin misiniz?')) {
+    if (this.notifications.length === 0) {
+      return;
+    }
+
+    const confirmMessage = this.translateService.instant('NOTIFICATION.CONFIRM_CLEAR_READ');
+    if (!confirm(confirmMessage)) {
       return;
     }
 
@@ -217,6 +251,8 @@ export class NotificationListComponent implements OnInit, OnDestroy {
           }
         });
   }
+
+  // =================== PAGINATION ===================
 
   /**
    * Sayfa değiştirir
@@ -243,59 +279,57 @@ export class NotificationListComponent implements OnInit, OnDestroy {
     this.changePage(this.currentPage + 1);
   }
 
+  // =================== TRANSLATION HELPERS ===================
+
+  /**
+   * Bildirim başlığını döndürür (translation key varsa translate eder)
+   */
+  getTitle(notification: NotificationResponse): string {
+    if (hasTranslationKey(notification)) {
+      const params = parseNotificationParams(notification.titleParams);
+      return this.translateService.instant(notification.titleKey!, params);
+    }
+    return notification.title;
+  }
+
+  /**
+   * Bildirim mesajını döndürür (translation key varsa translate eder)
+   */
+  getMessage(notification: NotificationResponse): string {
+    if (notification.messageKey && notification.messageKey.trim()) {
+      const params = parseNotificationParams(notification.messageParams);
+      return this.translateService.instant(notification.messageKey, params);
+    }
+    return notification.message;
+  }
+
+  /**
+   * JSON params string'ini parse eder
+   */
+  parseParams(jsonParams: string | undefined): any {
+    return parseNotificationParams(jsonParams);
+  }
+
+  // =================== UI HELPERS ===================
+
   /**
    * Bildirim tipine göre icon döndürür
    */
   getNotificationIcon(notification: NotificationResponse): string {
-    const iconMap: { [key: string]: string } = {
-      'COURSE_PURCHASE': 'shopping_cart',
-      'CERTIFICATE_EARNED': 'workspace_premium',
-      'NEW_ENROLLMENT': 'person_add',
-      'COURSE_COMPLETED': 'check_circle',
-      'REVIEW_RECEIVED': 'rate_review',
-      'SUBSCRIPTION_EXPIRING': 'schedule',
-      'SUBSCRIPTION_EXPIRED': 'error_outline',
-      'SYSTEM_ANNOUNCEMENT': 'campaign',
-      'PAYMENT_SUCCESS': 'payment',
-      'PAYMENT_FAILED': 'error',
-      'COURSE_UPDATED': 'update',
-      'NEW_LESSON_ADDED': 'library_add',
-      'WELCOME': 'waving_hand'
-    };
-    return iconMap[notification.type] || 'notifications';
+    return NOTIFICATION_TYPE_ICONS[notification.type] || 'notifications';
   }
 
   /**
    * Bildirim tipine göre renk döndürür
    */
   getNotificationColor(notification: NotificationResponse): string {
-    const colorMap: { [key: string]: string } = {
-      'COURSE_PURCHASE': '#4361ee',
-      'CERTIFICATE_EARNED': '#ffb700',
-      'NEW_ENROLLMENT': '#06d6a0',
-      'COURSE_COMPLETED': '#10b981',
-      'REVIEW_RECEIVED': '#8b5cf6',
-      'SUBSCRIPTION_EXPIRING': '#fbbf24',
-      'SUBSCRIPTION_EXPIRED': '#f72585',
-      'SYSTEM_ANNOUNCEMENT': '#4cc9f0',
-      'PAYMENT_SUCCESS': '#10b981',
-      'PAYMENT_FAILED': '#f72585',
-      'COURSE_UPDATED': '#6366f1',
-      'NEW_LESSON_ADDED': '#06d6a0',
-      'WELCOME': '#4361ee'
-    };
-    return colorMap[notification.type] || '#4361ee';
+    return NOTIFICATION_TYPE_COLORS[notification.type] || '#4361ee';
   }
 
   /**
    * Bildirim önceliğine göre CSS class döndürür
    */
   getPriorityClass(notification: NotificationResponse): string {
-    const classMap: { [key: string]: string } = {
-      'HIGH': 'priority-high',
-      'MEDIUM': 'priority-medium',
-      'LOW': 'priority-low'
-    };
-    return classMap[notification.priority] || 'priority-medium';
+    return NOTIFICATION_PRIORITY_CLASSES[notification.priority] || 'priority-medium';
   }
 }
