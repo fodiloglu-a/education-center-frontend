@@ -879,16 +879,81 @@
   "CLEAR_ALL": "Tümünü Temizle",
   "DELETE_NOTIFICATION": "Bildirimi Sil",
   "CLOSE": "Kapat",
-
   "NOTIFICATION": {
     "WELCOME": {
-      "TITLE": "Ласкаво просимо!",
-      "MESSAGE": "Ласкаво просимо до нашої платформи навчання. Бажаємо успіхів!"
+      "TITLE": "Hoş Geldiniz!",
+      "MESSAGE": "Merhaba {{userName}}, platformumuza hoş geldiniz. Saat {{loginTime}}, {{loginDate}} tarihinde giriş yaptınız. İyi öğrenmeler dileriz!"
     },
     "COURSE_PURCHASE": {
-      "TITLE": "Курс придбано",
-      "MESSAGE": "Курс {{courseName}} успішно придбано."
-    }
+      "TITLE": "Kurs Satın Alındı",
+      "MESSAGE": "{{courseName}} kursu {{date}} tarihinde başarıyla satın alındı. Hemen öğrenmeye başlayabilirsiniz!"
+    },
+    "CERTIFICATE_EARNED": {
+      "TITLE": "Sertifika Kazandınız!",
+      "MESSAGE": "Tebrikler! {{courseName}} kursunu başarıyla tamamladınız ve sertifikanızı kazandınız."
+    },
+    "NEW_ENROLLMENT": {
+      "TITLE": "Yeni Öğrenci Kaydı",
+      "MESSAGE": "{{studentName}} adlı öğrenci {{courseName}} kursunuza kaydoldu."
+    },
+    "COURSE_COMPLETED": {
+      "TITLE": "Kurs Tamamlandı",
+      "MESSAGE": "Harika! {{courseName}} kursunu başarıyla tamamladınız. Sertifikanızı indirebilirsiniz."
+    },
+    "REVIEW_RECEIVED": {
+      "TITLE": "Yeni Değerlendirme Alındı",
+      "MESSAGE": "{{courseName}} kursunuz için {{rating}} yıldızlı bir değerlendirme aldınız."
+    },
+    "SUBSCRIPTION_EXPIRING": {
+      "TITLE": "Abonelik Süresi Dolmak Üzere",
+      "MESSAGE": "Öğretmen aboneliğiniz {{daysLeft}} gün içinde sona erecek. Yenilemek için tıklayın."
+    },
+    "SUBSCRIPTION_EXPIRED": {
+      "TITLE": "Abonelik Süresi Doldu",
+      "MESSAGE": "Öğretmen aboneliğiniz {{expireDate}} tarihinde sona erdi. Kurslarınızı yayınlamaya devam etmek için yenileyin."
+    },
+    "SYSTEM_ANNOUNCEMENT": {
+      "TITLE": "Sistem Duyurusu",
+      "MESSAGE": "{{announcementText}}"
+    },
+    "PAYMENT_SUCCESS": {
+      "TITLE": "Ödeme Başarılı",
+      "MESSAGE": "{{amount}} TL tutarındaki ödemeniz başarıyla alındı. Sipariş numarası: {{orderId}}"
+    },
+    "PAYMENT_FAILED": {
+      "TITLE": "Ödeme Başarısız",
+      "MESSAGE": "{{amount}} TL tutarındaki ödemeniz başarısız oldu. Lütfen ödeme yönteminizi kontrol edin."
+    },
+    "COURSE_UPDATED": {
+      "TITLE": "Kurs Güncellendi",
+      "MESSAGE": "{{courseName}} kursu güncellendi. Yeni içerikleri keşfetmek için tıklayın."
+    },
+    "NEW_LESSON_ADDED": {
+      "TITLE": "Yeni Ders Eklendi",
+      "MESSAGE": "{{courseName}} kursuna {{lessonTitle}} adlı yeni ders eklendi."
+    },
+    "TYPE": {
+      "COURSE_PURCHASE": "Kurs Satın Alımı",
+      "CERTIFICATE_EARNED": "Sertifika Kazanıldı",
+      "NEW_ENROLLMENT": "Yeni Kayıt",
+      "COURSE_COMPLETED": "Kurs Tamamlandı",
+      "REVIEW_RECEIVED": "Değerlendirme Alındı",
+      "SUBSCRIPTION_EXPIRING": "Abonelik Sona Eriyor",
+      "SUBSCRIPTION_EXPIRED": "Abonelik Sona Erdi",
+      "SYSTEM_ANNOUNCEMENT": "Sistem Duyurusu",
+      "PAYMENT_SUCCESS": "Ödeme Başarılı",
+      "PAYMENT_FAILED": "Ödeme Başarısız",
+      "COURSE_UPDATED": "Kurs Güncellendi",
+      "NEW_LESSON_ADDED": "Yeni Ders Eklendi",
+      "WELCOME": "Hoş Geldiniz"
+    },
+    "PRIORITY": {
+      "HIGH": "Yüksek",
+      "MEDIUM": "Orta",
+      "LOW": "Düşük"
+    },
+    "CONFIRM_DELETE": "Bu bildirimi silmek istediğinizden emin misiniz?",
+    "CONFIRM_CLEAR_ALL": "Tüm bildirimleri silmek istediğinizden emin misiniz?",
+    "CONFIRM_CLEAR_READ": "Okunmuş bildirimleri silmek istediğinizden emin misiniz?"
   }
-
 }

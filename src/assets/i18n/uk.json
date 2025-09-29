@@ -832,12 +832,81 @@
   "CLOSE": "Закрити",
   "NOTIFICATION": {
     "WELCOME": {
-      "TITLE": "Hoş Geldiniz!",
-      "MESSAGE": "Eğitim platformumuza hoş geldiniz. Başarılar dileriz!"
+      "TITLE": "Ласкаво просимо!",
+      "MESSAGE": "Вітаємо, {{userName}}! Ви увійшли в систему о {{loginTime}}, {{loginDate}}. Бажаємо успішного навчання!"
     },
     "COURSE_PURCHASE": {
-      "TITLE": "Kurs Satın Alındı",
-      "MESSAGE": "{{courseName}} kursu başarıyla satın alındı."
-    }
+      "TITLE": "Курс придбано",
+      "MESSAGE": "Курс {{courseName}} успішно придбано {{date}}. Можете розпочати навчання прямо зараз!"
+    },
+    "CERTIFICATE_EARNED": {
+      "TITLE": "Сертифікат отримано!",
+      "MESSAGE": "Вітаємо! Ви успішно завершили курс {{courseName}} і отримали сертифікат."
+    },
+    "NEW_ENROLLMENT": {
+      "TITLE": "Новий студент",
+      "MESSAGE": "Студент {{studentName}} записався на ваш курс {{courseName}}."
+    },
+    "COURSE_COMPLETED": {
+      "TITLE": "Курс завершено",
+      "MESSAGE": "Чудово! Ви успішно завершили курс {{courseName}}. Можете завантажити свій сертифікат."
+    },
+    "REVIEW_RECEIVED": {
+      "TITLE": "Отримано новий відгук",
+      "MESSAGE": "Ви отримали відгук {{rating}} зірок для курсу {{courseName}}."
+    },
+    "SUBSCRIPTION_EXPIRING": {
+      "TITLE": "Закінчується термін підписки",
+      "MESSAGE": "Ваша підписка викладача закінчиться через {{daysLeft}} днів. Натисніть для поновлення."
+    },
+    "SUBSCRIPTION_EXPIRED": {
+      "TITLE": "Термін підписки закінчився",
+      "MESSAGE": "Ваша підписка викладача закінчилася {{expireDate}}. Поновіть підписку для продовження публікації курсів."
+    },
+    "SYSTEM_ANNOUNCEMENT": {
+      "TITLE": "Системне оголошення",
+      "MESSAGE": "{{announcementText}}"
+    },
+    "PAYMENT_SUCCESS": {
+      "TITLE": "Оплата успішна",
+      "MESSAGE": "Ваш платіж на суму {{amount}} грн успішно оброблено. Номер замовлення: {{orderId}}"
+    },
+    "PAYMENT_FAILED": {
+      "TITLE": "Помилка оплати",
+      "MESSAGE": "Ваш платіж на суму {{amount}} грн не вдалося обробити. Будь ласка, перевірте спосіб оплати."
+    },
+    "COURSE_UPDATED": {
+      "TITLE": "Курс оновлено",
+      "MESSAGE": "Курс {{courseName}} оновлено. Натисніть, щоб переглянути новий контент."
+    },
+    "NEW_LESSON_ADDED": {
+      "TITLE": "Додано новий урок",
+      "MESSAGE": "До курсу {{courseName}} додано новий урок: {{lessonTitle}}."
+    },
+    "TYPE": {
+      "COURSE_PURCHASE": "Придбання курсу",
+      "CERTIFICATE_EARNED": "Сертифікат отримано",
+      "NEW_ENROLLMENT": "Нова реєстрація",
+      "COURSE_COMPLETED": "Курс завершено",
+      "REVIEW_RECEIVED": "Відгук отримано",
+      "SUBSCRIPTION_EXPIRING": "Підписка закінчується",
+      "SUBSCRIPTION_EXPIRED": "Підписка закінчилась",
+      "SYSTEM_ANNOUNCEMENT": "Системне оголошення",
+      "PAYMENT_SUCCESS": "Оплата успішна",
+      "PAYMENT_FAILED": "Помилка оплати",
+      "COURSE_UPDATED": "Курс оновлено",
+      "NEW_LESSON_ADDED": "Додано новий урок",
+      "WELCOME": "Ласкаво просимо"
+    },
+    "PRIORITY": {
+      "HIGH": "Високий",
+      "MEDIUM": "Середній",
+      "LOW": "Низький"
+    },
+    "CONFIRM_DELETE": "Ви впевнені, що хочете видалити це сповіщення?",
+    "CONFIRM_CLEAR_ALL": "Ви впевнені, що хочете видалити всі сповіщення?",
+    "CONFIRM_CLEAR_READ": "Ви впевнені, що хочете видалити прочитані сповіщення?"
   }
+
+
 }
