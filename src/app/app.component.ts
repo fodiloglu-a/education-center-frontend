@@ -7,6 +7,9 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { TokenService } from './core/services/token.service';
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ToastNotificationComponent } from './features/notifications/components/toast-notification/toast-notification.component';
+import { NotificationBellComponent } from './features/notifications/components/notification-bell/notification-bell.component';
+import { NotificationService } from './features/notifications/services/notification.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +19,9 @@ import { map } from 'rxjs/operators';
     RouterLink,
     RouterLinkActive,
     CommonModule,
-    TranslatePipe
+    TranslatePipe,
+    ToastNotificationComponent,
+    NotificationBellComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -38,7 +43,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private tokenService: TokenService,
     private router: Router,
     private renderer: Renderer2,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private notificationService: NotificationService
   ) {
     this.isLoggedIn$ = this.tokenService.isLoggedIn$;
     this.userRole$ = this.tokenService.userRole$;
@@ -54,22 +60,34 @@ export class AppComponent implements OnInit, OnDestroy {
     this.translate.use('uk');
 
     this.translateSubscription.add(
-      this.translate.onLangChange.subscribe(() => {
-        this.updateDocumentTitle();
-      })
+        this.translate.onLangChange.subscribe(() => {
+          this.updateDocumentTitle();
+        })
     );
     this.updateDocumentTitle();
 
     this.authSubscription.add(
-      this.tokenService.isLoggedIn$.subscribe(() => {
-        // Oturum durumu değiştiğinde ek işlemler yapılabilir (şimdilik boş)
-      })
+        this.tokenService.isLoggedIn$.subscribe(() => {
+          // Oturum durumu değiştiğinde ek işlemler yapılabilir (şimdilik boş)
+        })
+    );
+
+    // Kullanıcı giriş yaptıysa notification polling'i başlat
+    this.authSubscription.add(
+        this.tokenService.isLoggedIn$.subscribe(isLoggedIn => {
+          if (isLoggedIn && isPlatformBrowser(this.platformId)) {
+            this.notificationService.startPolling();
+          } else {
+            this.notificationService.stopPolling();
+          }
+        })
     );
   }
 
   ngOnDestroy(): void {
     this.authSubscription.unsubscribe();
     this.translateSubscription.unsubscribe();
+    this.notificationService.stopPolling();  // <-- BU SATIRI EKLEYİN
   }
 
   /**

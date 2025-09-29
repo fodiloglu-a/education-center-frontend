@@ -1,0 +1,86 @@
+<!-- notification-bell.component.html -->
+
+<div class="notification-bell-container" (clickOutside)="onClickOutside($event)">
+    <!-- Bell Icon with Badge -->
+    <button
+            class="notification-bell-button"
+            (click)="toggleDropdown()"
+            [attr.aria-label]="'NOTIFICATIONS' | translate"
+            [attr.aria-expanded]="isDropdownOpen">
+
+    <span class="material-icons bell-icon" [class.has-notifications]="unreadCount > 0">
+      {{ unreadCount > 0 ? 'notifications_active' : 'notifications' }}
+    </span>
+
+        <!-- Badge -->
+        <span
+                *ngIf="unreadCount > 0"
+                class="notification-badge"
+                [attr.aria-label]="unreadCount + ' ' + ('UNREAD_NOTIFICATIONS' | translate)">
+      {{ unreadCount > 99 ? '99+' : unreadCount }}
+    </span>
+    </button>
+
+    <!-- Dropdown -->
+    <div class="notification-dropdown" *ngIf="isDropdownOpen" [@slideDown]>
+        <!-- Header -->
+        <div class="dropdown-header">
+            <h3 class="dropdown-title">
+                <span class="material-icons">notifications</span>
+                {{ 'NOTIFICATIONS' | translate }}
+            </h3>
+            <button
+                    *ngIf="unreadCount > 0"
+                    class="mark-all-read-btn"
+                    (click)="markAllAsRead()"
+                    [disabled]="isLoading"
+                    [attr.aria-label]="'MARK_ALL_AS_READ' | translate">
+                <span class="material-icons">done_all</span>
+            </button>
+        </div>
+
+        <!-- Notification List -->
+        <div class="notification-list" *ngIf="recentNotifications.length > 0">
+            <div
+                    *ngFor="let notification of recentNotifications"
+                    class="notification-item"
+                    [class.unread]="!notification.isRead"
+                    [class]="getPriorityClass(notification)"
+                    (click)="onNotificationClick(notification)"
+                    [attr.aria-label]="notification.title">
+
+                <!-- Icon -->
+                <div class="notification-icon">
+                    <span class="material-icons">{{ getNotificationIcon(notification) }}</span>
+                </div>
+
+                <!-- Content -->
+                <div class="notification-content">
+                    <h4 class="notification-title">{{ notification.title }}</h4>
+                    <p class="notification-message">{{ notification.message }}</p>
+                    <span class="notification-time">{{ notification.timeAgo }}</span>
+                </div>
+
+                <!-- Unread Indicator -->
+                <div *ngIf="!notification.isRead" class="unread-indicator"></div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="recentNotifications.length === 0">
+            <span class="material-icons empty-icon">notifications_none</span>
+            <p>{{ 'NO_NOTIFICATIONS' | translate }}</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="dropdown-footer" *ngIf="recentNotifications.length > 0">
+            <button
+                    class="view-all-btn"
+                    (click)="viewAllNotifications()"
+                    [attr.aria-label]="'VIEW_ALL_NOTIFICATIONS' | translate">
+                {{ 'VIEW_ALL' | translate }}
+                <span class="material-icons">arrow_forward</span>
+            </button>
+        </div>
+    </div>
+</div>

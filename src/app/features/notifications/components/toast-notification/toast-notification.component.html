@@ -1,0 +1,37 @@
+<!-- toast-notification.component.html -->
+
+<div class="toast-container">
+    <div
+            *ngFor="let notification of notifications"
+            class="toast-notification"
+            [class]="getPriorityClass(notification)"
+            [@toastAnimation]
+            (click)="onToastClick(notification)"
+            role="alert"
+            aria-live="assertive"
+            [attr.aria-label]="notification.title">
+
+        <!-- Icon -->
+        <div class="toast-icon" [style.background]="getNotificationColor(notification)">
+            <span class="material-icons">{{ getNotificationIcon(notification) }}</span>
+        </div>
+
+        <!-- Content -->
+        <div class="toast-content">
+            <h4 class="toast-title">{{ notification.title }}</h4>
+            <p class="toast-message">{{ notification.message }}</p>
+            <span class="toast-time">{{ notification.timeAgo }}</span>
+        </div>
+
+        <!-- Close Button -->
+        <button
+                class="toast-close-btn"
+                (click)="onCloseClick(notification, $event)"
+                [attr.aria-label]="'CLOSE' | translate">
+            <span class="material-icons">close</span>
+        </button>
+
+        <!-- Progress Bar -->
+        <div class="toast-progress"></div>
+    </div>
+</div>

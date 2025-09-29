@@ -808,5 +808,26 @@
   "CATEGORY.LANGUAGE": "Мова",
   "CATEGORY.OTHER": "Інше",
 
-  "ADD_NEW_COUPON": "Додати новий купон"
+  "ADD_NEW_COUPON": "Додати новий купон",
+
+
+  "NOTIFICATIONS_bell_component": "Повідомлення",
+  "NOTIFICATIONS": "Повідомлення",
+  "UNREAD_NOTIFICATIONS": "непрочитане повідомлення",
+  "MARK_ALL_AS_READ": "Позначити все як прочитане",
+  "NO_NOTIFICATIONS": "Повідомлень ще немає",
+  "VIEW_ALL_NOTIFICATIONS": "Переглянути всі повідомлення",
+  "LOADING_NOTIFICATIONS": "Завантаження повідомлень...",
+  "NO_NOTIFICATIONS_FOUND": "Повідомлення не знайдено",
+  "NO_NOTIFICATIONS_YET": "У вас ще немає жодного повідомлення",
+  "NO_UNREAD_NOTIFICATIONS": "У вас немає непрочитаних повідомлень",
+  "NO_READ_NOTIFICATIONS": "У вас немає прочитаних повідомлень",
+  "MY_NOTIFICATIONS": "Мої повідомлення",
+  "ALL": "Всі",
+  "UNREAD": "Непрочитані",
+  "READ": "Прочитані",
+  "CLEAR_READ": "Очистити прочитані",
+  "CLEAR_ALL": "Очистити все",
+  "DELETE_NOTIFICATION": "Видалити повідомлення",
+  "CLOSE": "Закрити"
 }

@@ -856,9 +856,28 @@
   "CATEGORY.LANGUAGE": "Dil",
   "CATEGORY.OTHER": "Diğer",
 
-  "ADD_NEW_COUPON": "Yeni Kupon Ekle"
+  "ADD_NEW_COUPON": "Yeni Kupon Ekle",
 
 
 
+  "NOTIFICATIONS_BELL_COMPONEET": "NOTIFICATIONS_BELL_COMPONEET",
+  "NOTIFICATIONS": "Bildirimler",
+  "UNREAD_NOTIFICATIONS": "okunmamış bildirim",
+  "MARK_ALL_AS_READ": "Tümünü Okundu İşaretle",
+  "NO_NOTIFICATIONS": "Henüz bildirim yok",
+  "VIEW_ALL_NOTIFICATIONS": "Tüm bildirimleri görüntüle",
+  "LOADING_NOTIFICATIONS": "Bildirimler yükleniyor...",
+  "NO_NOTIFICATIONS_FOUND": "Bildirim bulunamadı",
+  "NO_NOTIFICATIONS_YET": "Henüz hiç bildiriminiz yok",
+  "NO_UNREAD_NOTIFICATIONS": "Okunmamış bildiriminiz bulunmuyor",
+  "NO_READ_NOTIFICATIONS": "Okunmuş bildiriminiz bulunmuyor",
+  "MY_NOTIFICATIONS": "Bildirimlerim",
+  "ALL": "Tümü",
+  "UNREAD": "Okunmamış",
+  "READ": "Okunmuş",
+  "CLEAR_READ": "Okunmuşları Temizle",
+  "CLEAR_ALL": "Tümünü Temizle",
+  "DELETE_NOTIFICATION": "Bildirimi Sil",
+  "CLOSE": "Kapat"
 
 }

@@ -17,9 +17,13 @@
             </nav>
 
             <div class="header-actions">
+                <!-- Notification Bell - SADECE LOGIN OLDUYSA GÖSTER -->
+                <app-notification-bell *ngIf="isLoggedIn$ | async"></app-notification-bell>
+
                 <div class="lang-switcher desktop-only">
                     <button class="lang-toggle-button" (click)="toggleLanguageDropdown()">
-                        <span class="material-icons">language</span> </button>
+                        <span class="material-icons">language</span>
+                    </button>
                     <div class="lang-dropdown" [class.open]="isLanguageDropdownOpen">
                         <button class="lang-option-button" (click)="switchLanguage('uk'); closeMobileMenu()">
                             <span class="flag-emoji">🇺🇦</span> Українська
@@ -41,7 +45,7 @@
 
                 <ng-container *ngIf="!(isLoggedIn$ | async); else loggedInActions">
                     <button class="auth-button primary-btn" routerLink="/auth/login">{{ 'LOGIN' | translate }}</button>
-                 </ng-container>
+                </ng-container>
                 <ng-template #loggedInActions>
 
                 </ng-template>
@@ -105,14 +109,15 @@
         <router-outlet></router-outlet>
     </main>
 
+    <!-- Toast Notification Component - SADECE LOGIN OLDUYSA GÖSTER -->
+    <app-toast-notification *ngIf="isLoggedIn$ | async"></app-toast-notification>
+
     <footer class="app-footer">
         <div class="container">
             <div class="footer-content">
                 <!-- Logo -->
                 <div class="footer-logo">
-
-                    <img   src="assets/logos/logo5-Photoroom.png" alt="Koyu Mod Logo" class="app-logo-img">
-
+                    <img src="assets/logos/logo5-Photoroom.png" alt="Koyu Mod Logo" class="app-logo-img">
                 </div>
 
                 <!-- Telif hakkı metni -->

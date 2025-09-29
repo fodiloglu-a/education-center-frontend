@@ -1,6 +1,6 @@
 
 
-TODO
+TODO LIST
 
 todo:HomeComponent:
 -------------------
@@ -8,8 +8,9 @@ todo:HomeComponent:
 
 todo:ProfileComponenet:
 -----------------------
--Profil alanına bildirimler eklenecek.
 
+todo:NotificationComponent:
+-----------------------
 
 todo:InstructorDashboard:
 -------------------------
@@ -34,7 +35,7 @@ Burada başvuru yapan kullanıcıya sınav atanacak kullanıcıya sınav atandı
 sınav tamamlanmamış ise goruntu farklı sınav tamamlanmış ise görüntü farklı yani ertidika olacak.
 
 todo:ProfileComponenet
--LogOut butonunu buraya saklayacağız.
+
 
 
 

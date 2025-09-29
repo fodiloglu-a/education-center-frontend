@@ -23,6 +23,8 @@ import { catchError, finalize, timeout, takeUntil, retry } from 'rxjs/operators'
 import { forkJoin, of, Subject, timer } from 'rxjs';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
+import { NotificationListComponent } from '../../../notifications/components/notification-list/notification-list.component';
+import { ActivatedRoute } from '@angular/router';
 
 // Constants
 const COURSES_DISPLAY_LIMIT = 6;
@@ -40,7 +42,8 @@ const RETRY_DELAY_MS = 1000;
     RouterLink,
     TranslateModule,
     LoadingSpinnerComponent,
-    AlertDialogComponent
+    AlertDialogComponent,
+    NotificationListComponent
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
@@ -72,6 +75,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // View states
   showAllCourses = false;
   showAllCertificates = false;
+  showNotifications = true;
 
   constructor(
       private readonly userService: UserService,
@@ -83,17 +87,38 @@ export class ProfileComponent implements OnInit, OnDestroy {
       private readonly cdr: ChangeDetectorRef,
       private readonly meta: Meta,
       private readonly title: Title,
-      private readonly sanitizer: DomSanitizer
+      private readonly sanitizer: DomSanitizer,
+      private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.initializePageMetadata();
     this.loadUserProfile();
+
+    // URL fragment kontrolü - bildirimler section'ına scroll
+    this.route.fragment.subscribe(fragment => {
+      if (fragment === 'notifications') {
+        setTimeout(() => {
+          const element = document.getElementById('notifications-section');
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 500);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Notifications section'ını toggle eder
+   */
+  toggleNotificationsSection(): void {
+    this.showNotifications = !this.showNotifications;
+    this.cdr.detectChanges();
   }
 
   /**
