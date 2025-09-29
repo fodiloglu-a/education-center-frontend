@@ -374,7 +374,7 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
    */
   goToCourse(): void {
     if (this.course) {
-      this.router.navigate(['/checkout', this.courseId]);
+      this.router.navigate(['payment/checkout', this.courseId]);
     }
   }
 

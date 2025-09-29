@@ -283,7 +283,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
     // YENİ: Checkout sayfasına yönlendir
     console.log('Navigating to checkout:', this.courseId);
-    this.router.navigate(['/checkout', this.courseId]);
+    this.router.navigate(['payment/checkout', this.courseId]);
   }
 
   private initializeLiqPay(response: PaymentResponse): void {
