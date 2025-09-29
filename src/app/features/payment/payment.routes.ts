@@ -42,6 +42,13 @@ export const PAYMENT_ROUTES: Routes = [
                 .then(c => c.PaymentSuccessComponent),
         title: 'Ödeme Başarılı'
     },
+    {
+        path: 'payment-success',
+        loadComponent: () =>
+            import('./components/payment-success/payment-success.component')
+                .then(c => c.PaymentSuccessComponent),
+        title: 'Ödeme Başarılı'
+    },
 
     // Payment failure - /payment/failure
     {
