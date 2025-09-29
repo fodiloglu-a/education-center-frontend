@@ -174,6 +174,19 @@
 
                 <!-- Actions for subscribed teachers -->
                 <div *ngIf="instructorProfile?.isTeacher" class="action-buttons-grid">
+
+                    <a [routerLink]="['/instructor', 'courses']" class="action-button secondary-btn">
+                        <span class="material-icons">list_alt</span>
+                        <span>{{ 'MY_COURSES' | translate }}</span>
+                    </a>
+                    <a [routerLink]="['/instructor', 'subscription']" class="action-button secondary-btn">
+                        <span class="material-icons">payment</span>
+                        <span>{{ 'SUBSCRIPTION' | translate }}</span>
+                    </a>
+                    <a [routerLink]="['/instructor', 'reviews']" class="action-button secondary-btn">
+                        <span class="material-icons">comment</span>
+                        <span>{{ 'MY_REVIEWS' | translate }}</span>
+                    </a>
                     <a (click)="checkAndNavigateToCourseCreation()"
                        class="action-button primary-btn"
                        [class.disabled]="isLoading">
@@ -192,27 +205,20 @@
                         </button>
                     </div>
 
-                    <a [routerLink]="['/instructor', 'courses']" class="action-button secondary-btn">
-                        <span class="material-icons">list_alt</span>
-                        <span>{{ 'MY_COURSES' | translate }}</span>
-                    </a>
-                    <a [routerLink]="['/instructor', 'reviews']" class="action-button secondary-btn">
-                        <span class="material-icons">comment</span>
-                        <span>{{ 'MY_REVIEWS' | translate }}</span>
-                    </a>
                     <a [routerLink]="['/instructor', 'add-material']" class="action-button secondary-btn">
                         <span class="material-icons">library_add</span>
                         <span>{{ 'ADD_MATERIAL' | translate }}</span>
                     </a>
+                    <!-- COUPON  -->
+                    <a *ngIf="instructorProfile?.isTeacher"
+                       [routerLink]="['/instructor/coupons/new']"
+                       class="action-button secondary-btn">
+                        <span class="material-icons">add_circle</span>
+                        <span>{{ 'ADD_NEW_COUPON' | translate }}</span>
+                    </a>
                     <!-- Subscription-dependent Actions -->
                     <br>
                     <div style="align-content: center" class="subscription-dependent-actions">
-                        <a *ngIf="instructorProfile?.isTeacher"
-                           [routerLink]="['/instructor/coupons/new']"
-                           class="tab-btn add-coupon-btn">
-                            <span class="material-icons">add_circle</span>
-                            {{ 'ADD_NEW_COUPON' | translate }}
-                        </a>
 
                         <button *ngIf="!instructorProfile?.isTeacher"
                                 class="tab-btn disabled-btn"

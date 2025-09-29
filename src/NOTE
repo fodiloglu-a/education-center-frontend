@@ -8,6 +8,8 @@ todo:HomeComponent:
 
 todo:ProfileComponenet:
 -----------------------
+-#PaymentHistory vs alanları eklenecek buton eklenecek ve kullanıcı tıklayıp alana gidecek yada daha
+güzel bir yapı düşünülecek.
 
 todo:NotificationComponent:
 -----------------------
@@ -35,7 +37,17 @@ Burada başvuru yapan kullanıcıya sınav atanacak kullanıcıya sınav atandı
 sınav tamamlanmamış ise goruntu farklı sınav tamamlanmış ise görüntü farklı yani ertidika olacak.
 
 todo:ProfileComponenet
+------------------------
 
+* Buraya iki adet buton eklenecek
+
+BUTON-1:Ödeme Yönerimi::Ödeme geçmişi faturalar vs
+BUTON-2:Abonelik Yönetimi::Abonelik sürekliliği için ödeme tekrarı,,,,/Ödeme kaydetme
+
+todo:Payment
+
+---Yeni oluşturulan compoenentler html css ve ts
+ olarak tekrardan revize edilecek ve kullanıcı başarılı ödeme yaptıktan sonra gideceği yerler ayarlanacak.
 
 
 

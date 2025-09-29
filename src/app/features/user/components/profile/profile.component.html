@@ -137,6 +137,13 @@
                 {{ 'ACCOUNT_ACTIONS' | translate }}
             </h2>
             <nav class="profile-actions" role="navigation" [attr.aria-label]="'ACCOUNT_ACTIONS' | translate">
+                <a class="action-button secondary-btn"
+                   (click)="paymentHistory()"
+                   [attr.aria-label]="'PAYMENT' | translate"
+                   role="button">
+                    <span class="material-icons" aria-hidden="true">payment</span>
+                    <span>{{ 'PAYMENT' | translate }}</span>
+                </a>
                 <a class="action-button primary-btn"
                    routerLink="/profile/edit"
                    [attr.aria-label]="'EDIT_PROFILE' | translate"

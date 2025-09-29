@@ -683,4 +683,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.router.navigate(['/auth/login']);
 
   }
+
+  paymentHistory() {
+    this.router.navigate(['/payment/history']);
+  }
 }
