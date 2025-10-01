@@ -1,1 +1,206 @@
-<p>payment-status works!</p>
+<!-- src/app/features/payment/components/payment-status/payment-status.component.html -->
+
+<div class="status-container">
+
+    <!-- Loading State -->
+    <div class="loading-wrapper" *ngIf="isLoading">
+        <app-loading-spinner></app-loading-spinner>
+        <p class="loading-text">{{ 'LOADING_PAYMENT_STATUS' | translate }}</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-wrapper" *ngIf="!isLoading && errorMessage && !paymentDetails">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h2>{{ 'ERROR_LOADING_PAYMENT' | translate }}</h2>
+        <p class="error-message">{{ errorMessage | translate }}</p>
+        <div class="error-actions">
+            <button class="btn btn-primary" (click)="refreshStatus()" type="button">
+                <i class="fas fa-redo"></i>
+                <span>{{ 'TRY_AGAIN' | translate }}</span>
+            </button>
+            <button class="btn btn-outline" (click)="goToPaymentHistory()" type="button">
+                <i class="fas fa-history"></i>
+                <span>{{ 'VIEW_PAYMENT_HISTORY' | translate }}</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Status Content -->
+    <div class="status-content" *ngIf="!isLoading && paymentDetails">
+
+        <div class="status-card" [class]="statusClass">
+
+            <!-- Status Icon -->
+            <div class="status-icon-wrapper">
+                <div class="icon-circle" [class]="statusClass">
+                    <i [class]="statusIcon"></i>
+                </div>
+                <div class="icon-background" [class]="statusClass"></div>
+            </div>
+
+            <!-- Status Title & Message -->
+            <h1 class="status-title">{{ statusTitle | translate }}</h1>
+            <p class="status-message">{{ statusMessage | translate }}</p>
+
+            <!-- Payment Details Card -->
+            <div class="details-card">
+                <div class="details-header">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>{{ 'PAYMENT_DETAILS' | translate }}</span>
+                </div>
+
+                <div class="details-grid">
+                    <!-- Order ID -->
+                    <div class="detail-item">
+            <span class="detail-label">
+              <i class="fas fa-hashtag"></i>
+                {{ 'ORDER_ID' | translate }}
+            </span>
+                        <span class="detail-value">{{ paymentDetails.orderId }}</span>
+                    </div>
+
+                    <!-- Course -->
+                    <div class="detail-item">
+            <span class="detail-label">
+              <i class="fas fa-book-open"></i>
+                {{ 'COURSE' | translate }}
+            </span>
+                        <span class="detail-value">{{ paymentDetails.courseTitle }}</span>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="detail-item">
+            <span class="detail-label">
+              <i class="fas fa-money-bill-wave"></i>
+                {{ 'AMOUNT' | translate }}
+            </span>
+                        <span class="detail-value amount">
+              {{ formatCurrency(paymentDetails.amount) }}
+            </span>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="detail-item">
+            <span class="detail-label">
+              <i class="fas fa-info-circle"></i>
+                {{ 'STATUS' | translate }}
+            </span>
+                        <span class="detail-value">
+              <span class="status-badge" [class]="paymentDetails.status">
+                {{ ('STATUS_' + paymentDetails.status.toUpperCase()) | translate }}
+              </span>
+            </span>
+                    </div>
+
+                    <!-- Transaction ID -->
+                    <div class="detail-item" *ngIf="paymentDetails.transactionId">
+            <span class="detail-label">
+              <i class="fas fa-receipt"></i>
+                {{ 'TRANSACTION_ID' | translate }}
+            </span>
+                        <span class="detail-value transaction-id">
+              {{ paymentDetails.transactionId }}
+            </span>
+                    </div>
+
+                    <!-- Payment Date -->
+                    <div class="detail-item">
+            <span class="detail-label">
+              <i class="fas fa-calendar-alt"></i>
+                {{ 'PAYMENT_DATE' | translate }}
+            </span>
+                        <span class="detail-value">
+              {{ paymentDetails.paymentDate | date: 'dd MMM yyyy, HH:mm' }}
+            </span>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="detail-item">
+            <span class="detail-label">
+              <i class="fas fa-credit-card"></i>
+                {{ 'PAYMENT_METHOD' | translate }}
+            </span>
+                        <span class="detail-value">{{ paymentDetails.paymentMethod }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto-refresh notification for pending payments -->
+            <div class="pending-notice" *ngIf="isPending">
+                <i class="fas fa-sync fa-spin"></i>
+                <p>{{ 'AUTO_REFRESHING_STATUS' | translate }}</p>
+            </div>
+
+            <!-- Success Actions -->
+            <div class="action-buttons" *ngIf="isSuccess">
+                <button class="btn btn-primary btn-lg" (click)="goToCourse()" type="button">
+                    <i class="fas fa-play-circle"></i>
+                    <span>{{ 'START_COURSE' | translate }}</span>
+                </button>
+
+                <button class="btn btn-secondary" (click)="downloadInvoice()" type="button">
+                    <i class="fas fa-download"></i>
+                    <span>{{ 'DOWNLOAD_INVOICE' | translate }}</span>
+                </button>
+
+                <button class="btn btn-outline" (click)="goToPaymentHistory()" type="button">
+                    <i class="fas fa-history"></i>
+                    <span>{{ 'VIEW_PAYMENT_HISTORY' | translate }}</span>
+                </button>
+            </div>
+
+            <!-- Failed Actions -->
+            <div class="action-buttons" *ngIf="isFailed">
+                <button class="btn btn-primary btn-lg" (click)="retryPayment()" type="button">
+                    <i class="fas fa-redo"></i>
+                    <span>{{ 'RETRY_PAYMENT' | translate }}</span>
+                </button>
+
+                <button class="btn btn-secondary" (click)="contactSupport()" type="button">
+                    <i class="fas fa-headset"></i>
+                    <span>{{ 'CONTACT_SUPPORT' | translate }}</span>
+                </button>
+
+                <button class="btn btn-outline" (click)="goToPaymentHistory()" type="button">
+                    <i class="fas fa-history"></i>
+                    <span>{{ 'VIEW_PAYMENT_HISTORY' | translate }}</span>
+                </button>
+            </div>
+
+            <!-- Pending Actions -->
+            <div class="action-buttons" *ngIf="isPending">
+                <button class="btn btn-primary" (click)="refreshStatus()" type="button">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>{{ 'REFRESH_STATUS' | translate }}</span>
+                </button>
+
+                <button class="btn btn-outline" (click)="goToPaymentHistory()" type="button">
+                    <i class="fas fa-history"></i>
+                    <span>{{ 'VIEW_PAYMENT_HISTORY' | translate }}</span>
+                </button>
+
+                <button class="btn btn-outline" (click)="goToDashboard()" type="button">
+                    <i class="fas fa-home"></i>
+                    <span>{{ 'GO_TO_DASHBOARD' | translate }}</span>
+                </button>
+            </div>
+
+            <!-- Refunded Actions -->
+            <div class="action-buttons" *ngIf="isRefunded">
+                <button class="btn btn-primary" (click)="goToPaymentHistory()" type="button">
+                    <i class="fas fa-history"></i>
+                    <span>{{ 'VIEW_PAYMENT_HISTORY' | translate }}</span>
+                </button>
+
+                <button class="btn btn-outline" (click)="goToDashboard()" type="button">
+                    <i class="fas fa-home"></i>
+                    <span>{{ 'GO_TO_DASHBOARD' | translate }}</span>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>

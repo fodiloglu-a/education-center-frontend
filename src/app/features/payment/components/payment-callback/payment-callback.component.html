@@ -1,1 +1,233 @@
-<p>payment-callback works!</p>
+<!-- src/app/features/payment/components/payment-callback/payment-callback.component.html -->
+
+<div class="callback-container">
+    <!-- Confetti Animation -->
+    <div class="confetti-container" *ngIf="showConfetti">
+        <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"></div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-wrapper" *ngIf="isProcessing">
+        <app-loading-spinner></app-loading-spinner>
+        <div class="processing-text">
+            <h2>{{ statusTitle | translate }}</h2>
+            <p>{{ statusMessage | translate }}</p>
+            <div class="progress-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Content -->
+    <div class="callback-content" *ngIf="!isProcessing" [class.animate-in]="animateSuccess">
+
+        <!-- Success State -->
+        <div class="status-card success-card" *ngIf="isSuccess">
+            <div class="status-icon-wrapper">
+                <div class="icon-circle" [class.pulse]="isSuccess">
+                    <i [class]="statusIcon"></i>
+                </div>
+            </div>
+
+            <h1 class="status-title">{{ statusTitle | translate }}</h1>
+            <p class="status-message">{{ statusMessage | translate }}</p>
+            <p class="status-subtitle" *ngIf="statusSubtitle">{{ statusSubtitle }}</p>
+
+            <!-- Order Details -->
+            <div class="details-card">
+                <div class="detail-row" *ngIf="orderId">
+          <span class="detail-label">
+            <i class="fas fa-receipt"></i>
+              {{ 'ORDER_ID' | translate }}
+          </span>
+                    <span class="detail-value">{{ orderId }}</span>
+                </div>
+
+                <div class="detail-row" *ngIf="transactionId">
+          <span class="detail-label">
+            <i class="fas fa-hashtag"></i>
+              {{ 'TRANSACTION_ID' | translate }}
+          </span>
+                    <span class="detail-value">{{ transactionId }}</span>
+                </div>
+
+                <div class="detail-row" *ngIf="amount">
+          <span class="detail-label">
+            <i class="fas fa-money-bill-wave"></i>
+              {{ 'AMOUNT_PAID' | translate }}
+          </span>
+                    <span class="detail-value amount">{{ formattedAmount }}</span>
+                </div>
+
+                <!-- Course Purchase Details -->
+                <div class="detail-row" *ngIf="isCoursePurchase && courseName">
+          <span class="detail-label">
+            <i class="fas fa-book-open"></i>
+              {{ 'COURSE' | translate }}
+          </span>
+                    <span class="detail-value">{{ courseName }}</span>
+                </div>
+
+                <!-- Subscription Details -->
+                <div class="detail-row" *ngIf="isSubscription && subscriptionPlanName">
+          <span class="detail-label">
+            <i class="fas fa-crown"></i>
+              {{ 'SUBSCRIPTION_PLAN' | translate }}
+          </span>
+                    <span class="detail-value">{{ subscriptionPlanName }}</span>
+                </div>
+
+                <div class="detail-row" *ngIf="isSubscription && subscriptionValidUntil">
+          <span class="detail-label">
+            <i class="fas fa-calendar-check"></i>
+              {{ 'VALID_UNTIL' | translate }}
+          </span>
+                    <span class="detail-value">{{ subscriptionValidUntil | date: 'dd.MM.yyyy' }}</span>
+                </div>
+            </div>
+
+            <!-- Success Message Box -->
+            <div class="success-message-box">
+                <i class="fas fa-info-circle"></i>
+                <p *ngIf="isCoursePurchase">{{ 'COURSE_ACCESS_GRANTED' | translate }}</p>
+                <p *ngIf="isSubscription">{{ 'SUBSCRIPTION_ACTIVATED' | translate }}</p>
+            </div>
+
+            <!-- Action Buttons for Course Purchase -->
+            <div class="action-buttons" *ngIf="isCoursePurchase">
+                <button
+                        class="btn btn-primary btn-lg"
+                        (click)="goToCourse()"
+                        *ngIf="courseId">
+                    <i class="fas fa-play-circle"></i>
+                    <span>{{ 'START_LEARNING' | translate }}</span>
+                </button>
+
+                <button
+                        class="btn btn-secondary"
+                        (click)="goToMyCourses()">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>{{ 'MY_COURSES' | translate }}</span>
+                </button>
+
+                <button
+                        class="btn btn-outline"
+                        (click)="goToCourses()">
+                    <i class="fas fa-book"></i>
+                    <span>{{ 'BROWSE_COURSES' | translate }}</span>
+                </button>
+            </div>
+
+            <!-- Action Buttons for Subscription -->
+            <div class="action-buttons" *ngIf="isSubscription">
+                <button
+                        class="btn btn-primary btn-lg"
+                        (click)="goToCreateCourse()">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>{{ 'CREATE_FIRST_COURSE' | translate }}</span>
+                </button>
+
+                <button
+                        class="btn btn-secondary"
+                        (click)="goToSubscriptionDashboard()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>{{ 'INSTRUCTOR_DASHBOARD' | translate }}</span>
+                </button>
+
+                <button
+                        class="btn btn-outline"
+                        (click)="goToCourses()">
+                    <i class="fas fa-book"></i>
+                    <span>{{ 'BROWSE_COURSES' | translate }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div class="status-card error-card" *ngIf="!isSuccess">
+            <div class="status-icon-wrapper">
+                <div class="icon-circle error">
+                    <i [class]="statusIcon"></i>
+                </div>
+            </div>
+
+            <h1 class="status-title">{{ statusTitle | translate }}</h1>
+            <p class="status-message">{{ statusMessage | translate }}</p>
+            <p class="status-subtitle error-subtitle" *ngIf="statusSubtitle">{{ statusSubtitle }}</p>
+
+            <!-- Error Details -->
+            <div class="details-card error-details">
+                <div class="detail-row" *ngIf="orderId">
+          <span class="detail-label">
+            <i class="fas fa-receipt"></i>
+              {{ 'ORDER_ID' | translate }}
+          </span>
+                    <span class="detail-value">{{ orderId }}</span>
+                </div>
+
+                <div class="detail-row" *ngIf="errorCode">
+          <span class="detail-label">
+            <i class="fas fa-exclamation-triangle"></i>
+              {{ 'ERROR_CODE' | translate }}
+          </span>
+                    <span class="detail-value">{{ errorCode }}</span>
+                </div>
+            </div>
+
+            <!-- Error Message Box -->
+            <div class="error-message-box">
+                <i class="fas fa-info-circle"></i>
+                <p>{{ 'PAYMENT_ERROR_INFO' | translate }}</p>
+            </div>
+
+            <!-- Action Buttons for Error -->
+            <div class="action-buttons">
+                <button
+                        class="btn btn-primary btn-lg"
+                        (click)="retryPayment()">
+                    <i class="fas fa-redo"></i>
+                    <span>{{ 'RETRY_PAYMENT' | translate }}</span>
+                </button>
+
+                <button
+                        class="btn btn-secondary"
+                        (click)="contactSupport()">
+                    <i class="fas fa-headset"></i>
+                    <span>{{ 'CONTACT_SUPPORT' | translate }}</span>
+                </button>
+
+                <button
+                        class="btn btn-outline"
+                        (click)="goToCourses()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>{{ 'BACK_TO_COURSES' | translate }}</span>
+                </button>
+            </div>
+
+            <!-- Additional Help -->
+            <div class="help-section">
+                <h3>{{ 'COMMON_ISSUES' | translate }}</h3>
+                <ul class="help-list">
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        {{ 'CHECK_CARD_DETAILS' | translate }}
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        {{ 'CHECK_SUFFICIENT_FUNDS' | translate }}
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        {{ 'CHECK_CARD_LIMITS' | translate }}
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        {{ 'TRY_DIFFERENT_CARD' | translate }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

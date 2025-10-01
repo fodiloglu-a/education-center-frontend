@@ -1,1 +1,184 @@
-<p>payment-failure works!</p>
+<!-- src/app/features/payment/components/payment-failure/payment-failure.component.html -->
+
+<div class="failure-container">
+    <div class="failure-content">
+
+        <!-- Error Icon -->
+        <div class="failure-icon-wrapper">
+            <div class="icon-circle error-pulse">
+                <i [class]="errorDetail?.icon || 'fas fa-exclamation-circle'"></i>
+            </div>
+            <div class="icon-background"></div>
+        </div>
+
+        <!-- Error Title -->
+        <h1 class="failure-title">
+            {{ (errorDetail?.title || 'PAYMENT_FAILED') | translate }}
+        </h1>
+
+        <!-- Error Description -->
+        <p class="failure-message">
+            {{ (errorDetail?.description || errorMessage || 'PAYMENT_FAILED_DETAILS') | translate }}
+        </p>
+
+        <!-- Error Details Card -->
+        <div class="error-details-card" *ngIf="hasErrorDetails()">
+            <div class="details-header">
+                <i class="fas fa-info-circle"></i>
+                <span>{{ 'TRANSACTION_DETAILS' | translate }}</span>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item" *ngIf="orderId">
+          <span class="detail-label">
+            <i class="fas fa-receipt"></i>
+              {{ 'ORDER_ID' | translate }}
+          </span>
+                    <span class="detail-value">
+            {{ orderId }}
+                        <button class="copy-btn" (click)="copyOrderId()" type="button"
+                                title="{{ 'COPY' | translate }}">
+              <i class="fas fa-copy"></i>
+            </button>
+          </span>
+                </div>
+
+                <div class="detail-item" *ngIf="transactionId">
+          <span class="detail-label">
+            <i class="fas fa-hashtag"></i>
+              {{ 'TRANSACTION_ID' | translate }}
+          </span>
+                    <span class="detail-value">{{ transactionId }}</span>
+                </div>
+
+                <div class="detail-item" *ngIf="errorCode">
+          <span class="detail-label">
+            <i class="fas fa-exclamation-triangle"></i>
+              {{ 'ERROR_CODE' | translate }}
+          </span>
+                    <span class="detail-value error-code-badge">{{ errorCode }}</span>
+                </div>
+
+                <div class="detail-item" *ngIf="amount">
+          <span class="detail-label">
+            <i class="fas fa-money-bill-wave"></i>
+              {{ 'AMOUNT' | translate }}
+          </span>
+                    <span class="detail-value amount">{{ formatCurrency(amount) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solutions/Troubleshooting -->
+        <div class="troubleshooting-card" *ngIf="errorDetail">
+            <div class="troubleshooting-header">
+                <i class="fas fa-lightbulb"></i>
+                <h3>{{ 'HOW_TO_FIX' | translate }}</h3>
+            </div>
+
+            <ul class="solutions-list">
+                <li *ngFor="let solution of errorDetail.solutions; let i = index"
+                    class="solution-item">
+                    <span class="solution-number">{{ i + 1 }}</span>
+                    <span class="solution-text">{{ solution | translate }}</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Common Issues -->
+        <div class="common-issues-card">
+            <div class="issues-header">
+                <i class="fas fa-question-circle"></i>
+                <h3>{{ 'COMMON_ISSUES' | translate }}</h3>
+            </div>
+
+            <div class="issues-grid">
+                <div class="issue-item">
+                    <i class="fas fa-credit-card"></i>
+                    <p>{{ 'CHECK_CARD_DETAILS' | translate }}</p>
+                </div>
+
+                <div class="issue-item">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <p>{{ 'ENSURE_SUFFICIENT_FUNDS' | translate }}</p>
+                </div>
+
+                <div class="issue-item">
+                    <i class="fas fa-wifi"></i>
+                    <p>{{ 'CHECK_INTERNET_CONNECTION' | translate }}</p>
+                </div>
+
+                <div class="issue-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <p>{{ 'VERIFY_CARD_SECURITY' | translate }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button
+                    class="btn btn-primary btn-lg"
+                    (click)="retryPayment()"
+                    type="button">
+                <i class="fas fa-redo"></i>
+                <span>{{ 'RETRY_PAYMENT' | translate }}</span>
+            </button>
+
+            <button
+                    class="btn btn-secondary"
+                    (click)="goToCheckout()"
+                    *ngIf="courseId"
+                    type="button">
+                <i class="fas fa-shopping-cart"></i>
+                <span>{{ 'BACK_TO_CHECKOUT' | translate }}</span>
+            </button>
+
+            <button
+                    class="btn btn-outline"
+                    (click)="goToCourses()"
+                    type="button">
+                <i class="fas fa-book"></i>
+                <span>{{ 'BROWSE_COURSES' | translate }}</span>
+            </button>
+        </div>
+
+        <!-- Support Section -->
+        <div class="support-section">
+            <div class="support-content">
+                <i class="fas fa-life-ring"></i>
+                <div class="support-text">
+                    <p class="support-title">{{ 'STILL_HAVING_TROUBLE' | translate }}</p>
+                    <p class="support-description">
+                        {{ 'SUPPORT_TEAM_HELP' | translate }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="support-actions">
+                <button class="btn btn-support" (click)="goToSupport()" type="button">
+                    <i class="fas fa-headset"></i>
+                    <span>{{ 'CONTACT_SUPPORT' | translate }}</span>
+                </button>
+            </div>
+
+            <div class="support-contact">
+                <a href="mailto:support@yourplatform.com" class="contact-link">
+                    <i class="fas fa-envelope"></i>
+                    support---yourplatform.com
+                </a>
+                <a href="tel:+380123456789" class="contact-link">
+                    <i class="fas fa-phone"></i>
+                    +380 12 345 6789
+                </a>
+            </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="info-note">
+            <i class="fas fa-info-circle"></i>
+            <p>{{ 'NO_CHARGE_ON_FAILED_PAYMENT' | translate }}</p>
+        </div>
+
+    </div>
+</div>

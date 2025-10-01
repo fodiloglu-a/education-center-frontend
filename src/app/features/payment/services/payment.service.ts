@@ -1,12 +1,54 @@
-// src/app/features/payment/payment.service.ts
+// src/app/features/payment/services/payment.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, map } from 'rxjs/operators';
 
 import { TokenService } from '../../../core/services/token.service';
 import { PaymentResponse } from '../models/payment.models';
 import { environment } from "../../../../environments/environment";
+
+export interface PaymentHistoryResponse {
+  id: string;
+  orderId: string;
+  courseId: number;
+  courseTitle: string;
+  courseImage?: string;
+  amount: number;
+  currency: string;
+  status: 'success' | 'failed' | 'pending' | 'refunded';
+  paymentDate: string;
+  paymentMethod: string;
+  transactionId?: string;
+  invoiceUrl?: string;
+  refundDate?: string;
+  refundReason?: string;
+}
+
+export interface PaymentHistoryFilter {
+  status?: string;
+  dateRange?: string;
+  search?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface PagedPaymentHistory {
+  content: PaymentHistoryResponse[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  size: number;
+}
+
+export interface PaymentStatsResponse {
+  successfulPayments: number;
+  totalPayments: number;
+  totalAmount: number;
+  failedPayments: number;
+  pendingPayments: number;
+  refundedPayments: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -20,10 +62,7 @@ export class PaymentService {
   ) { }
 
   /**
-   * 🔧 GÜNCELLENDİ: Belirli bir kurs için ödeme işlemini başlatır ve Liqpay ödeme verilerini backend'den alır.
-   * @param courseId Satın alınacak kursun ID'si.
-   * @param discountAmount İndirim tutarı (UAH)
-   * @returns data ve signature içeren PaymentResponse nesnesini içeren Observable.
+   * Belirli bir kurs için ödeme işlemini başlatır
    */
   initiatePayment(courseId: number, discountAmount: number): Observable<PaymentResponse> {
     console.log('💳 Initiating payment:', { courseId, discountAmount });
@@ -39,9 +78,7 @@ export class PaymentService {
         tap(response => {
           console.log('✅ Payment response received:', {
             hasData: !!response.data,
-            hasSignature: !!response.signature,
-            dataLength: response.data?.length || 0,
-            signatureLength: response.signature?.length || 0
+            hasSignature: !!response.signature
           });
         }),
         catchError(this.handleError.bind(this))
@@ -49,30 +86,108 @@ export class PaymentService {
   }
 
   /**
-   * 🔧 YENİ: Debug bilgilerini backend'e gönder
+   * Kullanıcının ödeme geçmişini getirir
    */
-  sendDebugInfo(debugInfo: any): Observable<any> {
+  getPaymentHistory(filter?: PaymentHistoryFilter): Observable<PagedPaymentHistory> {
+    console.log('📜 Fetching payment history with filter:', filter);
+
     const headers = this.getAuthHeaders();
+    let params = new HttpParams();
 
-    console.log('🔧 Sending debug info to backend:', debugInfo);
+    if (filter) {
+      if (filter.status && filter.status !== 'all') {
+        params = params.set('status', filter.status);
+      }
+      if (filter.dateRange && filter.dateRange !== 'all') {
+        params = params.set('dateRange', filter.dateRange);
+      }
+      if (filter.search) {
+        params = params.set('search', filter.search);
+      }
+      if (filter.page !== undefined) {
+        params = params.set('page', filter.page.toString());
+      }
+      if (filter.size !== undefined) {
+        params = params.set('size', filter.size.toString());
+      }
+    }
 
-    return this.http.post<any>(
-        `${this.apiUrl}/debug-log`,
-        debugInfo,
-        { headers }
+    return this.http.get<PagedPaymentHistory>(
+        `${this.apiUrl}/history`,
+        { headers, params }
     ).pipe(
         tap(response => {
-          console.log('✅ Debug info sent successfully:', response);
+          console.log('✅ Payment history loaded:', {
+            totalPayments: response.totalElements,
+            currentPage: response.currentPage
+          });
         }),
-        catchError(error => {
-          console.error('❌ Failed to send debug info:', error);
-          return throwError(() => error);
-        })
+        catchError(this.handleError.bind(this))
     );
   }
 
   /**
-   * 🔧 YENİ: Payment verification
+   * Kullanıcının ödeme istatistiklerini getirir
+   */
+  getPaymentStats(): Observable<PaymentStatsResponse> {
+    console.log('📊 Fetching payment stats');
+
+    const headers = this.getAuthHeaders();
+
+    return this.http.get<PaymentStatsResponse>(
+        `${this.apiUrl}/stats`,
+        { headers }
+    ).pipe(
+        tap(stats => {
+          console.log('✅ Payment stats loaded:', stats);
+        }),
+        catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Belirli bir ödemenin detaylarını getirir
+   */
+  getPaymentDetails(orderId: string): Observable<PaymentHistoryResponse> {
+    console.log('🔍 Fetching payment details for:', orderId);
+
+    const headers = this.getAuthHeaders();
+
+    return this.http.get<PaymentHistoryResponse>(
+        `${this.apiUrl}/details/${orderId}`,
+        { headers }
+    ).pipe(
+        tap(payment => {
+          console.log('✅ Payment details loaded:', payment);
+        }),
+        catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Fatura indir
+   */
+  downloadInvoice(orderId: string): Observable<Blob> {
+    console.log('📄 Downloading invoice for:', orderId);
+
+    const headers = this.getAuthHeaders();
+
+    return this.http.get(
+        `${this.apiUrl}/invoice/${orderId}`,
+        {
+          headers,
+          responseType: 'blob'
+        }
+    ).pipe(
+        tap(() => {
+          console.log('✅ Invoice downloaded');
+        }),
+        catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Payment verification
    */
   verifyPayment(orderId: string): Observable<any> {
     const headers = this.getAuthHeaders();
@@ -92,7 +207,47 @@ export class PaymentService {
   }
 
   /**
-   * 🔧 GÜNCELLENDİ: Auth headers oluştur
+   * Payment status check
+   */
+  checkPaymentStatus(orderId: string): Observable<any> {
+    const headers = this.getAuthHeaders();
+    const params = new HttpParams().set('orderId', orderId);
+
+    console.log('📊 Checking payment status for order:', orderId);
+
+    return this.http.get<any>(
+        `${this.apiUrl}/status`,
+        { headers, params }
+    ).pipe(
+        tap(response => {
+          console.log('📊 Payment status:', response);
+        }),
+        catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Client callback gönder
+   */
+  sendClientCallback(callbackData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+
+    console.log('📞 Sending client callback:', callbackData);
+
+    return this.http.post<any>(
+        `${this.apiUrl}/client-callback`,
+        callbackData,
+        { headers }
+    ).pipe(
+        tap(response => {
+          console.log('✅ Client callback response:', response);
+        }),
+        catchError(this.handleError.bind(this))
+    );
+  }
+
+  /**
+   * Auth headers oluştur
    */
   private getAuthHeaders(): HttpHeaders {
     const token = this.tokenService.getAccessToken();
@@ -109,7 +264,7 @@ export class PaymentService {
   }
 
   /**
-   * 🔧 GÜNCELLENDİ: HTTP hatalarını işler - Daha detaylı error handling
+   * HTTP hatalarını işler
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.error('💥 Payment service error:', error);
@@ -118,11 +273,9 @@ export class PaymentService {
     let errorCode = 'PAYMENT_ERROR';
 
     if (error.error instanceof ErrorEvent) {
-      // Client-side error
       errorMessage = `Ağ hatası: ${error.error.message}`;
       errorCode = 'NETWORK_ERROR';
     } else {
-      // Server-side error
       switch (error.status) {
         case 401:
           errorMessage = 'Yetkilendirme hatası. Lütfen tekrar giriş yapın.';
@@ -133,8 +286,8 @@ export class PaymentService {
           errorCode = 'FORBIDDEN';
           break;
         case 404:
-          errorMessage = 'Kurs bulunamadı.';
-          errorCode = 'COURSE_NOT_FOUND';
+          errorMessage = 'Kurs veya ödeme bulunamadı.';
+          errorCode = 'NOT_FOUND';
           break;
         case 409:
           errorMessage = 'Bu kursu zaten satın aldınız.';
@@ -158,7 +311,6 @@ export class PaymentService {
       }
     }
 
-    // Error object'i oluştur
     const paymentError = {
       message: errorMessage,
       code: errorCode,
@@ -170,45 +322,5 @@ export class PaymentService {
     console.error('💥 Processed payment error:', paymentError);
 
     return throwError(() => paymentError);
-  }
-
-  /**
-   * 🔧 YENİ: Payment status check
-   */
-  checkPaymentStatus(orderId: string): Observable<any> {
-    const headers = this.getAuthHeaders();
-    const params = new HttpParams().set('orderId', orderId);
-
-    console.log('📊 Checking payment status for order:', orderId);
-
-    return this.http.get<any>(
-        `${this.apiUrl}/status`,
-        { headers, params }
-    ).pipe(
-        tap(response => {
-          console.log('📊 Payment status:', response);
-        }),
-        catchError(this.handleError.bind(this))
-    );
-  }
-
-  /**
-   * 🔧 YENİ: Client callback gönder
-   */
-  sendClientCallback(callbackData: any): Observable<any> {
-    const headers = this.getAuthHeaders();
-
-    console.log('📞 Sending client callback:', callbackData);
-
-    return this.http.post<any>(
-        `${this.apiUrl}/client-callback`,
-        callbackData,
-        { headers }
-    ).pipe(
-        tap(response => {
-          console.log('✅ Client callback response:', response);
-        }),
-        catchError(this.handleError.bind(this))
-    );
   }
 }

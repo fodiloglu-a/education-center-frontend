@@ -1,1 +1,171 @@
-<p>payment-success works!</p>
+<!-- src/app/features/payment/components/payment-success/payment-success.component.html -->
+
+<div class="success-container">
+
+    <!-- Confetti Animation -->
+    <div class="confetti-container" *ngIf="showConfetti">
+        <div class="confetti" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]"></div>
+    </div>
+
+    <div class="success-content">
+
+        <!-- Success Icon -->
+        <div class="success-icon-wrapper">
+            <div class="icon-circle success-pulse">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="icon-rings">
+                <span class="ring ring-1"></span>
+                <span class="ring ring-2"></span>
+                <span class="ring ring-3"></span>
+            </div>
+        </div>
+
+        <!-- Success Title & Message -->
+        <h1 class="success-title">{{ 'PAYMENT_SUCCESSFUL' | translate }}</h1>
+        <p class="success-message">{{ 'PAYMENT_SUCCESS_DETAILS' | translate }}</p>
+
+        <!-- Payment Info Card -->
+        <div class="order-info-card" *ngIf="paymentDetails || orderId">
+            <div class="info-header">
+                <i class="fas fa-receipt"></i>
+                <span>{{ 'ORDER_INFORMATION' | translate }}</span>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item" *ngIf="orderId">
+          <span class="info-label">
+            <i class="fas fa-hashtag"></i>
+              {{ 'ORDER_ID' | translate }}
+          </span>
+                    <span class="info-value">{{ orderId }}</span>
+                </div>
+
+                <div class="info-item" *ngIf="courseTitle || paymentDetails?.courseTitle">
+          <span class="info-label">
+            <i class="fas fa-book-open"></i>
+              {{ 'COURSE' | translate }}
+          </span>
+                    <span class="info-value">{{ courseTitle || paymentDetails?.courseTitle }}</span>
+                </div>
+
+                <div class="info-item" *ngIf="paymentDetails?.amount">
+          <span class="info-label">
+            <i class="fas fa-money-bill-wave"></i>
+              {{ 'AMOUNT_PAID' | translate }}
+          </span>
+                    <span class="info-value amount">{{ formatCurrency(paymentDetails?.amount) }}</span>
+                </div>
+
+                <div class="info-item" *ngIf="paymentDetails?.paymentDate">
+          <span class="info-label">
+            <i class="fas fa-calendar-check"></i>
+              {{ 'PAYMENT_DATE' | translate }}
+          </span>
+                    <span class="info-value">{{ paymentDetails?.paymentDate | date: 'dd MMM yyyy, HH:mm' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message Box -->
+        <div class="success-box">
+            <i class="fas fa-check-double"></i>
+            <p>{{ 'COURSE_ACCESS_GRANTED' | translate }}</p>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="next-steps-card">
+            <div class="steps-header">
+                <i class="fas fa-route"></i>
+                <h3>{{ 'WHAT_NEXT' | translate }}</h3>
+            </div>
+
+            <ul class="steps-list">
+                <li class="step-item">
+                    <div class="step-icon">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>{{ 'START_LEARNING_IMMEDIATELY' | translate }}</h4>
+                        <p>{{ 'START_LEARNING_DESC' | translate }}</p>
+                    </div>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>{{ 'ACCESS_COURSE_MATERIALS' | translate }}</h4>
+                        <p>{{ 'ACCESS_MATERIALS_DESC' | translate }}</p>
+                    </div>
+                </li>
+
+                <li class="step-item">
+                    <div class="step-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="step-content">
+                        <h4>{{ 'EARN_CERTIFICATE' | translate }}</h4>
+                        <p>{{ 'EARN_CERTIFICATE_DESC' | translate }}</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button
+                    class="btn btn-primary btn-lg"
+                    (click)="goToCourse()"
+                    *ngIf="courseId"
+                    type="button">
+                <i class="fas fa-play-circle"></i>
+                <span>{{ 'START_LEARNING_NOW' | translate }}</span>
+            </button>
+
+            <button
+                    class="btn btn-secondary"
+                    (click)="downloadInvoice()"
+                    *ngIf="orderId"
+                    type="button">
+                <i class="fas fa-file-invoice"></i>
+                <span>{{ 'DOWNLOAD_INVOICE' | translate }}</span>
+            </button>
+
+            <button
+                    class="btn btn-secondary"
+                    (click)="goToMyCourses()"
+                    type="button">
+                <i class="fas fa-graduation-cap"></i>
+                <span>{{ 'MY_COURSES' | translate }}</span>
+            </button>
+
+            <button
+                    class="btn btn-outline"
+                    (click)="goToDashboard()"
+                    type="button">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>{{ 'GO_TO_DASHBOARD' | translate }}</span>
+            </button>
+
+            <button
+                    class="btn btn-outline"
+                    (click)="goToCourses()"
+                    type="button">
+                <i class="fas fa-book"></i>
+                <span>{{ 'BROWSE_MORE_COURSES' | translate }}</span>
+            </button>
+        </div>
+
+        <!-- Support Info -->
+        <div class="support-section">
+            <i class="fas fa-question-circle"></i>
+            <p>
+                {{ 'NEED_HELP' | translate }}
+                <a routerLink="/support" class="support-link">{{ 'CONTACT_SUPPORT' | translate }}</a>
+            </p>
+        </div>
+
+    </div>
+</div>

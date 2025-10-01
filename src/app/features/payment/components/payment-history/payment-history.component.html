@@ -1,1 +1,322 @@
-<p>payment-history works!</p>
+<!-- src/app/features/payment/components/payment-history/payment-history.component.html -->
+
+<div class="history-container">
+
+    <!-- Loading State -->
+    <div class="loading-overlay" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>{{ 'LOADING_PAYMENT_HISTORY' | translate }}</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="history-content" *ngIf="!isLoading">
+
+        <!-- Header -->
+        <div class="history-header">
+            <div class="header-content">
+                <h1 class="page-title">{{ 'PAYMENT_HISTORY' | translate }}</h1>
+                <p class="page-subtitle">{{ 'VIEW_YOUR_PAYMENT_HISTORY' | translate }}</p>
+            </div>
+            <button class="btn btn-export" (click)="exportToCSV()" type="button">
+                <i class="fas fa-download"></i>
+                <span>{{ 'EXPORT_CSV' | translate }}</span>
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ stats.successfulPayments }}</div>
+                    <div class="stat-label">{{ 'SUCCESSFUL_PAYMENTS' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card total">
+                <div class="stat-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ stats.totalPayments }}</div>
+                    <div class="stat-label">{{ 'TOTAL_PAYMENTS' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card amount">
+                <div class="stat-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ formatCurrency(stats.totalAmount) }}</div>
+                    <div class="stat-label">{{ 'TOTAL_SPENT' | translate }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card failed">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ stats.failedPayments }}</div>
+                    <div class="stat-label">{{ 'FAILED_PAYMENTS' | translate }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-row">
+                <!-- Search -->
+                <br>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input
+                            type="text"
+                            [(ngModel)]="searchQuery"
+                            (ngModelChange)="filterPayments()"
+                            [placeholder]="'SEARCH_PAYMENTS' | translate"
+                            class="search-input">
+                    <br>
+                    <button
+                            *ngIf="searchQuery"
+                            class="clear-search"
+                            (click)="searchQuery = ''; filterPayments()"
+                            type="button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <br>
+                <!-- Status Filter -->
+                <div class="filter-group">
+                    <label for="statusFilter">
+                        <i class="fas fa-filter"></i>
+                        {{ 'STATUS' | translate }}
+                    </label>
+                    <select
+                            id="statusFilter"
+                            [(ngModel)]="statusFilter"
+                            (ngModelChange)="filterPayments()"
+                            class="filter-select">
+                        <option value="all">{{ 'ALL_STATUSES' | translate }}</option>
+                        <option value="success">{{ 'SUCCESSFUL' | translate }}</option>
+                        <option value="failed">{{ 'FAILED' | translate }}</option>
+                        <option value="pending">{{ 'PENDING' | translate }}</option>
+                        <option value="refunded">{{ 'REFUNDED' | translate }}</option>
+                    </select>
+                </div>
+                <br>
+                <!-- Date Filter -->
+                <div class="filter-group">
+                    <label for="dateFilter">
+                        <i class="fas fa-calendar"></i>
+                        {{ 'DATE_RANGE' | translate }}
+                    </label>
+                    <select
+                            id="dateFilter"
+                            [(ngModel)]="dateFilter"
+                            (ngModelChange)="filterPayments()"
+                            class="filter-select">
+                        <option value="all">{{ 'ALL_TIME' | translate }}</option>
+                        <option value="7days">{{ 'LAST_7_DAYS' | translate }}</option>
+                        <option value="30days">{{ 'LAST_30_DAYS' | translate }}</option>
+                        <option value="90days">{{ 'LAST_90_DAYS' | translate }}</option>
+                        <option value="180days">{{ 'LAST_180_DAYS' | translate }}</option>
+                    </select>
+                </div>
+
+                <!-- Clear Filters -->
+                <button
+                        class="btn btn-clear-filters"
+                        (click)="clearFilters()"
+                        *ngIf="statusFilter !== 'all' || dateFilter !== 'all' || searchQuery"
+                        type="button">
+                    <i class="fas fa-times-circle"></i>
+                    <span>{{ 'CLEAR_FILTERS' | translate }}</span>
+                </button>
+            </div>
+
+            <!-- Results Info -->
+            <div class="results-info">
+                <p>
+                    {{ 'SHOWING' | translate }}
+                    <strong>{{ paginatedPayments.length }}</strong>
+                    {{ 'OF' | translate }}
+                    <strong>{{ filteredPayments.length }}</strong>
+                    {{ 'PAYMENTS' | translate }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Payments List -->
+        <div class="payments-list" *ngIf="paginatedPayments.length > 0">
+            <div
+                    class="payment-card"
+                    *ngFor="let payment of paginatedPayments"
+                    [class.success]="payment.status === 'success'"
+                    [class.failed]="payment.status === 'failed'"
+                    [class.pending]="payment.status === 'pending'"
+                    [class.refunded]="payment.status === 'refunded'">
+
+                <div class="payment-header">
+                    <div class="payment-course-info">
+                        <div class="course-image" *ngIf="payment.courseImage">
+                            <img [src]="payment.courseImage" [alt]="payment.courseTitle">
+                        </div>
+                        <div class="course-details">
+                            <h3 class="course-title">{{ payment.courseTitle }}</h3>
+                            <div class="payment-meta">
+                <span class="meta-item">
+                  <i class="fas fa-hashtag"></i>
+                    {{ payment.orderId }}
+                </span>
+                                <span class="meta-item">
+                  <i class="fas fa-calendar"></i>
+                                    {{ payment.paymentDate | date: 'dd MMM yyyy, HH:mm' }}
+                </span>
+                                <span class="meta-item">
+                  <i class="fas fa-credit-card"></i>
+                                    {{ payment.paymentMethod }}
+                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="payment-amount-status">
+                        <div class="amount-display">
+                            {{ formatCurrency(payment.amount) }}
+                        </div>
+                        <div class="status-badge" [class]="payment.status">
+                            <i [class]="getStatusIcon(payment.status)"></i>
+                            <span>{{ ('STATUS_' + payment.status.toUpperCase()) | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Refund Info -->
+                <div class="refund-info" *ngIf="payment.status === 'refunded' && payment.refundDate">
+                    <i class="fas fa-info-circle"></i>
+                    <span>
+            {{ 'REFUNDED_ON' | translate }}: {{ payment.refundDate | date: 'dd MMM yyyy' }}
+                        <span *ngIf="payment.refundReason"> - {{ payment.refundReason }}</span>
+          </span>
+                </div>
+
+                <!-- Transaction ID -->
+                <div class="transaction-id" *ngIf="payment.transactionId">
+                    <span class="label">{{ 'TRANSACTION_ID' | translate }}:</span>
+                    <span class="value">{{ payment.transactionId }}</span>
+                </div>
+
+                <!-- Actions -->
+                <div class="payment-actions">
+                    <button
+                            class="btn btn-action btn-primary"
+                            (click)="viewCourse(payment.courseId)"
+                            *ngIf="payment.status === 'success'"
+                            type="button">
+                        <i class="fas fa-play-circle"></i>
+                        <span>{{ 'VIEW_COURSE' | translate }}</span>
+                    </button>
+
+                    <button
+                            class="btn btn-action btn-secondary"
+                            (click)="downloadInvoice(payment)"
+                            *ngIf="payment.invoiceUrl && payment.status === 'success'"
+                            type="button">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>{{ 'DOWNLOAD_INVOICE' | translate }}</span>
+                    </button>
+
+                    <button
+                            class="btn btn-action btn-warning"
+                            (click)="retryPayment(payment)"
+                            *ngIf="payment.status === 'failed'"
+                            type="button">
+                        <i class="fas fa-redo"></i>
+                        <span>{{ 'RETRY_PAYMENT' | translate }}</span>
+                    </button>
+
+                    <button
+                            class="btn btn-action btn-info"
+                            (click)="requestRefund(payment)"
+                            *ngIf="payment.status === 'success'"
+                            type="button">
+                        <i class="fas fa-undo"></i>
+                        <span>{{ 'REQUEST_REFUND' | translate }}</span>
+                    </button>
+
+                    <button
+                            class="btn btn-action btn-outline"
+                            (click)="viewDetails(payment)"
+                            type="button">
+                        <i class="fas fa-info-circle"></i>
+                        <span>{{ 'VIEW_DETAILS' | translate }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!isLoading && paginatedPayments.length === 0">
+            <div class="empty-icon">
+                <i class="fas fa-receipt"></i>
+            </div>
+            <h3>{{ 'NO_PAYMENTS_FOUND' | translate }}</h3>
+            <p>{{ filteredPayments.length === 0 && (statusFilter !== 'all' || dateFilter !== 'all' || searchQuery) ?
+                ('NO_PAYMENTS_MATCH_FILTERS' | translate) :
+                ('NO_PAYMENT_HISTORY_YET' | translate) }}</p>
+            <button
+                    class="btn btn-primary"
+                    (click)="clearFilters()"
+                    *ngIf="statusFilter !== 'all' || dateFilter !== 'all' || searchQuery"
+                    type="button">
+                <i class="fas fa-times-circle"></i>
+                <span>{{ 'CLEAR_FILTERS' | translate }}</span>
+            </button>
+            <button
+                    class="btn btn-primary"
+                    (click)="router.navigate(['/courses'])"
+                    *ngIf="payments.length === 0"
+                    type="button">
+                <i class="fas fa-book"></i>
+                <span>{{ 'BROWSE_COURSES' | translate }}</span>
+            </button>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1 && paginatedPayments.length > 0">
+            <button
+                    class="btn-page btn-prev"
+                    [disabled]="currentPage === 1"
+                    (click)="goToPage(currentPage - 1)"
+                    type="button">
+                <i class="fas fa-chevron-left"></i>
+                <span>{{ 'PREVIOUS' | translate }}</span>
+            </button>
+
+            <div class="page-numbers">
+                <button
+                        *ngFor="let page of pageNumbers"
+                        class="btn-page-number"
+                        [class.active]="page === currentPage"
+                        (click)="goToPage(page)"
+                        type="button">
+                    {{ page }}
+                </button>
+            </div>
+
+            <button
+                    class="btn-page btn-next"
+                    [disabled]="currentPage === totalPages"
+                    (click)="goToPage(currentPage + 1)"
+                    type="button">
+                <span>{{ 'NEXT' | translate }}</span>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+    </div>
+</div>
