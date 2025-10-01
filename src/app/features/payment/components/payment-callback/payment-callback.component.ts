@@ -261,7 +261,7 @@ export class PaymentCallbackComponent implements OnInit, OnDestroy {
   }
 
   goToMyCourses(): void {
-    this.router.navigate(['/my-courses']);
+    this.router.navigate(['/profile']);
   }
 
   goToCourses(): void {
@@ -269,11 +269,11 @@ export class PaymentCallbackComponent implements OnInit, OnDestroy {
   }
 
   goToDashboard(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/instructor']);
   }
 
   goToSubscriptionDashboard(): void {
-    this.router.navigate(['/instructor/dashboard']);
+    this.router.navigate(['/instructor']);
   }
 
   goToCreateCourse(): void {
