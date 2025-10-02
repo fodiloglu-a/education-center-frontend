@@ -134,7 +134,7 @@ export class NotificationListComponent implements OnInit, OnDestroy {
 
     // Action URL varsa oraya git
     if (notification.actionUrl && notification.actionUrl.trim()) {
-      this.router.navigate([notification.actionUrl]);
+
     }
   }
 

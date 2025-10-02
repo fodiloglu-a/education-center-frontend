@@ -163,7 +163,10 @@
                 <div class="payment-header">
                     <div class="payment-course-info">
                         <div class="course-image" *ngIf="payment.courseImage">
-                            <img [src]="payment.courseImage" [alt]="payment.courseTitle">
+                            <img [src]="payment.courseImage"
+                                 [alt]="payment.courseTitle"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/800x450/C3AD90/3D2010?text=ACADENON';"
+                            >
                         </div>
                         <div class="course-details">
                             <h3 class="course-title">{{ payment.courseTitle }}</h3>
@@ -248,13 +251,7 @@
                         <span>{{ 'REQUEST_REFUND' | translate }}</span>
                     </button>
 
-                    <button
-                            class="btn btn-action btn-outline"
-                            (click)="viewDetails(payment)"
-                            type="button">
-                        <i class="fas fa-info-circle"></i>
-                        <span>{{ 'VIEW_DETAILS' | translate }}</span>
-                    </button>
+
                 </div>
             </div>
         </div>
