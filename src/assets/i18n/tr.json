@@ -1181,7 +1181,7 @@
     },
     "WELCOME": {
       "TITLE": "Hoş Geldiniz",
-      "MESSAGE": "{{firstName}} {{lastName}}, platformumuza hoş geldiniz! Keyifli öğrenmeler dileriz."
+      "MESSAGE": "Acadenon'a hoş geldiniz! Keyifli öğrenmeler dileriz."
     },
     "FILE_UPLOADED": {
       "TITLE": "Dosya Yüklendi",

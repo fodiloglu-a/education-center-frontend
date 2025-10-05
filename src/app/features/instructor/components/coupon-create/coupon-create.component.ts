@@ -1,12 +1,20 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, finalize } from 'rxjs/operators';
 import { CheckoutService } from '../../../payment/services/checkout.service';
-import { Coupon, DiscountType, CouponCreateRequest } from '../../../payment/models/coupon.model';
+import {
+  Coupon,
+  DiscountType,
+  CouponCreateRequest,
+  isCouponExpired,
+  isCouponActive,
+  getCouponStatusColor,
+  getCouponStatusText
+} from '../../../payment/models/coupon.model';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -30,40 +38,29 @@ export class CouponCreateComponent implements OnInit, OnDestroy {
   couponForm!: FormGroup;
   isLoading = false;
   isSubmitting = false;
+  isDeletingCouponId: number | null = null;
   errorMessage: string | null = null;
   successMessage: string | null = null;
   instructorId: number | null = null;
-
   coupons: Coupon[] = [];
 
-  discountTypes = [
-    { label: 'PERCENTAGE', value: 'PERCENTAGE' },
-    { label: 'FIXED_AMOUNT', value: 'FIXED_AMOUNT' }
+  readonly discountTypes = [
+    { label: 'PERCENTAGE', value: DiscountType.PERCENTAGE },
+    { label: 'FIXED_AMOUNT', value: DiscountType.FIXED_AMOUNT }
   ];
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
-      private router: Router,
-      private checkoutService: CheckoutService,
-      private authService: AuthService,
-      private translate: TranslateService,
-      private cdr: ChangeDetectorRef
+      private readonly router: Router,
+      private readonly checkoutService: CheckoutService,
+      private readonly authService: AuthService,
+      private readonly translate: TranslateService,
+      private readonly cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.isLoading = true;
-    this.authService.getCurrentUser().pipe(takeUntil(this.destroy$)).subscribe(user => {
-      if (user?.id) {
-        this.instructorId = user.id;
-        this.initializeForm();
-        this.loadInstructorCoupons();
-      } else {
-        this.setError('Kupon oluşturmak için eğitmen girişi yapmalısınız.');
-        this.isLoading = false;
-      }
-      this.cdr.markForCheck();
-    });
+    this.loadCurrentUser();
   }
 
   ngOnDestroy(): void {
@@ -71,44 +68,87 @@ export class CouponCreateComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  // =================== INITIALIZATION ===================
+
+  private loadCurrentUser(): void {
+    this.isLoading = true;
+    this.cdr.markForCheck();
+
+    this.authService.getCurrentUser()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (user) => {
+            if (user?.id) {
+              this.instructorId = user.id;
+              this.initializeForm();
+              this.loadInstructorCoupons();
+            } else {
+              this.handleError('User authentication required to create coupons');
+              this.isLoading = false;
+            }
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            this.handleError('Failed to load user information');
+            this.isLoading = false;
+            this.cdr.markForCheck();
+          }
+        });
+  }
+
   private loadInstructorCoupons(): void {
     if (!this.instructorId) {
-      this.setError('Eğitmen kimliği bulunamadı.');
+      this.handleError('Instructor ID not found');
       this.isLoading = false;
       return;
     }
 
-    this.checkoutService.getCouponsByInstructor(this.instructorId).pipe(
-        takeUntil(this.destroy$)
-    ).subscribe({
-      next: (coupons) => {
-        this.coupons = coupons;
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        console.error('❌ Kuponları getirme hatası:', error);
-        this.setError('Kuponlar yüklenirken bir hata oluştu.');
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      }
-    });
+    this.checkoutService.getCouponsByInstructor(this.instructorId)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.isLoading = false;
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: (coupons) => {
+            this.coupons = coupons || [];
+            console.log('Coupons loaded:', this.coupons.length);
+          },
+          error: (error) => {
+            console.error('Failed to load coupons:', error);
+            this.handleError('Failed to load coupons');
+          }
+        });
   }
 
   private initializeForm(): void {
+    const now = this.getCurrentDateTimeString();
+
     this.couponForm = new FormGroup({
-      code: new FormControl('', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[A-Za-z0-9-_]+$/)]),
+      code: new FormControl('', [
+        Validators.required,
+        Validators.maxLength(50),
+        Validators.pattern(/^[A-Za-z0-9-_]+$/)
+      ]),
       discountType: new FormControl(this.discountTypes[0].value, Validators.required),
-      discountValue: new FormControl(null, [Validators.required, Validators.min(0.01), Validators.max(100.00)]),
-      minimumAmount: new FormControl(null, [Validators.min(0)]), // Yeni eklenen alan
-      maximumDiscount: new FormControl(null, [Validators.min(0)]), // Yeni eklenen alan
-      validFrom: new FormControl(this.getCurrentDateTimeString(), Validators.required),
-      validUntil: new FormControl(null, Validators.required),
+      discountValue: new FormControl(null, [
+        Validators.required,
+        Validators.min(0.01)
+      ]),
+      minimumAmount: new FormControl(null, [Validators.min(0)]),
+      maximumDiscount: new FormControl(null, [Validators.min(0)]),
+      validFrom: new FormControl(now, Validators.required),
+      validUntil: new FormControl(null, [
+        Validators.required,
+        this.validUntilValidator.bind(this)
+      ]),
       usageLimit: new FormControl(null, [Validators.min(1)]),
       isActive: new FormControl(true),
       applicableCourseIds: new FormControl([]),
       applicableCategories: new FormControl([]),
-      description: new FormControl('') // Yeni eklenen alan
+      description: new FormControl('', Validators.maxLength(500))
     });
 
     this.setupFormListeners();
@@ -118,127 +158,313 @@ export class CouponCreateComponent implements OnInit, OnDestroy {
     const discountTypeControl = this.couponForm.get('discountType');
     const discountValueControl = this.couponForm.get('discountValue');
     const validFromControl = this.couponForm.get('validFrom');
-    const minimumAmountControl = this.couponForm.get('minimumAmount');
-    const maximumDiscountControl = this.couponForm.get('maximumDiscount');
-
-    // ... (Mevcut validasyon mantığı)
-    if (discountTypeControl && discountValueControl) {
-      discountTypeControl.valueChanges.pipe(
-          takeUntil(this.destroy$)
-      ).subscribe(value => {
-        if (value === 'PERCENTAGE') {
-          discountValueControl.setValidators([
-            Validators.required,
-            Validators.min(0.01),
-            Validators.max(100.00)
-          ]);
-        } else if (value === 'FIXED_AMOUNT') {
-          discountValueControl.setValidators([
-            Validators.required,
-            Validators.min(0.01)
-          ]);
-        }
-        discountValueControl.updateValueAndValidity();
-      });
-    }
-
-    if (validFromControl) {
-      validFromControl.valueChanges.pipe(
-          takeUntil(this.destroy$)
-      ).subscribe(value => {
-        this.couponForm.get('validUntil')?.updateValueAndValidity();
-      });
-    }
-
     const validUntilControl = this.couponForm.get('validUntil');
-    if (validUntilControl) {
-      validUntilControl.setValidators([
+
+    if (discountTypeControl && discountValueControl) {
+      discountTypeControl.valueChanges
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((value: DiscountType) => {
+            this.updateDiscountValueValidators(value, discountValueControl);
+          });
+    }
+
+    if (validFromControl && validUntilControl) {
+      validFromControl.valueChanges
+          .pipe(takeUntil(this.destroy$))
+          .subscribe(() => {
+            validUntilControl.updateValueAndValidity({ emitEvent: false });
+          });
+    }
+  }
+
+  private updateDiscountValueValidators(discountType: DiscountType, control: AbstractControl): void {
+    if (discountType === DiscountType.PERCENTAGE) {
+      control.setValidators([
         Validators.required,
-        (control) => {
-          const validFrom = this.couponForm.get('validFrom')?.value;
-          if (validFrom && control.value && new Date(control.value) <= new Date(validFrom)) {
-            return { 'dateInvalid': true };
-          }
-          return null;
-        }
+        Validators.min(0.01),
+        Validators.max(100)
+      ]);
+    } else if (discountType === DiscountType.FIXED_AMOUNT) {
+      control.setValidators([
+        Validators.required,
+        Validators.min(0.01),
+        Validators.max(50000)
       ]);
     }
-    // ... (Mevcut validasyon mantığı sonu)
+    control.updateValueAndValidity();
   }
+
+  private validUntilValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value || !this.couponForm) {
+      return null;
+    }
+
+    const validFrom = this.couponForm.get('validFrom')?.value;
+    if (!validFrom) {
+      return null;
+    }
+
+    const fromDate = new Date(validFrom);
+    const untilDate = new Date(control.value);
+
+    if (untilDate <= fromDate) {
+      return { invalidDateRange: true };
+    }
+
+    return null;
+  }
+
+  // =================== FORM SUBMISSION ===================
 
   onSubmit(): void {
     if (this.couponForm.invalid) {
-      this.setError('Lütfen tüm gerekli alanları doldurun ve hataları düzeltin.');
+      this.markFormGroupTouched(this.couponForm);
+      this.handleError('Please fill all required fields correctly');
       return;
     }
 
     if (!this.instructorId) {
-      this.setError('Eğitmen kimliği bulunamadı. Lütfen tekrar giriş yapın.');
+      this.handleError('Instructor ID not found. Please login again');
       return;
     }
 
     this.isSubmitting = true;
     this.clearMessages();
+    this.cdr.markForCheck();
 
+    const couponRequest = this.buildCouponRequest();
+
+    this.checkoutService.createCouponForInstructor(this.instructorId, couponRequest)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.isSubmitting = false;
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Coupon created successfully:', response);
+            this.handleSuccess('Coupon created successfully!');
+            this.resetForm();
+            this.loadInstructorCoupons();
+          },
+          error: (error) => {
+            console.error('Failed to create coupon:', error);
+            this.handleError(error.message || 'Failed to create coupon. Please try again');
+          }
+        });
+  }
+
+  private buildCouponRequest(): CouponCreateRequest {
     const formValue = this.couponForm.value;
-    const newCoupon: CouponCreateRequest = {
-      ...formValue,
-      validFrom: new Date(formValue.validFrom),
-      validUntil: new Date(formValue.validUntil)
-    };
 
-    this.checkoutService.createCouponForInstructor(this.instructorId, newCoupon).pipe(
-        takeUntil(this.destroy$)
-    ).subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        this.setSuccess('Kupon başarıyla oluşturuldu!');
-        this.couponForm.reset();
-        this.loadInstructorCoupons();
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        console.error('❌ Kupon oluşturma hatası:', error);
-        this.setError(error.message || 'Kupon oluşturma başarısız oldu. Lütfen tekrar deneyin.');
-        this.cdr.markForCheck();
+    return {
+      code: formValue.code?.trim().toUpperCase(),
+      discountType: formValue.discountType,
+      discountValue: Number(formValue.discountValue),
+      minimumAmount: formValue.minimumAmount ? Number(formValue.minimumAmount) : null,
+      maximumDiscount: formValue.maximumDiscount ? Number(formValue.maximumDiscount) : null,
+      validFrom: new Date(formValue.validFrom).toISOString(),
+      validUntil: new Date(formValue.validUntil).toISOString(),
+      usageLimit: formValue.usageLimit ? Number(formValue.usageLimit) : null,
+      isActive: formValue.isActive ?? true,
+      applicableCourseIds: formValue.applicableCourseIds || [],
+      applicableCategories: formValue.applicableCategories || [],
+      description: formValue.description?.trim() || null
+    };
+  }
+
+  // =================== COUPON OPERATIONS ===================
+
+  deleteCoupon(id: number): void {
+    if (!confirm(this.translate.instant('CONFIRM_DELETE_COUPON'))) {
+      return;
+    }
+
+    this.isDeletingCouponId = id;
+    this.clearMessages();
+    this.cdr.markForCheck();
+
+    this.checkoutService.deleteCoupon(id)
+        .pipe(
+            takeUntil(this.destroy$),
+            finalize(() => {
+              this.isDeletingCouponId = null;
+              this.cdr.markForCheck();
+            })
+        )
+        .subscribe({
+          next: () => {
+            console.log('Coupon deleted successfully:', id);
+            this.handleSuccess('Coupon deleted successfully');
+            this.coupons = this.coupons.filter(c => c.id !== id);
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            console.error('Failed to delete coupon:', error);
+            this.handleError(error.message || 'Failed to delete coupon');
+          }
+        });
+  }
+
+  // =================== COUPON STATUS HELPERS ===================
+
+  isCouponExpired(coupon: Coupon): boolean {
+    return isCouponExpired(coupon);
+  }
+
+  isCouponActive(coupon: Coupon): boolean {
+    return isCouponActive(coupon);
+  }
+
+  getCouponStatusColor(coupon: Coupon): string {
+    return getCouponStatusColor(coupon);
+  }
+
+  getCouponStatusText(coupon: Coupon): string {
+    return getCouponStatusText(coupon);
+  }
+
+  // =================== UTILITY METHODS ===================
+
+  getCurrentDateTimeString(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  private resetForm(): void {
+    this.couponForm.reset({
+      discountType: this.discountTypes[0].value,
+      validFrom: this.getCurrentDateTimeString(),
+      isActive: true,
+      applicableCourseIds: [],
+      applicableCategories: []
+    });
+    this.couponForm.markAsUntouched();
+    this.couponForm.markAsPristine();
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
       }
     });
   }
 
-  getCurrentDateTimeString(): string {
-    const now = new Date();
-    const pad = (num: number) => num < 10 ? '0' + num : num;
-    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-  }
+  // =================== MESSAGE HANDLING ===================
 
-  private setError(message: string): void {
+  private handleError(message: string): void {
     this.errorMessage = message;
     this.successMessage = null;
-    this.isSubmitting = false;
+    this.cdr.markForCheck();
   }
 
-  private setSuccess(message: string): void {
+  private handleSuccess(message: string): void {
     this.successMessage = message;
     this.errorMessage = null;
-    this.isSubmitting = false;
+    this.cdr.markForCheck();
   }
 
   clearMessages(): void {
     this.errorMessage = null;
     this.successMessage = null;
+    this.cdr.markForCheck();
   }
 
-  get code() { return this.couponForm.get('code'); }
-  get discountValue() { return this.couponForm.get('discountValue'); }
-  get validFrom() { return this.couponForm.get('validFrom'); }
-  get validUntil() { return this.couponForm.get('validUntil'); }
-  get minimumAmount() { return this.couponForm.get('minimumAmount'); }
-  get maximumDiscount() { return this.couponForm.get('maximumDiscount'); }
+  // =================== FORM GETTERS ===================
 
-  deleteCoupon(id: number) {
-    this.checkoutService.deleteCoupon(id).subscribe({})
-    location.reload()
+  get code(): AbstractControl | null {
+    return this.couponForm?.get('code') || null;
+  }
 
+  get discountType(): AbstractControl | null {
+    return this.couponForm?.get('discountType') || null;
+  }
+
+  get discountValue(): AbstractControl | null {
+    return this.couponForm?.get('discountValue') || null;
+  }
+
+  get validFrom(): AbstractControl | null {
+    return this.couponForm?.get('validFrom') || null;
+  }
+
+  get validUntil(): AbstractControl | null {
+    return this.couponForm?.get('validUntil') || null;
+  }
+
+  get minimumAmount(): AbstractControl | null {
+    return this.couponForm?.get('minimumAmount') || null;
+  }
+
+  get maximumDiscount(): AbstractControl | null {
+    return this.couponForm?.get('maximumDiscount') || null;
+  }
+
+  get usageLimit(): AbstractControl | null {
+    return this.couponForm?.get('usageLimit') || null;
+  }
+
+  get description(): AbstractControl | null {
+    return this.couponForm?.get('description') || null;
+  }
+
+  // =================== VALIDATION HELPERS ===================
+
+  isDeleting(couponId: number): boolean {
+    return this.isDeletingCouponId === couponId;
+  }
+
+  hasError(controlName: string): boolean {
+    if (!this.couponForm) {
+      return false;
+    }
+    const control = this.couponForm.get(controlName);
+    return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  getErrorMessage(controlName: string): string {
+    if (!this.couponForm) {
+      return '';
+    }
+
+    const control = this.couponForm.get(controlName);
+    if (!control || !control.errors) {
+      return '';
+    }
+
+    const errors = control.errors;
+
+    if (errors['required']) {
+      return 'FIELD_REQUIRED';
+    }
+    if (errors['maxlength']) {
+      return 'FIELD_TOO_LONG';
+    }
+    if (errors['pattern']) {
+      return 'FIELD_INVALID_FORMAT';
+    }
+    if (errors['min']) {
+      return 'FIELD_MIN_VALUE';
+    }
+    if (errors['max']) {
+      return 'FIELD_MAX_VALUE';
+    }
+    if (errors['invalidDateRange']) {
+      return 'VALID_UNTIL_AFTER_VALID_FROM';
+    }
+
+    return 'FIELD_INVALID';
   }
 }
