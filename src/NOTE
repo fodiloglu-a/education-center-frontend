@@ -8,8 +8,7 @@ todo:HomeComponent:
 
 todo:ProfileComponenet:
 -----------------------
--#PaymentHistory vs alanları eklenecek buton eklenecek ve kullanıcı tıklayıp alana gidecek yada daha
-güzel bir yapı düşünülecek.
+
 
 todo:NotificationComponent:
 -----------------------
@@ -23,8 +22,6 @@ todo:InstructorDashboard:
 
 todo:CouponComponent:
 ----------------------
--Tamamen revize edilecek,
-
 
 todo:LessonPlayerComponenet:
 -----------------------------
@@ -42,10 +39,6 @@ todo:ProfileComponenet
 
 todo:Payment
 *Payment invoice için PDF oluşturusun artık ne ayarlıyorsan ayarla ekle
----Yeni oluşturulan compoenentler html css ve ts
- olarak tekrardan revize edilecek ve kullanıcı başarılı ödeme yaptıktan sonra gideceği yerler ayarlanacak.
-
-
 
 
 
