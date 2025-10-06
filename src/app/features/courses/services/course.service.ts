@@ -315,4 +315,11 @@ export class CourseService {
   checkCourseAccess(userId:number,courseId: number): Observable<boolean> {
     return this.checkCourseForUser(userId, courseId);
   }
+
+  requestCertificate(userId: number, courseId: number) {
+    return this.http.get<boolean>(
+        `${this.apiUrl}/${userId}/request-certificate/${courseId}`
+    );
+
+  }
 }

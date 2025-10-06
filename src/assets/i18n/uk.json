@@ -999,6 +999,17 @@
   "TECHNOLOGY": "Технології",
 
 
+
+  "REQUEST_CERTIFICATE": "Запросити сертифікат",
+  "CERTIFICATE_SUCCESS_REQUEST": "Ваш запит на сертифікат успішно отримано! Ми повідомимо вас, коли ваш сертифікат буде готовий.",
+  "CERTIFICATE_BAD_REQUEST": "Не вдалося створити запит на сертифікат. Будь ласка, переконайтеся, що ви завершили всі уроки, і спробуйте ще раз.",
+  "CERTIFICATE_ERROR": "Сталася помилка. Будь ласка, спробуйте пізніше.",
+  "CERTIFICATE_NOT_AVAILABLE": "Сертифікат для цього курсу ще недоступний.",
+  "CERTIFICATE_ALREADY_REQUESTED": "Ваш запит на сертифікат вже отримано.",
+  "CERTIFICATE_PROCESSING": "Ваш сертифікат готується...",
+  "CERTIFICATE_REQUIREMENTS_NOT_MET": "Для отримання сертифіката необхідно завершити всі уроки.",
+
+
   "NOTIFICATION": {
     "INSTRUCTOR_PROFILE_UPDATED": {
       "TITLE": "Профіль викладача оновлено",

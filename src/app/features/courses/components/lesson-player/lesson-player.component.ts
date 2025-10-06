@@ -17,6 +17,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import {UserService} from "../../../user/services/user.service";
 
 interface ComponentState {
   isLoading: boolean;
@@ -54,6 +55,7 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
   course: CourseDetailsResponse | null = null;
   currentLesson: LessonDTO | null = null;
   videoUrl: SafeResourceUrl | null = null;
+  certificateAvailable=false;
 
   // Notes
   currentNote: NoteResponse | null = null;
@@ -92,6 +94,7 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
       private courseService: CourseService,
       private noteService: NoteService,
       private authService: AuthService,
+      private userService: UserService,
       private translate: TranslateService,
       private sanitizer: DomSanitizer,
       private cdr: ChangeDetectorRef
@@ -186,15 +189,18 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
               return of(null);
             }),
             finalize(() => {
+
               this.updateState({ isLoading: false });
               this.cdr.markForCheck();
             })
         )
         .subscribe(course => {
           if (course) {
+            this.certificateAvailable=course.certificateAvailable;
             this.processCourseData(course);
           }
         });
+
   }
 
   private processCourseData(course: CourseDetailsResponse): void {
@@ -611,6 +617,7 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
   }
 
   // ========== RETRY MECHANISMS ==========
+  isRequestingCertificate = false;
 
   /**
    * Retry loading course and lesson details
@@ -620,4 +627,28 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
       this.loadCourseAndLessonDetails();
     }
   }
+
+    requestCertificate() {
+    if (this.course?.id && this.currentUser?.id) {
+      if (this.course.certificateAvailable){
+        this.courseService.requestCertificate(this.currentUser?.id,this.course?.id).subscribe({
+          next: (result) => {
+            if (result) {
+              alert(this.translate.instant('CERTIFICATE_SUCCESS_REQUEST'));
+            } else {
+              alert(this.translate.instant('CERTIFICATE_BAD_REQUEST'));
+            }
+          },
+          error: (error) => {
+            alert(this.translate.instant('CERTIFICATE_ERROR'));
+          }
+        });
+      }
+
+    }else {
+      alert(this.translate.instant('CERTIFICATE_ERROR'));
+    }
+    }
+
+
 }

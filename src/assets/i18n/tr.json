@@ -1050,6 +1050,17 @@
   "PERSONAL_DEVELOPMENT": "Kişisel Gelişim",
   "TECHNOLOGY": "Teknoloji",
 
+
+  "REQUEST_CERTIFICATE": "Sertifika Talep Et",
+  "CERTIFICATE_SUCCESS_REQUEST": "Sertifika talebiniz başarıyla alındı! Sertifikanız hazırlandığında size bildirim gönderilecektir.",
+  "CERTIFICATE_BAD_REQUEST": "Sertifika talebi oluşturulamadı. Lütfen tüm dersleri tamamladığınızdan emin olun ve tekrar deneyin.",
+  "CERTIFICATE_ERROR": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+  "CERTIFICATE_NOT_AVAILABLE": "Bu kurs için henüz sertifika mevcut değil.",
+  "CERTIFICATE_ALREADY_REQUESTED": "Sertifika talebiniz zaten alındı.",
+  "CERTIFICATE_PROCESSING": "Sertifikanız hazırlanıyor...",
+  "CERTIFICATE_REQUIREMENTS_NOT_MET": "Sertifika almak için tüm dersleri tamamlamalısınız.",
+
+
   "NOTIFICATION": {
     "INSTRUCTOR_PROFILE_UPDATED": {
       "TITLE": "Eğitmen Profili Güncellendi",

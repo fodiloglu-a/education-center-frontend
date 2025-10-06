@@ -79,4 +79,10 @@ export class UserService {
   updateInstructorProfile(id: number, instructorProfileDTO: InstructorProfileDTO): Observable<InstructorProfileDTO> {
     return this.http.put<InstructorProfileDTO>(`${this.apiUrl}/users/${id}/instructor-profile`, instructorProfileDTO);
   }
+
+  requestCertificate(userId: any, courseId: number) {
+    return this.http.get<boolean>(
+        `${this.apiUrl}/users/${userId}/courses/${courseId}/request-certificate`
+    );
+  }
 }
