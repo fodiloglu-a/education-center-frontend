@@ -75,3 +75,44 @@ export interface AuthError {
   translationKey: string;
   fieldErrors?: { [key: string]: string };
 }
+
+// ========================================
+// 🆕 EMAIL VERIFICATION MODELS
+// ========================================
+
+/**
+ * Email doğrulama API response'u
+ * Backend'den dönen başarı/hata mesajını içerir
+ */
+export interface VerificationResponse {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * Email yeniden gönderme request'i
+ * Kullanıcının email adresi ile yeni doğrulama linki ister
+ */
+export interface ResendVerificationRequest {
+  email: string;
+}
+
+/**
+ * Email yeniden gönderme response'u
+ * Backend'den dönen başarı/hata mesajını içerir
+ */
+export interface ResendVerificationResponse {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * Email verification durumu
+ * Kullanıcının email doğrulama durumunu kontrol etmek için
+ */
+export interface EmailVerificationStatus {
+  isVerified: boolean;
+  email: string;
+  sentAt?: string;
+  expiresAt?: string;
+}

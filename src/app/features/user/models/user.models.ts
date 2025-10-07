@@ -12,6 +12,7 @@ export interface UserResponse {
   lastName: string;  // Kullanıcının soyadı
   role: string;      // Kullanıcının rolü
   enabled: boolean;  // Kullanıcı hesabının etkin olup olmadığı
+  isEmailVerified?: boolean; // 🆕 Email doğrulama durumu
   createdAt: string; // Kayıt tarihi (ISO 8601 string formatında)
   updatedAt: string | null; // Son güncelleme tarihi (ISO 8601 string formatında veya null)
 }
@@ -30,6 +31,7 @@ export interface PasswordChangeRequest {
   oldPassword: string; // Kullanıcının mevcut şifresi
   newPassword: string; // Kullanıcının belirleyeceği yeni şifre
 }
+
 // Backend'deki InstructorProfileDTO'ya karşılık gelen arayüz.
 // Eğitmen profil bilgilerini frontend'e güvenli bir şekilde göndermek için kullanılır.
 export interface InstructorProfileDTO {
@@ -40,6 +42,7 @@ export interface InstructorProfileDTO {
   lastName: string;
   role: string;
   enabled: boolean;
+  isEmailVerified?: boolean; // 🆕 Email doğrulama durumu
   createdAt: string;
   updatedAt: string | null;
 
@@ -83,10 +86,10 @@ export interface InstructorProfileDTO {
   studentCompletionRate?: number;
   lastActiveDate?: string;
   isTeacher?: boolean;
-  subscriptionPlanType?:string;
-  subscriptionOrderId?:string;
-  subscriptionEndDate?:Date;
-  subscriptionStartDate?:Date;
+  subscriptionPlanType?: string;
+  subscriptionOrderId?: string;
+  subscriptionEndDate?: Date;
+  subscriptionStartDate?: Date;
 
   // Medya Dosyaları
   mediaFiles?: string[];

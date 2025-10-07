@@ -60,6 +60,8 @@ export class RegisterComponent implements OnInit {
    * Kayıt formunu gönderir.
    * Backend API'sine kullanıcı kayıt isteği gönderir.
    */
+// register.component.ts - SADECE onSubmit() METODUNU GÜNCELLEYIN
+
   onSubmit(): void {
     this.errorMessage = null;
 
@@ -77,21 +79,26 @@ export class RegisterComponent implements OnInit {
       lastName: this.lastName?.value,
       email: this.email?.value,
       password: this.password?.value,
-      role: this.role?.value // Düzeltilen satır: Seçilen rolü RegisterRequest'e ekle
+      role: this.role?.value
     };
 
     this.authService.register(registerRequest).pipe(
-      catchError(error => {
-        this.errorMessage = error.message || this.translate.instant('REGISTER_FAILED_GENERIC');
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-      })
+        catchError(error => {
+          this.errorMessage = error.message || this.translate.instant('REGISTER_FAILED_GENERIC');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
     ).subscribe(jwtResponse => {
       if (jwtResponse) {
+        // Token'ı kaydet
         this.tokenService.saveTokenAndUser(jwtResponse);
-        this.router.navigate(['/profile']);
+
+        // 🆕 YENİ: Email verification sayfasına yönlendir
+        this.router.navigate(['/auth/verification-sent'], {
+          queryParams: { email: this.email?.value }
+        });
       }
     });
   }

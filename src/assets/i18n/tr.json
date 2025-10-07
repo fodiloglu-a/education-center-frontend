@@ -1206,7 +1206,42 @@
       "TITLE": "Dosya Güncellendi",
       "MESSAGE": "{{oldFileName}} dosyası {{newFileName}} olarak güncellendi."
     }
-  }
+  },
+
+  "VERIFYING_EMAIL": "Email Doğrulanıyor...",
+  "VERIFYING_EMAIL_MESSAGE": "Email adresiniz doğrulanıyor. Lütfen bekleyin...",
+  "EMAIL_VERIFIED_SUCCESS": "Email Başarıyla Doğrulandı!",
+  "EMAIL_VERIFIED_SUCCESS_MESSAGE": "Email adresiniz başarıyla doğrulandı. Artık tüm özellikleri kullanabilirsiniz.",
+  "EMAIL_VERIFICATION_FAILED": "Email Doğrulama Başarısız",
+  "VERIFICATION_FAILED": "Doğrulama başarısız oldu",
+  "TOKEN_MISSING": "Token bulunamadı",
+  "INVALID_TOKEN_FORMAT": "Geçersiz token formatı",
+  "INVALID_OR_EXPIRED_TOKEN": "Geçersiz veya süresi dolmuş token",
+  "REQUEST_NEW_LINK": "Yeni Link İste",
+  "REDIRECTING_TO_LOGIN": "Giriş sayfasına yönlendiriliyorsunuz...",
+  "GO_TO_LOGIN_NOW": "Hemen Giriş Yap",
+  "GO_TO_HOME": "Ana Sayfaya Dön",
+
+  "EMAIL_VERIFICATION_SENT": "Email Doğrulama Linki Gönderildi",
+  "EMAIL_VERIFICATION_SENT_SUBTITLE": "Hesabınızı aktifleştirmek için email adresinizi doğrulamanız gerekiyor.",
+  "CHECK_YOUR_EMAIL": "Email kutunuzu kontrol edin",
+  "VERIFICATION_INSTRUCTION_1": "Email kutunuzda 'Email Doğrulama' konulu bir mail bulacaksınız",
+  "VERIFICATION_INSTRUCTION_2": "Email'deki 'Email Adresimi Doğrula' butonuna tıklayın",
+  "VERIFICATION_INSTRUCTION_3": "Doğrulama linki 24 saat geçerlidir",
+
+  "EMAIL_NOT_RECEIVED": "Email gelmediyse ne yapmalıyım?",
+  "CHECK_SPAM_FOLDER": "Spam/Junk klasörünüzü kontrol edin",
+  "WAIT_FEW_MINUTES": "Birkaç dakika bekleyin, bazen gecikmeli gelebilir",
+  "CHECK_EMAIL_ADDRESS": "Email adresinizin doğru olduğundan emin olun",
+
+  "RESEND_VERIFICATION": "Yeniden Gönder",
+  "BACK_TO_LOGIN": "Giriş Sayfasına Dön",
+  "EMAIL_RESENT_SUCCESS": "Doğrulama emaili başarıyla yeniden gönderildi!",
+  "RESEND_FAILED": "Email yeniden gönderilemedi",
+  "SENDING": "Gönderiliyor",
+  "WAIT": "Bekleyin",
+  "INVALID_EMAIL_FORMAT": "Geçersiz email formatı"
+
 
 
 

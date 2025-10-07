@@ -161,3 +161,14 @@ export const routes: Routes = [
     title: 'Sayfa Bulunamadı - 404'
   }
 ];
+
+/*
+ * YENİ ROUTE YAPISI:
+ *
+ * /email/verify-email?token=xxx           → Email doğrulama
+ * /email/verification-sent?email=xxx      → Email gönderildi bilgilendirme
+ *
+ * KULLANIM:
+ * - Register sonrası: /email/verification-sent?email=user@example.com
+ * - Email'den tıklama: /email/verify-email?token=abc123
+ */

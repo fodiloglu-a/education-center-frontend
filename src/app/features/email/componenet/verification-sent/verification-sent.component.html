@@ -1,0 +1,86 @@
+<!-- verification-sent.component.html -->
+
+<div class="verification-sent-container">
+    <div class="verification-sent-card">
+
+        <!-- EMAIL ICON -->
+        <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+        </div>
+
+        <!-- TITLE & MESSAGE -->
+        <h2 class="card-title">{{ 'EMAIL_VERIFICATION_SENT' | translate }}</h2>
+        <p class="card-subtitle">{{ 'EMAIL_VERIFICATION_SENT_SUBTITLE' | translate }}</p>
+
+        <!-- EMAIL ADDRESS -->
+        <div class="email-display">
+            <span class="email-text">{{ email }}</span>
+        </div>
+
+        <!-- INSTRUCTIONS -->
+        <div class="instructions">
+            <h3 class="instructions-title">{{ 'CHECK_YOUR_EMAIL' | translate }}</h3>
+            <ul class="instructions-list">
+                <li>{{ 'VERIFICATION_INSTRUCTION_1' | translate }}</li>
+                <li>{{ 'VERIFICATION_INSTRUCTION_2' | translate }}</li>
+                <li>{{ 'VERIFICATION_INSTRUCTION_3' | translate }}</li>
+            </ul>
+        </div>
+
+        <!-- WARNING BOX -->
+        <div class="warning-box">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+                <p class="warning-title">{{ 'EMAIL_NOT_RECEIVED' | translate }}</p>
+                <ul class="warning-list">
+                    <li>{{ 'CHECK_SPAM_FOLDER' | translate }}</li>
+                    <li>{{ 'WAIT_FEW_MINUTES' | translate }}</li>
+                    <li>{{ 'CHECK_EMAIL_ADDRESS' | translate }}</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SUCCESS MESSAGE (Yeniden gönderim başarılı) -->
+        <div *ngIf="resendSuccess" class="alert alert-success">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="alert-icon">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+            {{ 'EMAIL_RESENT_SUCCESS' | translate }}
+        </div>
+
+        <!-- ERROR MESSAGE (Yeniden gönderim hatası) -->
+        <div *ngIf="resendError" class="alert alert-error">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="alert-icon">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            {{ resendError | translate }}
+        </div>
+
+        <!-- RESEND BUTTON -->
+        <div class="button-group">
+            <button
+                    type="button"
+                    class="resend-button primary-btn"
+                    [disabled]="!canResend || isResending"
+                    (click)="resendEmail()">
+        <span *ngIf="!isResending && canResend">
+          {{ 'RESEND_VERIFICATION' | translate }}
+        </span>
+                <span *ngIf="isResending" class="button-loading">
+          <span class="spinner-small"></span>
+                    {{ 'SENDING' | translate }}
+        </span>
+                <span *ngIf="!canResend && !isResending" class="cooldown-text">
+          {{ 'WAIT' | translate }} {{ getFormattedCooldown() }}
+        </span>
+            </button>
+
+            <button type="button" class="back-button outline-btn" (click)="goToLogin()">
+                {{ 'BACK_TO_LOGIN' | translate }}
+            </button>
+        </div>
+
+    </div>
+</div>

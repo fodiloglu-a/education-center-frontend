@@ -1,0 +1,58 @@
+<!-- verify-email.component.html -->
+
+<div class="verify-email-container">
+    <div class="verify-email-card">
+
+        <!-- LOADING STATE -->
+        <div *ngIf="isLoading" class="state-content loading-state">
+            <div class="icon-wrapper">
+                <div class="spinner"></div>
+            </div>
+            <h2 class="state-title">{{ 'VERIFYING_EMAIL' | translate }}</h2>
+            <p class="state-message">{{ 'VERIFYING_EMAIL_MESSAGE' | translate }}</p>
+        </div>
+
+        <!-- SUCCESS STATE -->
+        <div *ngIf="isSuccess && !isLoading" class="state-content success-state">
+            <div class="icon-wrapper success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                </svg>
+            </div>
+            <h2 class="state-title success-title">{{ 'EMAIL_VERIFIED_SUCCESS' | translate }}</h2>
+            <p class="state-message">{{ 'EMAIL_VERIFIED_SUCCESS_MESSAGE' | translate }}</p>
+
+            <div class="countdown-wrapper">
+                <p class="countdown-text">
+                    {{ 'REDIRECTING_TO_LOGIN' | translate }}
+                    <span class="countdown-number">{{ countdown }}</span>
+                </p>
+            </div>
+
+            <button type="button" class="action-button primary-btn" (click)="goToLogin()">
+                {{ 'GO_TO_LOGIN_NOW' | translate }}
+            </button>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div *ngIf="isError && !isLoading" class="state-content error-state">
+            <div class="icon-wrapper error-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+            </div>
+            <h2 class="state-title error-title">{{ 'EMAIL_VERIFICATION_FAILED' | translate }}</h2>
+            <p class="state-message error-message">{{ errorMessage | translate }}</p>
+
+            <div class="error-actions">
+                <button type="button" class="action-button secondary-btn" (click)="requestNewLink()">
+                    {{ 'REQUEST_NEW_LINK' | translate }}
+                </button>
+                <button type="button" class="action-button outline-btn" (click)="goToHome()">
+                    {{ 'GO_TO_HOME' | translate }}
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
