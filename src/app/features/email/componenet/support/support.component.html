@@ -1,0 +1,183 @@
+<div class="support-container">
+    <!-- Header Section -->
+    <div class="support-header">
+        <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        </div>
+        <h1 class="header-title">{{ 'support.header.title' | translate }}</h1>
+        <p class="header-subtitle">
+            {{ 'support.header.subtitle' | translate }}
+        </p>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="submitSuccess" class="alert alert-success">
+        <div class="alert-icon">✅</div>
+        <div class="alert-content">
+            <strong>{{ 'support.alerts.success' | translate }}</strong>
+            <p>{{ successMessage }}</p>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="submitError" class="alert alert-error">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+            <strong>{{ 'support.alerts.error' | translate }}</strong>
+            <p>{{ errorMessage }}</p>
+        </div>
+    </div>
+
+    <!-- Support Form -->
+    <form [formGroup]="supportForm" (ngSubmit)="onSubmit()" class="support-form">
+
+        <!-- Full Name Field -->
+        <div class="form-group">
+            <label for="fullName" class="form-label">
+                {{ 'support.form.fullName.label' | translate }}
+                <span class="required">{{ 'support.form.required' | translate }}</span>
+            </label>
+            <div class="input-wrapper">
+                <span class="input-icon">👤</span>
+                <input
+                        type="text"
+                        id="fullName"
+                        formControlName="fullName"
+                        class="form-input"
+                        [class.input-error]="isFieldInvalid('fullName')"
+                        [placeholder]="'support.form.fullName.placeholder' | translate"
+                />
+            </div>
+            <div *ngIf="isFieldInvalid('fullName')" class="error-message">
+                {{ getFieldErrorKey('fullName') | translate }}
+            </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+            <label for="email" class="form-label">
+                {{ 'support.form.email.label' | translate }}
+                <span class="required">{{ 'support.form.required' | translate }}</span>
+            </label>
+            <div class="input-wrapper">
+                <span class="input-icon">📧</span>
+                <input
+                        type="email"
+                        id="email"
+                        formControlName="email"
+                        class="form-input"
+                        [class.input-error]="isFieldInvalid('email')"
+                        [placeholder]="'support.form.email.placeholder' | translate"
+                />
+            </div>
+            <div *ngIf="isFieldInvalid('email')" class="error-message">
+                {{ getFieldErrorKey('email') | translate }}
+            </div>
+        </div>
+
+        <!-- Phone Number Field -->
+        <div class="form-group">
+            <label for="phoneNumber" class="form-label">
+                {{ 'support.form.phoneNumber.label' | translate }}
+                <span class="required">{{ 'support.form.required' | translate }}</span>
+            </label>
+            <div class="input-wrapper">
+                <span class="input-icon">📱</span>
+                <input
+                        type="tel"
+                        id="phoneNumber"
+                        formControlName="phoneNumber"
+                        class="form-input"
+                        [class.input-error]="isFieldInvalid('phoneNumber')"
+                        [placeholder]="'support.form.phoneNumber.placeholder' | translate"
+                />
+            </div>
+            <div *ngIf="isFieldInvalid('phoneNumber')" class="error-message">
+                {{ getFieldErrorKey('phoneNumber') | translate }}
+            </div>
+            <small class="field-hint">{{ 'support.form.phoneNumber.hint' | translate }}</small>
+        </div>
+
+        <!-- Subject Field -->
+        <div class="form-group">
+            <label for="subject" class="form-label">
+                {{ 'support.form.subject.label' | translate }}
+                <span class="required">{{ 'support.form.required' | translate }}</span>
+            </label>
+            <div class="input-wrapper">
+                <span class="input-icon">📋</span>
+                <input
+                        type="text"
+                        id="subject"
+                        formControlName="subject"
+                        class="form-input"
+                        [class.input-error]="isFieldInvalid('subject')"
+                        [placeholder]="'support.form.subject.placeholder' | translate"
+                />
+            </div>
+            <div *ngIf="isFieldInvalid('subject')" class="error-message">
+                {{ getFieldErrorKey('subject') | translate }}
+            </div>
+            <small class="field-hint char-counter">
+                {{ 'support.form.subject.remaining' | translate: { count: getRemainingChars('subject', 200) } }}
+            </small>
+        </div>
+
+        <!-- Message Field -->
+        <div class="form-group">
+            <label for="message" class="form-label">
+                {{ 'support.form.message.label' | translate }}
+                <span class="required">{{ 'support.form.required' | translate }}</span>
+            </label>
+            <textarea
+                    id="message"
+                    formControlName="message"
+                    class="form-textarea"
+                    [class.input-error]="isFieldInvalid('message')"
+                    [placeholder]="'support.form.message.placeholder' | translate"
+                    rows="6"
+            ></textarea>
+            <div *ngIf="isFieldInvalid('message')" class="error-message">
+                {{ getFieldErrorKey('message') | translate }}
+            </div>
+            <small class="field-hint char-counter">
+                {{ 'support.form.message.remaining' | translate: { count: getRemainingChars('message', 2000) } }}
+            </small>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="resetForm()"
+                    [disabled]="isSubmitting"
+            >
+                {{ 'support.buttons.reset' | translate }}
+            </button>
+            <button
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="supportForm.invalid || isSubmitting"
+            >
+                <span *ngIf="!isSubmitting">{{ 'support.buttons.submit' | translate }}</span>
+                <span *ngIf="isSubmitting" class="loading-spinner">
+          <span class="spinner"></span>
+                    {{ 'support.buttons.submitting' | translate }}
+        </span>
+            </button>
+        </div>
+    </form>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <div class="info-icon">ℹ️</div>
+        <div class="info-content">
+            <h3>{{ 'support.info.title' | translate }}</h3>
+            <p [innerHTML]="'support.info.description' | translate"></p>
+            <p>{{ 'support.info.urgent' | translate }} <a href="tel:+905xxxxxxxxx">+90 5xx xxx xx xx</a></p>
+        </div>
+    </div>
+</div>
