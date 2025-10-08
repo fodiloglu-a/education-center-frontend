@@ -1,31 +1,20 @@
-// verify-email.component.ts
+// verify-email.component.ts - GÜNCELLENMİŞ VERSİYON
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { EmailVerificationService } from '../../../../core/services/email-verification.service';
 import { take } from 'rxjs/operators';
 
-/**
- * Email Doğrulama Component
- * URL'den token alır, backend'e gönderir ve sonucu gösterir
- *
- * Route: /auth/verify-email?token=xxx
- */
 @Component({
   selector: 'app-verify-email',
   standalone: true,
-  imports: [
-    CommonModule,
-    TranslateModule
-  ],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './verify-email.component.html',
   styleUrl: './verify-email.component.css'
 })
 export class VerifyEmailComponent implements OnInit, OnDestroy {
-
-  // Component State
   isLoading: boolean = true;
   isSuccess: boolean = false;
   isError: boolean = false;
@@ -34,18 +23,21 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
   countdown: number = 5;
   private countdownInterval: any;
 
-  // 🆕 Static flag - Component instance'ları arasında paylaşılır
+  // Static flag - Tüm component instance'ları arasında paylaşılır
   private static isVerifying: boolean = false;
   private static verifiedTokens: Set<string> = new Set();
+
+  // 🆕 Instance-level flag - Bu component için istek yapıldı mı?
+  private hasAttemptedVerification: boolean = false;
 
   constructor(
       private route: ActivatedRoute,
       private router: Router,
       private emailVerificationService: EmailVerificationService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    // Snapshot kullan (observable yerine) - daha güvenli
+    // 🔥 KRITIK: Snapshot kullan, observable DEĞİL
     this.token = this.route.snapshot.queryParams['token'];
 
     if (!this.token) {
@@ -53,16 +45,22 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Token daha önce doğrulandı mı kontrol et
+    // Token daha önce doğrulandı mı?
     if (VerifyEmailComponent.verifiedTokens.has(this.token)) {
-      console.log('⚠️ Bu token zaten doğrulandı, tekrar istek gönderilmeyecek');
+      console.log('⚠️ Bu token zaten doğrulandı');
       this.showAlreadyVerified();
       return;
     }
 
-    // Şu anda başka bir doğrulama işlemi yapılıyor mu?
+    // Bu instance'da zaten bir istek yapıldı mı?
+    if (this.hasAttemptedVerification) {
+      console.log('⚠️ Bu component instance\'ında zaten istek yapıldı');
+      return;
+    }
+
+    // Global olarak doğrulama yapılıyor mu?
     if (VerifyEmailComponent.isVerifying) {
-      console.log('⚠️ Başka bir doğrulama işlemi devam ediyor, bekleniyor...');
+      console.log('⚠️ Başka bir doğrulama işlemi devam ediyor');
       return;
     }
 
@@ -80,19 +78,27 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
     }
+    // Component destroy olurken flag'i resetle
+    VerifyEmailComponent.isVerifying = false;
   }
 
   /**
    * Email doğrulama işlemini gerçekleştirir - SADECE BİR KEZ
    */
   verifyEmail(): void {
-    // Double check
-    if (VerifyEmailComponent.isVerifying) {
-      console.log('⚠️ Doğrulama zaten devam ediyor!');
+    // Triple check - Güvenlik için
+    if (this.hasAttemptedVerification) {
+      console.log('⚠️ Bu instance\'da zaten istek yapıldı!');
       return;
     }
 
-    // Flag'i set et
+    if (VerifyEmailComponent.isVerifying) {
+      console.log('⚠️ Global doğrulama zaten devam ediyor!');
+      return;
+    }
+
+    // Flag'leri set et
+    this.hasAttemptedVerification = true;
     VerifyEmailComponent.isVerifying = true;
     this.isLoading = true;
     this.isError = false;
@@ -100,7 +106,9 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
     console.log('🔄 Email doğrulama isteği gönderiliyor:', this.token);
 
     this.emailVerificationService.verifyEmail(this.token)
-        .pipe(take(1)) // Sadece 1 değer al
+        .pipe(
+            take(1) // Sadece 1 değer al ve unsubscribe
+        )
         .subscribe({
           next: (response) => {
             console.log('✅ Email doğrulama BAŞARILI:', response);
@@ -108,37 +116,33 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
             // Token'ı verified listesine ekle
             VerifyEmailComponent.verifiedTokens.add(this.token);
 
-            // Başarılı doğrulama
+            // Başarılı UI durumu
             this.isLoading = false;
             this.isSuccess = true;
 
-            // 5 saniye sonra login sayfasına yönlendir
+            // Countdown başlat
             this.startCountdown();
 
-            // Flag'i resetle
+            // Global flag'i resetle
             VerifyEmailComponent.isVerifying = false;
           },
           error: (error) => {
             console.error('❌ Email doğrulama HATASI:', error);
 
-            // Hata durumu
+            // Hata UI durumu
             this.isLoading = false;
             this.isError = true;
             this.errorMessage = error.message || 'VERIFICATION_FAILED';
 
-            // Flag'i resetle (tekrar deneme için)
+            // Global flag'i resetle
             VerifyEmailComponent.isVerifying = false;
           }
         });
   }
 
-  /**
-   * Başarılı doğrulama sonrası geri sayım başlatır
-   */
   private startCountdown(): void {
     this.countdownInterval = setInterval(() => {
       this.countdown--;
-
       if (this.countdown <= 0) {
         clearInterval(this.countdownInterval);
         this.goToLogin();
@@ -146,41 +150,26 @@ export class VerifyEmailComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  /**
-   * Login sayfasına yönlendirir
-   */
   goToLogin(): void {
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/home']);
   }
 
-  /**
-   * Yeniden deneme - Doğrulama emailini yeniden gönderme sayfasına yönlendirir
-   */
   requestNewLink(): void {
     this.router.navigate(['/auth/verification-sent']);
   }
 
-  /**
-   * Hata mesajını gösterir
-   */
   private showError(message: string): void {
     this.isLoading = false;
     this.isError = true;
     this.errorMessage = message;
   }
 
-  /**
-   * Token zaten doğrulanmış durumunu gösterir
-   */
   private showAlreadyVerified(): void {
     this.isLoading = false;
     this.isSuccess = true;
     this.startCountdown();
   }
 
-  /**
-   * Ana sayfaya yönlendirir
-   */
   goToHome(): void {
     this.router.navigate(['/']);
   }

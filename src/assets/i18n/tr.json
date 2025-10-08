@@ -1240,8 +1240,64 @@
   "RESEND_FAILED": "Email yeniden gönderilemedi",
   "SENDING": "Gönderiliyor",
   "WAIT": "Bekleyin",
-  "INVALID_EMAIL_FORMAT": "Geçersiz email formatı"
+  "INVALID_EMAIL_FORMAT": "Geçersiz email formatı",
 
+
+  "_comment_auth": "=== AUTH MODULE ===",
+
+  "_comment_register": "--- Register Component ---",
+  "REGISTER_TITLE": "Hesap Oluştur",
+  "REGISTER_BUTTON": "Kayıt Ol",
+  "LOGIN_HERE": "Giriş Yapın",
+  "INVALID_FORM_DATA": "Lütfen tüm alanları doğru şekilde doldurun.",
+  "REGISTER_FAILED_GENERIC": "Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin.",
+  "EMAIL_ALREADY_EXISTS": "Bu e-posta adresi zaten kullanımda.",
+
+  "_comment_login": "--- Login Component ---",
+  "LOGIN_TITLE": "Giriş Yap",
+  "LOGIN_BUTTON": "Giriş Yap",
+  "REMEMBER_ME": "Beni Hatırla",
+  "FORGOT_PASSWORD": "Şifremi Unuttum?",
+  "REGISTER_HERE": "Kayıt Olun",
+  "LOGIN_FAILED": "Giriş başarısız. E-posta veya şifre hatalı.",
+  "INVALID_CREDENTIALS": "Geçersiz e-posta veya şifre.",
+
+  "_comment_verify_email": "--- Verify Email Component ---",
+  "TOKEN_EXPIRED": "Doğrulama kodunun süresi dolmuş. Lütfen yeni bir doğrulama kodu isteyin.",
+  "TOKEN_ALREADY_USED": "Bu doğrulama linki daha önce kullanılmış.",
+  "USER_NOT_FOUND": "Kullanıcı bulunamadı.",
+  "EMAIL_ALREADY_VERIFIED": "E-posta adresi zaten doğrulanmış.",
+
+  "_comment_verification_sent": "--- Verification Sent Component ---",
+  "VERIFICATION_EMAIL_SENT": "Doğrulama E-postası Gönderildi",
+
+  "VERIFICATION_SENT_MESSAGE": "E-posta adresinize bir doğrulama linki gönderdik. Hesabınızı aktifleştirmek için lütfen e-postanızdaki linke tıklayın.",
+  "EMAIL_SENT_TO": "E-posta gönderildi:",
+  "DIDNT_RECEIVE_EMAIL": "E-posta almadınız mı?",
+
+  "RESEND_EMAIL": "Yeniden Gönder",
+  "RESENDING": "Gönderiliyor...",
+  "PLEASE_WAIT": "Lütfen bekleyin",
+  "COOLDOWN_MESSAGE": "Yeniden gönderebilmek için lütfen bekleyin:",
+
+  "TOO_MANY_REQUESTS": "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin.",
+
+  "_comment_common": "--- Common ---",
+  "LOADING": "Yükleniyor...",
+  "PLEASE_WAIT_MESSAGE": "Lütfen bekleyin...",
+  "ERROR": "Hata",
+  "SUCCESS": "Başarılı",
+  "_comment_validation": "--- Validation Messages ---",
+  "FIELD_REQUIRED": "Bu alan zorunludur.",
+  "NAME_MIN_LENGTH": "Ad en az 2 karakter olmalıdır.",
+  "PASSWORDS_DONT_MATCH": "Şifreler eşleşmiyor.",
+  "_comment_errors": "--- Error Messages ---",
+  "NETWORK_ERROR": "Bağlantı hatası. Lütfen internet bağlantınızı kontrol edin.",
+  "SERVER_ERROR": "Sunucu hatası. Lütfen daha sonra tekrar deneyin.",
+  "UNKNOWN_ERROR": "Bilinmeyen bir hata oluştu.",
+  "SESSION_EXPIRED": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
+  "UNAUTHORIZED": "Bu işlem için yetkiniz yok.",
+  "NOT_FOUND": "Aradığınız sayfa bulunamadı."
 
 
 
