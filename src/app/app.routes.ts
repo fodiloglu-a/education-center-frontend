@@ -13,6 +13,10 @@ import { Error404Component } from "./features/pages/error-404/error-404.componen
 // Legal Pages
 import { PrivacyPolicyComponent } from "./features/pages/privacy-policy/privacy-policy.component";
 import { TermsOfServiceComponent } from "./features/pages/terms-of-service/terms-of-service.component";
+import {SupportComponent} from "./features/email/componenet/support/support.component";
+
+// Support
+
 
 export const routes: Routes = [
   // Ana sayfa
@@ -34,6 +38,13 @@ export const routes: Routes = [
     title: 'Giriş / Kayıt'
   },
 
+  // Email modülü
+  {
+    path: 'email',
+    loadChildren: () => import('./features/email/email.routes').then(m => m.EMAIL_ROUTES),
+    title: 'Email'
+  },
+
   // User profile
   {
     path: 'profile',
@@ -49,7 +60,7 @@ export const routes: Routes = [
     title: 'Kurslar'
   },
 
-  // Ödeme sistemi - YENİ: Tüm payment route'ları burada
+  // Ödeme sistemi
   {
     path: 'payment',
     loadChildren: () => import('./features/payment/payment.routes').then(m => m.PAYMENT_ROUTES),
@@ -95,6 +106,14 @@ export const routes: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { roles: ['ROLE_ADMIN'] },
     title: 'Yönetici Paneli'
+  },
+
+  // ========== DESTEK ==========
+  // Direkt /support erişimi için
+  {
+    path: 'support',
+    component: SupportComponent,
+    title: 'Destek - Acadenon'
   },
 
   // ========== YASAL SAYFALAR ==========
@@ -163,12 +182,10 @@ export const routes: Routes = [
 ];
 
 /*
- * YENİ ROUTE YAPISI:
+ * ROUTE KULLANIMI:
  *
+ * /support                                → Destek formu (direkt erişim)
+ * /email/support                          → Destek formu (email modülü içinde)
  * /email/verify-email?token=xxx           → Email doğrulama
  * /email/verification-sent?email=xxx      → Email gönderildi bilgilendirme
- *
- * KULLANIM:
- * - Register sonrası: /email/verification-sent?email=user@example.com
- * - Email'den tıklama: /email/verify-email?token=abc123
  */

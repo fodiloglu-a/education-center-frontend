@@ -1,8 +1,8 @@
 // email.routes.ts
 
 import { Routes } from '@angular/router';
-import {VerificationSentComponent} from "./verification-sent/verification-sent.component";
-import {VerifyEmailComponent} from "./verify-email/verify-email.component";
+import {VerificationSentComponent} from "./componenet/verification-sent/verification-sent.component";
+import {VerifyEmailComponent} from "./componenet/verify-email/verify-email.component";
 
 
 /**

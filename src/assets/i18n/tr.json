@@ -1297,7 +1297,80 @@
   "UNKNOWN_ERROR": "Bilinmeyen bir hata oluştu.",
   "SESSION_EXPIRED": "Oturumunuzun süresi doldu. Lütfen tekrar giriş yapın.",
   "UNAUTHORIZED": "Bu işlem için yetkiniz yok.",
-  "NOT_FOUND": "Aradığınız sayfa bulunamadı."
+  "NOT_FOUND": "Aradığınız sayfa bulunamadı.",
+
+  "support": {
+    "header": {
+      "title": "Destek Talebi Oluştur",
+      "subtitle": "Size yardımcı olmaktan mutluluk duyarız. Formu doldurun, en kısa sürede size dönüş yapalım."
+    },
+    "alerts": {
+      "success": "Başarılı!",
+      "error": "Hata!"
+    },
+    "form": {
+      "fullName": {
+        "label": "Ad Soyad",
+        "placeholder": "Adınız ve soyadınız",
+        "errors": {
+          "required": "Bu alan zorunludur",
+          "minlength": "Ad soyad en az 2 karakter olmalıdır",
+          "maxlength": "Ad soyad en fazla 100 karakter olabilir"
+        }
+      },
+      "email": {
+        "label": "Email Adresi",
+        "placeholder": "ornek@email.com",
+        "errors": {
+          "required": "Bu alan zorunludur",
+          "email": "Geçerli bir email adresi giriniz"
+        }
+      },
+      "phoneNumber": {
+        "label": "Telefon Numarası",
+        "placeholder": "5xxxxxxxxx",
+        "hint": "10-15 rakam arasında telefon numarası giriniz",
+        "errors": {
+          "required": "Bu alan zorunludur",
+          "pattern": "Geçerli bir telefon numarası giriniz (10-15 rakam)"
+        }
+      },
+      "subject": {
+        "label": "Konu",
+        "placeholder": "Destek talebinizin konusu",
+        "remaining": "Kalan: {{count}} karakter",
+        "errors": {
+          "required": "Bu alan zorunludur",
+          "minlength": "Konu en az 5 karakter olmalıdır",
+          "maxlength": "Konu en fazla 200 karakter olabilir"
+        }
+      },
+      "message": {
+        "label": "Mesajınız",
+        "placeholder": "Detaylı olarak açıklayın...",
+        "remaining": "Kalan: {{count}} karakter",
+        "errors": {
+          "required": "Bu alan zorunludur",
+          "minlength": "Mesaj en az 10 karakter olmalıdır",
+          "maxlength": "Mesaj en fazla 2000 karakter olabilir"
+        }
+      },
+      "required": "*"
+    },
+    "buttons": {
+      "reset": "Sıfırla",
+      "submit": "Gönder",
+      "submitting": "Gönderiliyor..."
+    },
+    "info": {
+      "title": "Yanıt Süresi",
+      "description": "Destek taleplerinize genellikle <strong>24 saat içinde</strong> dönüş yapılmaktadır.",
+      "urgent": "Acil durumlar için:"
+    }
+  },
+  "FOOTER_SUPPORT": "Destek",
+  "SUPPORT": "Destek"
+
 
 
 
