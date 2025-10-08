@@ -207,29 +207,21 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
     this.course = course;
 
     if (this.course.lessons) {
-      // Sort lessons by order
       this.course.lessons = [...this.course.lessons].sort((a, b) => a.lessonOrder - b.lessonOrder);
       this.currentLesson = this.course.lessons.find(lesson => lesson.id === this.lessonId) || null;
 
+      // 🔍 DEBUG: URL'i konsola yazdır
       if (this.currentLesson) {
-        // Check if user can access this lesson
+        console.log('🎥 Current Lesson Video URL:', this.currentLesson.videoUrl);
+        console.log('🔗 URL Length:', this.currentLesson.videoUrl?.length);
+        console.log('🔗 URL Type:', typeof this.currentLesson.videoUrl);
+
+        // Check if user can access
         if (this.canAccessLesson(this.currentLesson)) {
           this.setupVideoPlayer();
           this.loadNoteForCurrentLesson();
-        } else {
-          this.updateState({
-            errorMessage: this.translate.instant('LESSON_ACCESS_DENIED')
-          });
         }
-      } else {
-        this.updateState({
-          errorMessage: this.translate.instant('LESSON_NOT_FOUND')
-        });
       }
-    } else {
-      this.updateState({
-        errorMessage: this.translate.instant('NO_LESSONS_IN_COURSE')
-      });
     }
   }
 
@@ -273,7 +265,7 @@ export class LessonPlayerComponent implements OnInit, OnDestroy {
    */
   canAccessLesson(lesson: LessonDTO): boolean {
     // Preview lessons are accessible to everyone
-    console.log('Preview lessons are accessible to everyone', lesson);
+
     if (lesson.preview) {
       return true;
     }

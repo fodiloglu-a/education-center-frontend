@@ -13,6 +13,7 @@ import { Observable, of } from 'rxjs';
 import { LoadingSpinnerComponent } from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import { AlertDialogComponent } from '../../../../shared/components/alert-dialog/alert-dialog.component';
 import { TokenService } from '../../../../core/services/token.service';
+import {environment} from "../../../../../environments/environment";
 
 @Component({
   selector: 'app-course-form',
@@ -38,7 +39,7 @@ export class CourseFormComponent implements OnInit {
   currentUserId: number | null = null;
 
   // Material upload URL'i
-  readonly MATERIAL_UPLOAD_URL = 'http://localhost:4200/instructor/add-material';
+  readonly MATERIAL_UPLOAD_URL = environment+'/instructor/add-material';
   // Cloudflare base URL
   readonly CLOUDFLARE_BASE_URL = 'https://media-videos.849d26839fb7b1d41361dfa0cfed6323.r2.cloudflarestorage.com/';
 

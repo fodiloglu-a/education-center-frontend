@@ -151,20 +151,31 @@ export class LessonFormComponent implements OnInit {
   /**
    * Video ID'si yapıştırıldığında çalışır
    * Form validation'ı otomatik olarak çalışacak
+   *
+   * ✅ DÜZELTME: Yapıştırılan değeri temizle
    */
   onVideoIdPaste(event: ClipboardEvent): void {
+    // Default paste davranışını engelle
+    event.preventDefault();
+
     // Paste event'ini yakala
     const pastedText = event.clipboardData?.getData('text') || '';
 
     if (pastedText) {
+      // ✅ Yapıştırılan değeri temizle (URL ise filename'i çıkar)
+      const cleanedVideoId = this.extractFilenameFromUrl(pastedText.trim());
+
+      console.log('📋 Pasted text:', pastedText);
+      console.log('✅ Cleaned videoId:', cleanedVideoId);
+
       // Video ID'sini form'a set et
       this.lessonForm.patchValue({
-        videoId: pastedText.trim()
+        videoId: cleanedVideoId
       });
 
       // Video ID'sinden başlığı çıkar
-      this.selectedVideoId = pastedText.trim();
-      this.selectedVideoTitle = this.getVideoTitleFromId(this.selectedVideoId);
+      this.selectedVideoId = cleanedVideoId;
+      this.selectedVideoTitle = this.getVideoTitleFromId(cleanedVideoId);
 
       // Validation'ı tetikle
       this.videoId?.markAsTouched();
@@ -179,14 +190,27 @@ export class LessonFormComponent implements OnInit {
 
   /**
    * Video ID input'undaki değişiklikleri handle eder
+   *
+   * ✅ DÜZELTME: Manuel girişleri de temizle
    */
   onVideoIdChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-    const videoId = target.value.trim();
+    const rawValue = target.value.trim();
 
-    if (videoId) {
-      this.selectedVideoId = videoId;
-      this.selectedVideoTitle = this.getVideoTitleFromId(videoId);
+    if (rawValue) {
+      // ✅ Girilen değeri temizle (URL ise filename'i çıkar)
+      const cleanedVideoId = this.extractFilenameFromUrl(rawValue);
+
+      // Eğer temizleme yapıldıysa, form'u güncelle
+      if (cleanedVideoId !== rawValue) {
+        console.log('🔧 Cleaned on change:', rawValue, '->', cleanedVideoId);
+        this.lessonForm.patchValue({
+          videoId: cleanedVideoId
+        }, { emitEvent: false }); // Sonsuz loop'u önle
+      }
+
+      this.selectedVideoId = cleanedVideoId;
+      this.selectedVideoTitle = this.getVideoTitleFromId(cleanedVideoId);
 
       // Validation sonucuna göre mesaj göster
       this.videoId?.updateValueAndValidity();
@@ -278,6 +302,8 @@ export class LessonFormComponent implements OnInit {
   /**
    * Düzenleme modunda ders detaylarını yükler
    * Video URL yerine video ID field'ını kullanır
+   *
+   * ✅ DÜZELTME: Backend'den gelen URL'den filename'i çıkar
    */
   loadLessonDetails(courseId: number, lessonId: number): void {
     this.isLoading = true;
@@ -291,18 +317,22 @@ export class LessonFormComponent implements OnInit {
       if (course?.lessons?.length) {
         const lesson = course.lessons.find(l => l.id === lessonId);
         if (lesson) {
-          // Mevcut videoUrl'yi videoId olarak kullan (backward compatibility)
-          const videoId = lesson.videoUrl || '';
+          // ✅ DÜZELTME: Backend'den gelen videoUrl'den sadece filename'i çıkar
+          const videoId = this.extractFilenameFromUrl(lesson.videoUrl || '');
+
+          console.log('📥 Loaded lesson videoUrl:', lesson.videoUrl);
+          console.log('✅ Extracted videoId:', videoId);
+
           this.selectedVideoId = videoId;
           this.selectedVideoTitle = videoId ? this.getVideoTitleFromId(videoId) : null;
 
           this.lessonForm.patchValue({
             title: lesson.title,
             description: lesson.description,
-            videoId: videoId, // videoUrl yerine videoId
+            videoId: videoId, // ✅ Sadece filename
             lessonOrder: lesson.lessonOrder,
             duration: lesson.duration,
-            isPreview: lesson.preview, // isPreview'ı isPreview'e atayın
+            isPreview: lesson.preview,
             resources: lesson.resources ? lesson.resources.join('\n') : ''
           });
         } else {
@@ -315,8 +345,76 @@ export class LessonFormComponent implements OnInit {
   }
 
   /**
+   * URL'den sadece filename'i çıkarır
+   * Hem tam URL'leri hem de düz filename'leri handle eder
+   *
+   * ✅ DÜZELTME: Daha güvenli ve kapsamlı
+   */
+  private extractFilenameFromUrl(url: string): string {
+    if (!url || url.trim() === '') {
+      return '';
+    }
+
+    let cleaned = url.trim();
+
+    try {
+      // 1. Tam URL ise (http veya https ile başlıyorsa)
+      if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+        const urlObj = new URL(cleaned);
+        const pathname = urlObj.pathname;
+        cleaned = pathname.substring(pathname.lastIndexOf('/') + 1);
+      }
+
+      // 2. Slash varsa son kısmı al
+      else if (cleaned.includes('/')) {
+        cleaned = cleaned.substring(cleaned.lastIndexOf('/') + 1);
+      }
+
+      // 3. Query string varsa temizle
+      if (cleaned.includes('?')) {
+        cleaned = cleaned.substring(0, cleaned.indexOf('?'));
+      }
+
+      // 4. URL decode et
+      cleaned = decodeURIComponent(cleaned);
+
+      return cleaned;
+
+    } catch (error) {
+      console.error('Error extracting filename:', error);
+
+      // Fallback: Basit string işlemleri
+      try {
+        // Query string temizle
+        if (cleaned.includes('?')) {
+          cleaned = cleaned.substring(0, cleaned.indexOf('?'));
+        }
+
+        // Slash varsa son kısmı al
+        if (cleaned.includes('/')) {
+          cleaned = cleaned.substring(cleaned.lastIndexOf('/') + 1);
+        }
+
+        // URL decode dene
+        try {
+          cleaned = decodeURIComponent(cleaned);
+        } catch (e) {
+          // Decode başarısız olursa olduğu gibi bırak
+        }
+
+        return cleaned;
+      } catch (fallbackError) {
+        console.error('Fallback extraction also failed:', fallbackError);
+        return url.trim(); // En kötü durumda orijinal değeri dön
+      }
+    }
+  }
+
+  /**
    * Form gönderimini handle eder
    * Video ID'sini videoUrl field'ına ve isPreview'i preview field'ına map eder (backend uyumluluğu için)
+   *
+   * ✅ DÜZELTME: Son bir kez daha temizlik yap
    */
   onSubmit(): void {
     this.errorMessage = null;
@@ -331,25 +429,32 @@ export class LessonFormComponent implements OnInit {
     this.isLoading = true;
     const rawLessonData = this.lessonForm.value;
 
+    // ✅ DÜZELTME: videoId'yi son bir kez temizle (double-check)
+    const cleanedVideoUrl = this.extractFilenameFromUrl(rawLessonData.videoId || '');
+
+    console.log('📤 Form raw videoId:', rawLessonData.videoId);
+    console.log('✅ Cleaned videoUrl for backend:', cleanedVideoUrl);
+
     // Backend uyumluluğu için formdan gelen verileri doğru DTO yapısına map et
     const lessonData: LessonDTO = {
-      id:rawLessonData.id,
+      id: rawLessonData.id,
       title: rawLessonData.title,
       description: rawLessonData.description,
       lessonOrder: rawLessonData.lessonOrder,
       duration: rawLessonData.duration,
-      videoUrl: rawLessonData.videoId, // Backend hala videoUrl bekliyor
-      preview: rawLessonData.isPreview, // DÜZELTME: isPreview'i isPreview'e map ediyoruz
+      videoUrl: cleanedVideoUrl, // ✅ Temizlenmiş filename
+      preview: rawLessonData.isPreview,
       resources: rawLessonData.resources
           ? rawLessonData.resources.split('\n').filter((item: string) => item.trim() !== '')
           : []
     };
 
+    console.log('📦 Final lesson data:', lessonData);
+
     let operation: Observable<any>;
     if (this.isEditMode && this.courseId && this.lessonId) {
       operation = this.courseService.updateLessonInCourse(this.courseId, this.lessonId, lessonData);
     } else if (this.courseId) {
-      console.log(lessonData);
       operation = this.courseService.addLessonToCourse(this.courseId, lessonData);
     } else {
       this.errorMessage = this.translate.instant('COURSE_ID_MISSING_FOR_LESSON_SAVE');
