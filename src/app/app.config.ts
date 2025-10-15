@@ -1,6 +1,6 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http'; // HttpClient ve Interceptor'lar için
+import {provideHttpClient, withFetch, withInterceptors} from '@angular/common/http'; // HttpClient ve Interceptor'lar için
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Animasyonlar için
 
 import { routes } from './app.routes'; // Ana yönlendirme tanımlarımız
@@ -26,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     // HttpClient sağlayıcısını ve interceptor'ları ekler
     provideHttpClient(
+        withFetch(),
       withInterceptors([
         AuthInterceptor, // AuthInterceptor'ı HTTP istek zincirine ekler
         ErrorInterceptor // ErrorInterceptor'ı HTTP istek zincirine ekler

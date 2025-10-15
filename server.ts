@@ -17,20 +17,51 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Serve sitemap.xml and robots.txt explicitly from the root of the browser dist folder.
+  // ============================================================
+  // CACHE CONTROL MIDDLEWARE - Set headers for all responses
+  // ============================================================
+  server.use((req, res, next) => {
+    // HTML files - No cache (always get fresh)
+    if (req.url.endsWith('.html') || req.url === '/') {
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+    }
+    // Versioned/hashed assets (JS, CSS with hash in filename) - Cache 1 year
+    else if (/\.(js|css)$/.test(req.url) && /[a-zA-Z0-9]{8,}/.test(req.url)) {
+      res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // Images - Cache 1 year
+    else if (/\.(png|jpg|jpeg|gif|svg|webp|ico)$/.test(req.url)) {
+      res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // Fonts - Cache 1 year
+    else if (/\.(woff|woff2|ttf|eot|otf)$/.test(req.url)) {
+      res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+    // Other static assets - Cache 1 hour
+    else if (/\.(js|css|txt|json|xml)$/.test(req.url)) {
+      res.set('Cache-Control', 'public, max-age=3600');
+    }
+
+    next();
+  });
+
+  // Serve sitemap.xml and robots.txt explicitly from the root of the browser dist folder
   server.get('/sitemap.xml', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=604800'); // Cache for 1 week
     res.sendFile(join(browserDistFolder, 'sitemap.xml'));
   });
 
   server.get('/robots.txt', (req, res) => {
+    res.set('Cache-Control', 'public, max-age=604800'); // Cache for 1 week
     res.sendFile(join(browserDistFolder, 'robots.txt'));
   });
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
+  // Serve static files from /browser with optimized caching
   server.get('*.*', express.static(browserDistFolder, {
-    maxAge: '1y'
+    maxAge: '1y', // Express static cache setting
+    etag: false   // Disable etag for better performance
   }));
 
   // All regular routes use the Angular engine
