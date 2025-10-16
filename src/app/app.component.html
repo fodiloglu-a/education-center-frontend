@@ -2,9 +2,26 @@
     <header class="app-header">
         <div class="header-content">
             <a routerLink="/" class="app-logo" (click)="closeMobileMenu()">
-                <img *ngIf="isDarkMode" src="assets/logos/logo5-Photoroom.png" alt="Koyu Mod Logo" class="app-logo-img">
-                <img *ngIf="!isDarkMode" src="assets/logos/logo4-Photoroom.png" alt="Açık Mod Logo" class="app-logo-img">
+                <img
+                        *ngIf="isDarkMode"
+                        src="assets/logos/logo5-Photoroom.png"
+                        alt="Koyu Mod Logo"
+                        class="app-logo-img"
+                        width="1016"
+                        height="354"
+                        decoding="async"
+                >
+                <img
+                        *ngIf="!isDarkMode"
+                        src="assets/logos/logo4-Photoroom.png"
+                        alt="Açık Mod Logo"
+                        class="app-logo-img"
+                        width="482"
+                        height="184"
+                        decoding="async"
+                >
             </a>
+
 
             <nav class="desktop-nav">
                 <ul class="nav-links">
@@ -117,8 +134,16 @@
             <div class="footer-content">
                 <!-- Logo -->
                 <div class="footer-logo">
-                    <img src="assets/logos/logo5-Photoroom.png" alt="Koyu Mod Logo" class="app-logo-img">
+                    <img
+                            src="assets/logos/logo5-Photoroom.png"
+                            alt="Koyu Mod Logo"
+                            class="app-logo-img"
+                            width="1016"
+                            height="354"
+                            decoding="async"
+                    >
                 </div>
+
 
                 <!-- Telif hakkı metni -->
                 <div class="footer-info">
