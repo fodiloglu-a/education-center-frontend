@@ -10,6 +10,7 @@ import { map } from 'rxjs/operators';
 import { ToastNotificationComponent } from './features/notifications/components/toast-notification/toast-notification.component';
 import { NotificationBellComponent } from './features/notifications/components/notification-bell/notification-bell.component';
 import { NotificationService } from './features/notifications/services/notification.service';
+import {AnalyticsLoaderService} from "./core/services/analytics-loader.service";
 
 @Component({
   selector: 'app-root',
@@ -40,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private translate: TranslateService,
+    private analytics: AnalyticsLoaderService,
     private tokenService: TokenService,
     private router: Router,
     private renderer: Renderer2,
@@ -58,7 +60,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.translate.setDefaultLang('uk');
     this.translate.use('uk');
-
+    this.analytics.initOnFirstInteraction('G-66CEFC5NB5');
     this.translateSubscription.add(
         this.translate.onLangChange.subscribe(() => {
           this.updateDocumentTitle();
