@@ -10,7 +10,7 @@
     <meta name="description"
           content="Acadenon — багатомовна онлайн-платформа для навчання. Публікуйте курси як викладач; надайте студентам доступ до якісного контенту. Безпечна оплата та гнучке навчання.">
 
-    <!-- Preconnect: backend ve font/CDN kaynakları -->
+    <!-- Preconnect: kritik origin'ler -->
     <link rel="preconnect" href="https://media-videos.849d26839fb7b1d41361dfa0cfed6323.r2.cloudflarestorage.com" crossorigin>
     <link rel="preconnect" href="https://education-center-backand.onrender.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,10 +26,10 @@
             imagesizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 80vw"
             fetchpriority="high">
 
-    <!-- Material Icons (Google) -->
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome: render-blocking olmadan yükle -->
+    <!-- Font Awesome: render-blocking olmadan -->
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
@@ -37,14 +37,16 @@
     <!-- Favicon -->
     <link rel="icon" href="/assets/logo/ikon.png">
 
-    <!-- Roboto: font-display=swap ile FOIT engelle -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Google Fonts: preload + print/onload -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"></noscript>
 </head>
 <body>
 <!-- App root -->
 <app-root></app-root>
 
-<!-- LiqPay: async ve body sonunda (HTML geçerliliği ve render sırası için daha doğru) -->
+<!-- LiqPay: async ve body sonunda -->
 <script src="https://static.liqpay.ua/libjs/checkout.js" async></script>
 </body>
 </html>

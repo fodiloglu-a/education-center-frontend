@@ -179,17 +179,20 @@
                              [attr.aria-labelledby]="'course-title-' + course.id"
                              tabindex="0">
                         <div class="course-image-container">
-                            <img
-                                    [ngSrc]="course.imageUrl"
-                                    [alt]="course.title + ' kurs görseli'"
-                                    class="course-image"
-                                    width="300"
-                                    height="220"
-                                    loading="lazy"
-                                    decoding="async"
-                                    sizes="(max-width: 600px) 100vw, 33vw"
-                                    (error)="onImageError($event)"
-                            />
+                            <div class="course-image-container">
+                                <img
+                                        [ngSrc]="course.imageUrl"
+                                        [alt]="course.title + ' kurs görseli'"
+                                        class="course-image"
+                                        fill
+                                        loading="lazy"
+                                        decoding="async"
+                                        sizes="(max-width: 600px) 100vw, 33vw"
+                                        (error)="onImageError($event)"
+                                        style="object-fit: cover;"
+                                />
+                            </div>
+
 
                         </div>
                         <div class="course-content">
