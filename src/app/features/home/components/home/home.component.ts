@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CourseResponse } from "../../../courses/models/course.models";
 import { CourseService } from "../../../courses/services/course.service";
-import { CurrencyPipe, DecimalPipe, NgForOf, NgIf } from "@angular/common";
+import {CurrencyPipe, DecimalPipe, NgForOf, NgIf, NgOptimizedImage} from "@angular/common";
 import { TranslatePipe } from "@ngx-translate/core";
 import { RouterLink } from "@angular/router";
 import { Subject, takeUntil, retry, catchError, of, finalize } from 'rxjs';
@@ -23,6 +23,7 @@ interface HomeComponentState {
     NgIf,
     TranslatePipe,
     RouterLink,
+    [NgOptimizedImage /* diğerleri */],
   ],
   styleUrls: ['./home.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

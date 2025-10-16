@@ -6,12 +6,28 @@
              [attr.aria-busy]="isLoading()">
         <div class="slider-wrapper">
             <div class="slide active">
-                <img src="assets/logo/hero.png"
-                     alt="Eğitim platformu logosu - Premium online kurslar"
-                     loading="eager"
-                     decoding="async"
-                     width="500"
-                     height="300">
+                <img
+                        ngSrc="assets/logo/hero-1280.avif"
+                        alt="Eğitim platformu logosu - Premium online kurslar"
+                        width="1280" height="853"
+                priority
+                fetchpriority="high"
+                decoding="async"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 80vw"
+
+                        srcset="
+                assets/logo/hero-480.avif 480w,
+                assets/logo/hero-768.avif 768w,
+                assets/logo/hero-1280.avif 1280w,
+                assets/logo/hero-1920.avif 1920w
+                "
+                />
+                <noscript>
+                    <img src="assets/logo/hero-1280.avif"
+                         alt="Eğitim platformu logosu - Premium online kurslar"
+                         width="1280" height="853">
+                </noscript>
+
                 <div class="slide-content">
                     <h1 id="slider-title" class="slide-title">
                         {{ 'HOME_SLIDER_TITLE' | translate }}
