@@ -57,7 +57,7 @@
                  role="list"
                  aria-label="Platform özellik listesi">
                 <div class="feature-item"
-                     role="listitem"
+
                      tabindex="0">
                     <i class="fas fa-shield-alt feature-icon"
                        aria-hidden="true"
@@ -70,7 +70,7 @@
                     </p>
                 </div>
                 <div class="feature-item"
-                     role="listitem"
+
                      tabindex="0">
                     <i class="fas fa-rocket feature-icon"
                        aria-hidden="true"
@@ -83,7 +83,7 @@
                     </p>
                 </div>
                 <div class="feature-item"
-                     role="listitem"
+
                      tabindex="0">
                     <i class="fas fa-award feature-icon"
                        aria-hidden="true"
@@ -175,7 +175,7 @@
                      aria-label="En çok satan kurslar">
                     <article *ngFor="let course of bestSellers(); trackBy: trackCourseById"
                              class="course-card"
-                             role="listitem"
+
                              [attr.aria-labelledby]="'course-title-' + course.id"
                              tabindex="0">
                         <div class="course-image-container">

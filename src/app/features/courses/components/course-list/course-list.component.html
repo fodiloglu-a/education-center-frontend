@@ -301,7 +301,7 @@
 
             <article *ngFor="let course of filteredCourses(); trackBy: trackByCourseId"
                      class="course-card"
-                     role="listitem"
+
                      [attr.aria-labelledby]="'course-title-' + course.id"
                      [attr.aria-describedby]="'course-desc-' + course.id"
                      tabindex="0"

@@ -101,3 +101,19 @@ html, body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+/* A11y: Skip link touch target >= 48px */
+.skip-link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;      /* önerilen minimum yükseklik */
+  padding: 0 12px;       /* yatay alan */
+  line-height: 1.2;
+  border-radius: 6px;
+}
+
+.skip-link:focus-visible{
+  outline: 2px solid #4361EE;   /* belirgin odak */
+  outline-offset: 2px;
+  text-decoration: none;
+}

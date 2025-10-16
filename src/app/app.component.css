@@ -635,3 +635,26 @@ body.mobile-menu-open {
     transition: none;
   }
 }
+/* Footer kontrast iyileştirme */
+.app-footer{
+  background: #FFF8EE;        /* açık arka plan */
+  color: #1b1b1b;             /* koyu metin rengi (yüksek kontrast) */
+}
+
+.app-footer a{
+  color: #001F83;              /* deep-blue: yüksek kontrast */
+  text-decoration: underline;  /* link olduğunun anlaşılması */
+}
+
+.app-footer a:hover,
+.app-footer a:focus{
+  color: #4361EE;              /* primary */
+  outline: 2px solid #4361EE;  /* klavye odak görünür */
+  outline-offset: 2px;
+}
+
+/* Küçük yazılar için okunabilirliği artır */
+.app-footer, .app-footer a{
+  font-size: 14px;             /* min okunabilir boyut */
+  line-height: 1.5;
+}
