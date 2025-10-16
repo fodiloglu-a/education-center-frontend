@@ -179,14 +179,18 @@
                              [attr.aria-labelledby]="'course-title-' + course.id"
                              tabindex="0">
                         <div class="course-image-container">
-                            <img [src]="course.imageUrl"
-                                 [alt]="course.title + ' kurs görseli'"
-                                 class="course-image"
-                                 loading="lazy"
-                                 decoding="async"
-                                 width="300"
-                                 height="220"
-                                 (error)="onImageError($event)">
+                            <img
+                                    [ngSrc]="course.imageUrl"
+                                    [alt]="course.title + ' kurs görseli'"
+                                    class="course-image"
+                                    width="300"
+                                    height="220"
+                                    loading="lazy"
+                                    decoding="async"
+                                    sizes="(max-width: 600px) 100vw, 33vw"
+                                    (error)="onImageError($event)"
+                            />
+
                         </div>
                         <div class="course-content">
                             <h4 [id]="'course-title-' + course.id"

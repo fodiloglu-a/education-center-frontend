@@ -312,14 +312,17 @@
 
                 <div class="course-image-wrapper">
                     <img
-                            [src]="course.imageUrl"
+                            [ngSrc]="course.imageUrl"
                             [alt]="'COURSE_IMAGE_ALT' | translate: { title: course.title }"
                             class="course-image"
-                            loading="lazy"
-                            decoding="async"
                             width="320"
                             height="220"
-                            (error)="onImageError($event)" />
+                            loading="lazy"
+                            decoding="async"
+                            sizes="(max-width: 600px) 100vw, 33vw"
+                            (error)="onImageError($event)"
+                    />
+
 
                     <!-- Badges -->
                     <div class="course-badges" aria-hidden="true">

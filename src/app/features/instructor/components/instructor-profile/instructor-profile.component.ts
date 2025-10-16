@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { InstructorProfileDTO } from "../../../user/models/user.models";
 import { UserService } from "../../../user/services/user.service";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
@@ -10,12 +10,13 @@ import {CourseResponse} from "../../../courses/models/course.models";
 @Component({
   selector: 'app-instructor-profile',
   standalone: true,
-  imports: [
-    CommonModule,
-    TranslateModule,
-    RouterLink,
-    // Diğer gerekli Angular Material importları kaldırıldı
-  ],
+    imports: [
+        CommonModule,
+        TranslateModule,
+        RouterLink,
+        NgOptimizedImage,
+        // Diğer gerekli Angular Material importları kaldırıldı
+    ],
   templateUrl: './instructor-profile.component.html',
   styleUrls: ['./instructor-profile.component.scss']
 })

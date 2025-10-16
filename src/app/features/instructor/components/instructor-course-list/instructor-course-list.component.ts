@@ -1,7 +1,7 @@
 // instructor-course-list.component.ts
 
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // ngIf, ngFor gibi direktifler için
+import {CommonModule, NgOptimizedImage} from '@angular/common'; // ngIf, ngFor gibi direktifler için
 import {Router, RouterLink} from '@angular/router'; // routerLink için
 import { TranslateModule, TranslateService } from '@ngx-translate/core'; // ngx-translate için
 import { InstructorService } from '../../services/instructor.service'; // InstructorService'i import ediyoruz
@@ -16,13 +16,14 @@ import {CourseService} from "../../../courses/services/course.service"; // Alert
 @Component({
   selector: 'app-instructor-course-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    TranslateModule,
-    LoadingSpinnerComponent,
-    AlertDialogComponent
-  ],
+    imports: [
+        CommonModule,
+        RouterLink,
+        TranslateModule,
+        LoadingSpinnerComponent,
+        AlertDialogComponent,
+        NgOptimizedImage
+    ],
   templateUrl: './instructor-course-list.component.html',
   styleUrl: './instructor-course-list.component.css'
 })

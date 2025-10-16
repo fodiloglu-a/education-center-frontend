@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, signal, computed, effect } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import {CommonModule, isPlatformBrowser, NgOptimizedImage} from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { trigger, state, style, transition, animate, keyframes } from '@angular/animations';
@@ -53,7 +53,7 @@ interface ComponentState {
     TranslateModule,
     LoadingSpinnerComponent,
     AlertDialogComponent,
-    FormsModule
+    FormsModule,NgOptimizedImage
   ],
   templateUrl: './course-list.component.html',
   styleUrl: './course-list.component.css',

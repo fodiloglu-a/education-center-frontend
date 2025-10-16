@@ -34,9 +34,18 @@
   <!-- Eğitmen Kurs Kartları Listesi -->
   <div class="course-cards-grid" *ngIf="!isLoading && courses.length > 0">
     <div class="course-card" *ngFor="let course of courses">
-      <img [src]="course.imageUrl" alt="{{ course.title }}" class="course-image"
-           onerror="this.onerror=null;this.src='https://placehold.co/600x400/C3AD90/3D2010?text=Course+Image';" />
-      <div class="card-content">
+        <img
+                [ngSrc]="course.imageUrl || 'https://placehold.co/600x400/C3AD90/3D2010?text=Course+Image'"
+                alt="{{ course.title }}"
+                class="course-image"
+                width="150"
+                height="150"
+                loading="lazy"
+                decoding="async"
+                sizes="(max-width: 600px) 25vw, 10vw"
+        />
+
+        <div class="card-content">
         <h3 class="course-title">{{ course.title }}</h3>
         <p class="course-description">{{ course.description }}</p>
         <div class="course-stats">

@@ -132,7 +132,17 @@
                 <h2 class="section-title">{{ 'INSTRUCTOR_PROFILE.TAUGHT_COURSES' | translate }}</h2>
                 <div class="courses-grid">
                     <div class="course-card" *ngFor="let course of taughtCourses" [routerLink]="['/courses', course.id]">
-                        <img [src]="course.imageUrl" [alt]="course.title" class="course-image" onerror="this.onerror=null;this.src='https://placehold.co/300x200/C3AD90/3D2010?text=Course+Image';" />
+                        <img
+                                [ngSrc]="instructorProfile.profileImageUrl || 'https://placehold.co/150x150/C3AD90/3D2010?text=Avatar'"
+                                [alt]="instructorProfile.firstName + ' ' + instructorProfile.lastName"
+                                class="profile-image"
+                                width="150"
+                                height="150"
+                                loading="lazy"
+                                decoding="async"
+                                sizes="(max-width: 600px) 25vw, 10vw"
+                        />
+
                         <div class="card-content">
                             <h4 class="course-title">{{ course.title }}</h4>
                             <div class="course-meta">

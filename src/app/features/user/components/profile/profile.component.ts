@@ -8,7 +8,7 @@ import {
   ChangeDetectorRef,
   SecurityContext
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Meta, Title, DomSanitizer } from '@angular/platform-browser';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -43,7 +43,8 @@ const RETRY_DELAY_MS = 1000;
     TranslateModule,
     LoadingSpinnerComponent,
     AlertDialogComponent,
-    NotificationListComponent
+    NotificationListComponent,
+    NgOptimizedImage
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'

@@ -22,8 +22,7 @@ interface HomeComponentState {
     NgForOf,
     NgIf,
     TranslatePipe,
-    RouterLink,
-    [NgOptimizedImage /* diğerleri */],
+    RouterLink, NgOptimizedImage,
   ],
   styleUrls: ['./home.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

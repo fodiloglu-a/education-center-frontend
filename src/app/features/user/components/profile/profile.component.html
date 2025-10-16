@@ -230,14 +230,20 @@
                          itemtype="https://schema.org/Course">
 
                     <div class="course-image" role="img" [attr.aria-label]="course.title">
-                        <img [src]="sanitizeUrl(course.imageUrl)"
-                             [alt]="course.title"
-                             loading="lazy"
-                             class="course-image-element"
-                             (error)="onImageError($event)"
-                             itemprop="image"
-                             [style.content-visibility]="'auto'"
-                             [style.contain-intrinsic-size]="'300px 180px'" />
+                        <img
+                                [ngSrc]="sanitizeUrl(course.imageUrl)"
+                                [alt]="course.title"
+                                class="course-image-element"
+                                width="300"
+                                height="180"
+                                loading="lazy"
+                                decoding="async"
+                                sizes="(max-width: 600px) 100vw, 33vw"
+                                (error)="onImageError($event)"
+                                [style.content-visibility]="'auto'"
+                                [style.contain-intrinsic-size]="'300px 180px'"
+                        />
+
                         <div class="course-overlay" aria-hidden="true">
                             <span class="material-icons play-icon">play_circle_filled</span>
                         </div>

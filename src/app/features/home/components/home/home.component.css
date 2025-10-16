@@ -683,9 +683,12 @@
 
 .course-image {
     width: 100%;
-    height: 220px;
+
     object-fit: cover;
     transition: transform var(--transition-normal);
+    max-width: 100%;      /* container'a sığ */
+    height: auto;         /* oran koru */
+
 }
 
 .course-card:hover .course-image,
